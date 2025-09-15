@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Korean Traditional Artifacts Gallery</title>
+  <style>
+    @font-face {
+      font-family: 'SUIT-Regular';
+      src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'SUIT-Regular';
+    }
+
+    body {
+      background-color: #f8f8f8;
+    }
+
+    .home-icon {
+      position: absolute;
+      top: 30px;
+      right: 30px;
+      z-index: 5;
+      width: 30px;
+      cursor: pointer;
+    }
+
+    .slider {
+      position: relative;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .inner-container {
+      max-width: 1400px;
+      height: 100%;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+    }
+
+    .flex-column {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .flex-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .justify-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slider__wrraper {
+      height: 100%;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .slider__content {
+      flex-grow: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .main-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 70vh;
+      width: 100%;
+      position: relative;
+    }
+
+    .main-image img {
+      max-height: 100%;
+      max-width: 100%;
+      position: absolute;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+
+    .main-image img.visible {
+      opacity: 1;
+      position: relative;
+      pointer-events: auto;
+    }
+
+    .thumbnail-container {
+      position: absolute;
+      top: 10%;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .thumbnail {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .thumbnail:hover {
+      transform: scale(1.1);
+    }
+
+    .thumbnail img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .artifact-info {
+      position: absolute;
+      left: 5%;
+      bottom: 15%;
+      transition: opacity 0.3s ease;
+    }
+
+    .artifact-title {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #1a1a1a;
+    }
+
+    .artifact-subtitle {
+      font-size: 16px;
+      color: #555;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .artifact-number {
+      font-size: 12px;
+      color: #777;
+      margin-top: 40px;
+    }
+
+    .slider__btn-buy {
+      background: none;
+      border: 1px solid #333;
+      padding: 8px 20px;
+      cursor: pointer;
+      font-size: 14px;
+      position: absolute;
+      top: 30px;
+      left: 60px;
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    .slider__btn-buy:hover {
+      background-color: #333;
+      color: white;
+    }
+
+    .slider__footer {
+      padding: 20px 0;
+      width: 100%;
+    }
+
+    .slider__btns {
+      width: 100%;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .slider__btn-switch {
+      width: 40px;
+      height: 40px;
+      border: none;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .slider__btn-switch:after {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-top: 2px solid currentColor;
+      border-right: 2px solid currentColor;
+      display: block;
+    }
+
+    .slider__btn-switch--dark {
+      background-color: #f0f0f0;
+      color: 333;
+    }
+
+    .slider__btn-switch--dark:after {
+      transform: rotate(-135deg);
+    }
+
+    .slider__btn-switch--light {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+
+    .slider__btn-switch--light:after {
+      transform: rotate(45deg);
+    }
+
+    .slider__index {
+      width: 100%;
+      height: 2px;
+      background-color: #ddd;
+      position: relative;
+    }
+
+    .slider__index-active {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      background-color: #333;
+      transition: width 0.3s ease;
+    }
+    
+    .section-container {
+      display: none;
+    }
+    
+    .section-container.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+    <!-- 홈 아이콘 -->
+    <a href="index.html" class="home-icon" style="z-index: 9999;">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#6d6d6d" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+      </svg>
+    </a>
+  <div class="slider">
+    <div class="inner-container">
+      <div class="slider__wrraper flex-column">
+        <button class="slider__btn-buy">동물문양</button>
+        
+        <div class="flex-column slider__content">
+          <!-- 용 문양 섹션 -->
+          <div class="section-container active" id="section1">
+            <div class="main-image">
+              <img src="img/sumak/yong/1.png" alt="Dragon Artifact 1" class="visible" id="dragon-image1">
+              <img src="img/sumak/yong/F.png" alt="Dragon Artifact 2" id="dragon-image2">
+              <img src="img/sumak/yong/m.png" alt="Dragon Artifact 3" id="dragon-image3">
+              <img src="img/sumak/yong/g.png" alt="Dragon Artifact 3" id="dragon-image4">
+            </div>
+            
+            <div class="thumbnail-container">
+              <div class="thumbnail" data-section="1" data-target="dragon-image1" data-title="용 문양" data-subtitle="녹유 용무늬 수막새 (綠釉龍文平瓦當)<br><br>왕권과 권위의 상징<br>특히 왕궁, 사찰, 관아 등 중요한 건물일수록<br>이러한 문양이 더 자주 쓰였고,<br>건물의 성격과 위상을 드러내는 수단이었음.">
+                <img src="img/sumak/yong/1.png" alt="Dragon Variant 1">
+              </div>
+              <div class="thumbnail" data-section="1" data-target="dragon-image2" data-title="짐승 문양" data-subtitle="귀면문 원와당 (鬼面文圓瓦當)<br><br>짐승, 특히 호랑이, 용, 괴수 같은 문양은<br>사악한 기운을 몰아내는 벽사(辟邪)의 의미<br>외부로부터의 악한 기운이나 재앙이<br>침입하지 못하도록 막는 부적 같은 역할.">
+                <img src="img/sumak/yong/F.png" alt="Dragon Variant 2">
+              </div>
+              <div class="thumbnail" data-section="1" data-target="dragon-image3" data-title="봉황 문양" data-subtitle="봉황무늬 수막새 (鳳凰文圓瓦當)<br><br>봉황은 평화로운 시대에만 나타나는 신조로,<br>그 건물의 번영과 조화로운 기운을 상징<br>외부의 악기(邪氣)를 막고 복을 부름.">
+                <img src="img/sumak/yong/m.png" alt="Dragon Variant 3">
+              </div>
+              <div class="thumbnail" data-section="1" data-target="dragon-image4" data-title="가릉빈가 문양" data-subtitle="가릉빈가문 원와당 (迦陵頻伽文圓瓦當)<br><br>가릉빈가는 불교경전에 등장하는 상상의 새로,<br>사람의 머리에 새의 몸을 하고 있으며, 극락정토에 산다고 함.">
+                <img src="img/sumak/yong/g.png" alt="Dragon Variant 4">
+              </div>
+            </div>
+          </div>
+          
+          <!-- 꽃 문양 섹션 -->
+          <div class="section-container" id="section2">
+            <div class="main-image">
+              <img src="img/sumak/yeon/11.png" alt="Flower Artifact 1" class="visible" id="flower-image1">
+              <img src="img/sumak/yeon/g.png" alt="Flower Artifact 2" id="flower-image2">
+              <img src="img/sumak/yeon/mm.png" alt="Flower Artifact 3" id="flower-image3">
+              <img src="img/sumak/yeon/h.png" alt="Flower Artifact 3" id="flower-image4">
+            </div>
+            
+            <div class="thumbnail-container">
+              <div class="thumbnail" data-section="2" data-target="flower-image1" data-title="연꽃 문양" data-subtitle="연화문 원와당 (蓮花文圓瓦當)<br><br>연꽃은 진흙 속에서도 맑게 피는 꽃<br>이는 불교의 깨달음, 순결을 나타냄.<br>사찰, 불교 관련 건축에 자주 등장함.">
+                <img src="img/sumak/yeon/11.png" alt="Flower Variant 1">
+              </div>
+              <div class="thumbnail" data-section="2" data-target="flower-image2" data-title="국화 문양" data-subtitle="국화문 원와당 (菊花紋圓瓦當)<br><br>장수, 고결한 기품을 상징<br>국화는 수명을 늘려주는 약초<br>이는 불로장생, 고결함을 나타냄.">
+                <img src="img/sumak/yeon/g.png" alt="Flower Variant 2">
+              </div>
+              <div class="thumbnail" data-section="2" data-target="flower-image3" data-title="모란 문양" data-subtitle="녹유 모란문 원와당 (綠釉牡丹文圓瓦當)<br><br>부귀와 풍요를 상징<br>여성 공간, 상류층 거주지에 자주 등장.">
+                <img src="img/sumak/yeon/mm.png" alt="Flower Variant 3">
+              </div>
+              <div class="thumbnail" data-section="2" data-target="flower-image4" data-title="해바라기 문양" data-subtitle="규문 원와당 (葵文圓瓦當)<br><br>조선 시대 후기부터 등장한 문양 중 하나로,<br>집안에 밝은 기운이 들어오길 바라는 염원을 담은<br>길상문(吉祥紋)으로 사용.">
+                <img src="img/sumak/yeon/h.png" alt="Flower Variant 4">
+              </div>
+            </div>
+          </div>
+          
+          <!-- 소용돌이 문양 섹션 -->
+          <div class="section-container" id="section3">
+            <div class="main-image">
+              <img src="img/sumak/tae/2.png" alt="Spiral Artifact 1" class="visible" id="spiral-image1">
+              <img src="img/sumak/tae/g.png" alt="Spiral Artifact 2" id="spiral-image2">
+              <img src="img/sumak/tae/p.png" alt="Spiral Artifact 3" id="spiral-image3">
+            </div>
+            
+            <div class="thumbnail-container">
+              <div class="thumbnail" data-section="3" data-target="spiral-image1" data-title="태극 문양" data-subtitle="태극문 원와당 (太極文圓瓦當)<br><br>음양의 조화, 우주의 순환, 자연 질서를 상징징<br>건물이 자연과 조화를 이루고 있다는 철학적 상징.">
+                <img src="img/sumak/tae/2.png" alt="Spiral Variant 1">
+              </div>
+              <div class="thumbnail" data-section="3" data-target="spiral-image2" data-title="구름 문양" data-subtitle="운문 원와당 (雲文圓瓦當)<br><br>길운, 하늘의 기운, 선계(신선의 세계)를 상징<br>궁궐, 사찰 등 상서로운 기운을 불러들이는 장소에 사용.">
+                <img src="img/sumak/tae/g.png" alt="Spiral Variant 2">
+              </div>
+              <div class="thumbnail" data-section="3" data-target="spiral-image3" data-title="파도 문양" data-subtitle="파도문 원와당 (波濤文圓瓦當)<br><br>끊임없는 생명력과 번영의 상징<br>집안의 번영과 자손의 번창을 기원하는 의미.">
+                <img src="img/sumak/tae/p.png" alt="Spiral Variant 3">
+              </div>
+            </div>
+          </div>
+          
+          <!-- 문자 문양 섹션 -->
+          <div class="section-container" id="section4">
+            <div class="main-image">
+              <img src="img/sumak/moon/bok.png" alt="Character Artifact 1" class="visible" id="character-image1">
+              <img src="img/sumak/moon/b.png" alt="Character Artifact 2" id="character-image2">
+              <img src="img/sumak/moon/h.png" alt="Character Artifact 3" id="character-image3">
+            </div>
+            
+            <div class="thumbnail-container">
+              <div class="thumbnail" data-section="4" data-target="character-image1" data-title="복(福) 문양" data-subtitle="'복'명 원와당 (福'銘圓瓦當)<br><br>행운, 복이 깃들기를 바라는 마음<br>집안에 행복과 복이 가득하길 기원하는 부적적 상징.">
+                <img src="img/sumak/moon/bok.png" alt="Character Variant 1">
+              </div>
+              <div class="thumbnail" data-section="4" data-target="character-image2" data-title="수(壽) 문양" data-subtitle="'수'자문 원와당 (壽'字文圓瓦當)'<br><br>장수, 오래 살기를 바라는 뜻<br>병풍이나 기물, 수막새 등에 새겨져 무병장수의 기원 표현.">
+                <img src="img/sumak/moon/b.png" alt="Character Variant 2">
+              </div>
+              <div class="thumbnail" data-section="4" data-target="character-image3" data-title="희(喜) 문양" data-subtitle="'희'명 원와당편 ('喜'銘圓瓦當片)<br><br>큰 기쁨, 부부의 화합 상징<br>혼례, 가정의 화목을 바라는 의미로 주택 수막새에 사용.">
+                <img src="img/sumak/moon/h.png" alt="Character Variant 3">
+              </div>
+            </div>
+          </div>
+          
+          <div class="artifact-info">
+            <h2 class="artifact-title">용 문양</h2>
+            <p class="artifact-subtitle">왕권과 권위의 상징<br>고대 왕실의 결속력</p>
+            <p class="artifact-number"></p>
+          </div>
+        </div>
+        
+        <div class="slider__footer">
+          <div class="slider__btns">
+            <div class="flex-center">
+              <button data-type="prev" class="slider__btn-switch slider__btn-switch--dark flex-center"></button>
+              <button data-type="next" class="slider__btn-switch slider__btn-switch--light flex-center"></button>
+            </div>
+          </div>
+          <div class="slider__index">
+            <div class="slider__index-active" style="width: 25%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.1/gsap.min.js'></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const sectionParam = urlParams.get('section');
+  
+      // Sections data
+      const sections = [
+        { 
+          id: 'section1', 
+          title: '동물 문양', 
+          subtitle: '왕실과 신분의 상징<br>고대 전통의 정수',
+          number: '',
+          buttonText: '동물문양',
+          defaultImage: 'dragon-image1',
+          defaultInfo: {
+            title: '용 문양',
+            subtitle: '녹유 용무늬 수막새 (綠釉龍文平瓦當)<br><br>왕권과 권위의 상징<br>특히 왕궁, 사찰, 관아 등 중요한 건물일수록<br>이러한 문양이 더 자주 쓰였고,<br>건물의 성격과 위상을 드러내는 수단이었음.'
+          }
+        },
+        {
+          id: 'section2', 
+          title: '식물 문양', 
+          subtitle: '꽃과 식물을 형상화<br>자연의 아름다움', 
+          number: '',
+          buttonText: '식물문양',
+          defaultImage: 'flower-image1',
+          defaultInfo: {
+            title: '연꽃 문양',
+            subtitle: '연화문 원와당 (蓮花文圓瓦當)<br><br>연꽃은 진흙 속에서도 맑게 피는 꽃임.<br>이는 불교의 깨달음, 순결을 나타냄<br>사찰, 불교 관련 건축에 자주 등장함.'
+          }
+        },
+        { 
+          id: 'section3', 
+          title: '기하학적 문양', 
+          subtitle: '자연에서 유래한 형상을<br>기하학적으로 단순화한 문양', 
+          number: '',
+          buttonText: '기하학문양',
+          defaultImage: 'spiral-image1',
+          defaultInfo: {
+            title: '태극 문양',
+            subtitle: '태극문 원와당 (太極文圓瓦當)<br><br>음양의 조화, 우주의 순환, 자연 질서를 의미<br>건물이 자연과 조화를 이루고 있다는 철학적 상징.'
+          }
+        },
+        { 
+          id: 'section4', 
+          title: '문자 문양', 
+          subtitle: '지혜와 학문의 상징<br>축복과 행운의 기원', 
+          number: '',
+          buttonText: '문자문양',
+          defaultImage: 'character-image1',
+          defaultInfo: {
+            title: '복(福) 문양',
+            subtitle: "'복'명 원와당 (福'銘圓瓦當)<br><br>행운, 복이 깃들기를 바라는 마음<br>집안에 행복과 복이 가득하길 기원하는 부적적 상징."
+          }
+        }
+      ];
+
+      let currentSectionIndex = 0;
+      const switchBtns = document.querySelectorAll('.slider__btn-switch');
+      const progressBar = document.querySelector('.slider__index-active');
+      const sectionContainers = document.querySelectorAll('.section-container');
+      const artifactInfo = document.querySelector('.artifact-info');
+      const artifactTitle = document.querySelector('.artifact-title');
+      const artifactSubtitle = document.querySelector('.artifact-subtitle');
+      const artifactNumber = document.querySelector('.artifact-number');
+      const detailButton = document.querySelector('.slider__btn-buy');
+      if (sectionParam) {
+    const sectionIndex = parseInt(sectionParam) - 1;
+    // Verify it's a valid section index
+    if (sectionIndex >= 0 && sectionIndex < sections.length) {
+      currentSectionIndex = sectionIndex;
+    }
+  }
+
+      // 썸네일 클릭 핸들러 함수
+      function setupThumbnailHandlers() {
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        thumbnails.forEach(thumbnail => {
+          thumbnail.addEventListener('click', function() {
+            const sectionId = this.getAttribute('data-section');
+            const targetImgId = this.getAttribute('data-target');
+            const title = this.getAttribute('data-title');
+            const subtitle = this.getAttribute('data-subtitle');
+            
+            // 현재 섹션의 모든 이미지 숨기기
+            const section = document.getElementById(`section${sectionId}`);
+            const sectionImages = section.querySelectorAll('.main-image img');
+            sectionImages.forEach(img => {
+              img.classList.remove('visible');
+            });
+            
+            // 대상 이미지 표시
+            const targetImg = document.getElementById(targetImgId);
+            if (targetImg) {
+              targetImg.classList.add('visible');
+            }
+            
+            // 아티팩트 정보 업데이트
+            gsap.to(artifactInfo, {
+              opacity: 0,
+              duration: 0.2,
+              onComplete: function() {
+                artifactTitle.textContent = title;
+                artifactSubtitle.innerHTML = subtitle;
+                // 섹션 번호는 유지
+                
+                gsap.to(artifactInfo, {
+                  opacity: 1,
+                  duration: 0.2
+                });
+              }
+            });
+          });
+        });
+      }
+      
+      // 섹션 업데이트 함수
+      function updateSection(index) {
+        // 모든 섹션 숨기기
+        sectionContainers.forEach(section => {
+          section.classList.remove('active');
+        });
+        
+        // 현재 섹션 표시
+        document.getElementById(sections[index].id).classList.add('active');
+        
+        // 현재 섹션의 모든 이미지 숨기기
+        const currentSection = document.getElementById(sections[index].id);
+        const currentSectionImages = currentSection.querySelectorAll('.main-image img');
+        
+        currentSectionImages.forEach(img => {
+          img.classList.remove('visible');
+        });
+        
+        // 현재 섹션의 기본 이미지 표시
+        const defaultImage = document.getElementById(sections[index].defaultImage);
+        if (defaultImage) {
+          defaultImage.classList.add('visible');
+        }
+        
+        // 자세히 버튼 텍스트 업데이트
+        detailButton.textContent = sections[index].buttonText;
+        
+        // 아티팩트 정보 업데이트
+        gsap.to(artifactInfo, {
+          opacity: 0,
+          duration: 0.2,
+          onComplete: function() {
+            if (sections[index].defaultInfo) {
+              artifactTitle.textContent = sections[index].defaultInfo.title;
+              artifactSubtitle.innerHTML = sections[index].defaultInfo.subtitle;
+            } else {
+              artifactTitle.textContent = sections[index].title;
+              artifactSubtitle.innerHTML = sections[index].subtitle;
+            }
+            artifactNumber.textContent = sections[index].number;
+            
+            gsap.to(artifactInfo, {
+              opacity: 1,
+              duration: 0.2
+            });
+          }
+        });
+        
+        // 프로그레스 바 업데이트
+        const width = ((index + 1) / sections.length) * 100;
+        gsap.to(progressBar, {
+          width: `${width}%`,
+          duration: 0.3,
+          ease: "power2.out"
+        });
+        
+        currentSectionIndex = index;
+      }
+      
+      // 이전/다음 버튼 핸들러
+      switchBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const type = btn.getAttribute('data-type');
+          
+          if (type === 'prev') {
+            currentSectionIndex = currentSectionIndex === 0 ? sections.length - 1 : currentSectionIndex - 1;
+          } else {
+            currentSectionIndex = currentSectionIndex === sections.length - 1 ? 0 : currentSectionIndex + 1;
+          }
+          
+          updateSection(currentSectionIndex);
+        });
+      });
+      
+      // 초기화: 썸네일 핸들러 설정
+      setupThumbnailHandlers();
+      
+      // 초기화: 첫 번째 섹션 표시
+  updateSection(currentSectionIndex);
+});
+
+    
+  </script>
+</body>
+</html>

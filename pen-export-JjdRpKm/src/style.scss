@@ -1,0 +1,164 @@
+@font-face {
+    src: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/2479807/neuzeit.woff2') format('woff2');
+    font-family: 'Neuzeit';
+}
+
+img {
+    max-width: 100%;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    overflow-x: hidden;
+}
+
+body {
+    font-family: 'Neuzeit', sans-serif;
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.hero {
+    background-color: #fff;
+    
+    &__background {
+        position: absolute;
+        z-index: 1;
+        top: 0%;
+        height: 0%;
+        width: 100%;
+        background: #090e18;
+    }
+    
+    &__top {
+        position: relative;
+        height: 70vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        
+        h1 {
+            color: #090e1f;
+            font-size: 80px;
+            line-height: 1.1;
+            margin-bottom: 32px;
+            max-width: 600px;
+            z-index: 3;
+            position: relative;
+            
+            @media (max-width: 960px) {
+                font-size: 32px;
+            }
+        }
+        
+        p {
+            mix-blend-mode: difference;
+            color: rgba(white, .6);
+            max-width: 500px;
+            margin: 0 auto;
+            font-size: 18px;
+            z-index: 3;
+            position: relative;
+        }
+    }
+    
+    &__bottom {
+        height: 60vh;
+        
+        img {
+            object-fit: cover;
+            height: 100%;
+            width: 100%;
+        }
+    }
+}
+
+
+.about {
+    background-color: #fff;
+
+    &__item {
+        display: inline-block;
+        width: 700px;
+        padding: 0px 40px;
+        display: flex;
+        flex-direction: column;
+        
+        
+        &:nth-child(odd) {
+            img {
+                margin-bottom: 64px;
+            }
+        }
+        
+        &:nth-child(even) {
+            flex-direction: column-reverse;
+        }
+        
+        img {
+            object-fit: cover;
+            height: 500px;
+            width: 500px;
+            //flex: 1;
+        }
+        
+        .content {
+            height: 50%;
+            max-width: 500px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            
+            h3 {
+                font-size: 32px;
+                max-width: 250px;
+                line-height: 1.2;
+            }
+            
+            p {
+                color: rgba(0,0,0,.6);
+                max-width: 350px;
+                margin-top: 8px;
+            }
+        }
+    }
+}
+
+.horizontal-scroll {
+    
+    &__section {
+        position: relative;
+        height: 350vh;
+    }
+    
+    &__wrapper {
+        position: sticky;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+    }
+    
+    &__content {
+        display: flex;
+        padding: 80px;
+        height: 100vh;
+        width: 350vh;
+        will-change: transform;
+    }
+}
+
+
+
+
+.extra-section {
+    height: 200vh;
+    background-color: #020407;
+}

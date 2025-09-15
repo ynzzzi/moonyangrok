@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>무늬기와 수막새 레이아웃</title>
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script src="https://unpkg.com/@studio-freight/lenis/dist/lenis.min.js"></script>
+
+  <style>
+    @font-face{
+      font-family:'SUIT-Regular';
+      src:url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');
+      font-weight:normal; font-style:normal;
+      font-display:swap;
+    }
+
+    /* ==== 스크롤바/기본 ==== */
+    html{ scroll-behavior:auto; }
+    html, body { height: 100%; margin: 0; padding: 0; }
+    body { font-family:'SUIT-Regular'; overflow-x:hidden; color:#FCFCFc; }
+    img{ max-width:100%; height:auto; display:block; }
+
+    /* ==== 커스텀 커서 ==== */
+    *{ box-sizing:border-box; cursor: none; } /* 시스템 커서 숨김 */
+
+    /* 기본(작은) 커서 */
+    .cursor{
+      position: fixed;
+      width: 20px; height: 20px;
+      background: rgba(100, 100, 100, 0.7);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999;
+      mix-blend-mode: difference;
+      transition: transform .15s ease-out, width .25s ease, height .25s ease, background-color .25s ease, border-color .25s ease, opacity .2s ease;
+      top: 0; left: 0;
+      transform: translate(-50%, -50%);
+      display:grid; place-items:center;
+    }
+    /* 커서 안의 텍스트는 기본 숨김 */
+    .cursor > span{
+      display:none;
+      font-family:'SUIT-Regular';
+      font-size:13px; letter-spacing:.2em;
+      text-transform:uppercase; color:#000; line-height:1;
+      user-select:none; pointer-events:none;
+    }
+    /* 히어로에서만 커지는 전용 상태 */
+    .cursor--hero{
+      width:110px; height:110px;
+      background: rgba(128,128,128,0.96);
+      border:2px solid #000;
+      mix-blend-mode: normal; /* 텍스트 식별을 위해 히어로에서는 일반 합성 */
+    }
+    .cursor--hero > span{ display:block; }
+
+    /* ==== 상단 헤더 + 메뉴 ==== */
+    :root{
+      --gutter: clamp(16px, 4vw, 48px);
+      --z-header: 100;
+      --z-overlay: 90;
+
+      --fm-bg:#060010; --fm-fg:#fff; --fm-divider:rgba(255,255,255,.3);
+    }
+    .site-header{
+      position: fixed; inset: 0 0 auto 0; height: 64px; z-index: var(--z-header);
+      display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+      padding: 8px var(--gutter); pointer-events: none;
+    }
+    .header-left{ justify-self: start; }
+    .header-right{ justify-self: end; }
+    .icon-btn{
+      pointer-events: auto; appearance: none; border: 0; background: transparent; cursor: pointer;
+      width: 44px; height: 44px; display: inline-grid; place-items: center;
+      border-radius: 999px; transition: background .2s ease;
+    }
+    .icon-btn:hover{ background: rgba(0,0,0,.06); }
+    .icon-btn:focus-visible{ outline: 2px solid #111; outline-offset: 2px; }
+    .home-svg{ width: 22px; height: 22px; fill:none; stroke:#111; stroke-width:2; }
+
+    .menu-btn .burger{ display:grid; gap:4px; }
+    .menu-btn .burger span{ width:20px; height:2px; background:#111; display:block; transition: transform .25s, opacity .25s; }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(2){ opacity:0; }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(1){ transform: translateY(6px) rotate(45deg); }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(3){ transform: translateY(-6px) rotate(-45deg); }
+
+    .hm-overlay{ position: fixed; inset:0; background: rgba(0,0,0,.35); display:none; z-index: var(--z-overlay); }
+    .hm-overlay.open{ display:grid; place-items: stretch; }
+    .hm-panel{
+      margin-left:auto; width:min(500px, 90vw); height:100%;
+      background:#060010; color:#fff; position:relative;
+      transform: translateX(100%); transition: transform .45s cubic-bezier(.19,1,.22,1);
+      box-shadow: -12px 0 24px rgba(0,0,0,.25);
+    }
+    .hm-overlay.open .hm-panel{ transform: translateX(0); }
+
+    #react-menu-root{ height:100%; }
+    .fm-menu-wrap{ width:100%; height:100%; overflow:hidden; background:var(--fm-bg); }
+    .fm-menu{ display:flex; flex-direction:column; height:100%; margin:0; padding:0; }
+    .fm-menu__item{ flex:1; position:relative; overflow:hidden; text-align:center; box-shadow:0 -1px var(--fm-divider);
+      min-height: 120px; display:flex; align-items:center; justify-content:center; }
+    .fm-menu__item-link{
+      display:flex; align-items:center; justify-content:center; height:100%;
+      cursor:pointer; text-transform:uppercase; text-decoration:none; white-space:nowrap;
+      font-weight:600; color:var(--fm-fg); font-size:clamp(18px,4vh,42px); outline:none;
+    }
+    .fm-menu__item-link:focus-visible{ outline:2px solid #fff; outline-offset: -4px; }
+    .fm-marquee{ position:absolute; inset:0; overflow:hidden; pointer-events:none; background:#fff;
+      transform: translate3d(0,101%,0); transition: transform .6s cubic-bezier(.19,1,.22,1); }
+    .fm-marquee__inner-wrap{ height:100%; width:200%; display:flex; transform:translateX(0); }
+    .fm-marquee__inner{ display:flex; align-items:center; height:100%; width:200%; will-change:transform; animation: fm-marquee 15s linear infinite; }
+    .fm-marquee span{ color:#060010; white-space:nowrap; text-transform:uppercase; font-weight:400;
+      font-size:clamp(16px,4vh,36px); line-height:1.2; padding:1vh 1vw 0; }
+    .fm-marquee__img{ width:200px; height:7vh; min-height:42px; margin:2em 2vw; padding:1em 0; border-radius:50px; background-size:cover; background-position:50% 50%; }
+    @keyframes fm-marquee{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    /* ==== sumak 레이아웃 ==== */
+    #main{
+      background-image:url('img/sumak/bg.jpg');
+      background-size:cover; background-position:center; background-repeat:no-repeat;
+      position:relative; overflow:hidden; height:100vh; width:100%;
+      display:flex; justify-content:center; align-items:center;
+    }
+    #main::after{
+      content:""; position:absolute; inset:0; background:#000; z-index:5; pointer-events:none;
+      opacity:1; animation:fadeOutScreen 1.6s ease .2s forwards;
+    }
+    @keyframes fadeOutScreen{ to{ opacity:0; } }
+    @media (prefers-reduced-motion: reduce){ #main::after{ animation:none; opacity:0; } }
+
+    .scroll-indicator{
+      position:absolute; bottom:50px; left:50%; transform:translateX(-50%);
+      text-align:center; animation:fadeUpDown 2s infinite; z-index:10; color:#fff; font-size:20px; transition:opacity .5s ease;
+    }
+    .scroll-indicator .arrow{ display:block; font-size:24px; margin-top:8px; animation:bounce 1.5s infinite; }
+    @keyframes bounce{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+
+    .section{ width:100%; min-height:100vh; display:flex; justify-content:center; align-items:center; }
+    .page{ width:100%; min-height:100vh; position:relative; background-color:#ffffff; display:flex; justify-content:center; align-items:center; }
+
+    .about-image-container{ display:flex; justify-content:center; align-items:center; width:60%; padding:60px 0; }
+    .un-section{ position:relative; width:100vw; display:flex; justify-content:center; align-items:center; }
+    .un-section img{ width:100vw; height:auto; }
+    .un-overlay-text{ position:absolute; left:15%; top:23%; transform:translateY(-50%); color:#121212; max-width:400px; }
+    .about-image-container2{ display:flex; justify-content:center; align-items:center; width:100%; padding:60px 0; z-index:2; margin-top:-500px; margin-bottom:-200px; }
+    .about-image-container2 img{ width:70vw; max-width:1200px; height:auto; }
+    .about-image-container3{ display:flex; justify-content:center; align-items:center; width:100%; z-index:0; padding:60px 0; position:relative; margin-bottom:-300px; }
+    .about-image-container3 img{ width:100vw; height:auto; }
+    .about-image-container4{ display:flex; justify-content:center; align-items:center; z-index:0; width:100%; padding:20px 0; margin-top:200px; }
+    .overlay-text{ position:absolute; top:50%; transform:translateY(-50%); color:#121212; max-width:800px; padding:20px; }
+    .overlay-text.left{ left:13.5%; text-align:left; }
+    .overlay-text.right{ right:13%; text-align:right; margin-top:150px; }
+    .tile-grid{ position:relative; width:100%; height:600px; max-width:1200px; margin:0 auto; }
+    .tile-item{ position:absolute; transition:transform .3s ease; z-index:1; }
+    .tile-item:hover{ transform:scale(1.05); z-index:10; }
+    .tile-item img{ width:100%; height:auto; object-fit:contain; }
+
+    .tile-item:nth-child(1){ width:190px; top:0%; left:32%; }
+    .tile-item:nth-child(2){ width:230px; top:36%; left:19%; z-index:2; }
+    .tile-item:nth-child(3){ width:450px; top:4%; left:43%; z-index:2; }
+    .tile-item:nth-child(4){ width:170px; top:68%; left:35%; z-index:2; }
+    .tile-item:nth-child(5){ width:190px; top:53%; left:64%; z-index:3; }
+    .tile-item:nth-child(6){ width:160px; top:-12%; left:5%; z-index:3; }
+
+    @media (max-width:900px){
+      .tile-grid{ height:800px; }
+      .tile-item:nth-child(1){ top:0; left:5%; }
+      .tile-item:nth-child(2){ top:15%; left:25%; }
+      .tile-item:nth-child(3){ top:35%; left:10%; }
+      .tile-item:nth-child(4){ top:55%; left:20%; }
+      .tile-item:nth-child(5){ top:70%; left:5%; }
+    }
+    @media (max-width:600px){
+      .tile-grid{ height:1000px; }
+      .tile-item{ width:70% !important; }
+      .tile-item:nth-child(1){ top:0; left:15%; }
+      .tile-item:nth-child(2){ top:18%; left:15%; }
+      .tile-item:nth-child(3){ top:36%; left:15%; }
+      .tile-item:nth-child(4){ top:54%; left:15%; }
+      .tile-item:nth-child(5){ top:72%; left:15%; }
+    }
+
+    .fade-in{ opacity:0; transform:translateY(30px); transition:opacity 1s ease, transform 1s ease; }
+    .fade-in.appear{ opacity:1; transform:translateY(0); }
+    .stagger{ transition-delay:calc(var(--order) * 200ms); }
+
+    /* ============================================= */
+/* ===== 4K 및 고해상도 데스크톱을 위한 미디어 쿼리 ===== */
+/* ============================================= */
+@media (min-width: 1921px) {
+
+    /* --- 텍스트 오버레이 가독성 개선 --- */
+    .un-overlay-text {
+        max-width: 600px; /* 텍스트 영역 너비 확장 */
+        font-size: 1.1rem;  /* 폰트 크기 증가 */
+        left: 20%;        /* 왼쪽 위치 조정 */
+    }
+
+    .overlay-text {
+        max-width: 950px; /* 텍스트 영역 너비 확장 */
+        font-size: 1.15rem; /* 폰트 크기 증가 */
+    }
+
+    .overlay-text.left {
+        left: 15%;
+    }
+
+    .overlay-text.right {
+        right: 15%;
+        margin-top: 200px; /* 위치 미세 조정 */
+    }
+
+    /* --- 이미지 컨테이너 너비 확장 --- */
+    .about-image-container {
+        width: 100%;
+        max-width: 1800px; /* 콘텐츠 최대 너비를 늘려 4K 화면 활용 */
+    }
+    
+    .about-image-container2 img {
+        width: 60vw;
+        max-width: 1800px; /* 콘텐츠 최대 너비 확장 */
+    }
+
+    /* --- 타일 그리드 레이아웃 재구성 --- */
+    .tile-grid {
+        max-width: 1800px; /* 그리드 전체 너비 확장 */
+        height: 900px;     /* 그리드 전체 높이 확장 */
+    }
+
+    /* 각 타일 아이템 크기 및 위치 재조정 */
+    .tile-item:nth-child(1) { width: 285px; top: 0%; left: 32%; }
+    .tile-item:nth-child(2) { width: 345px; top: 36%; left: 19%; }
+    .tile-item:nth-child(3) { width: 675px; top: 4%; left: 43%; }
+    .tile-item:nth-child(4) { width: 255px; top: 68%; left: 35%; }
+    .tile-item:nth-child(5) { width: 285px; top: 53%; left: 64%; }
+    .tile-item:nth-child(6) { width: 240px; top: -12%; left: 5%; }
+}
+  </style>
+</head>
+<body>
+  <!-- ★ 커서: 텍스트 포함 구조로 교체 -->
+  <div id="custom-cursor" class="cursor" aria-hidden="true"><span>scroll</span></div>
+
+  <header class="site-header" role="banner">
+    <div class="header-left">
+      <a class="icon-btn" href="index.html" aria-label="Home">
+        <svg class="home-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />
+        </svg>
+      </a>
+    </div>
+    <div class="header-right">
+      <button id="menuBtn" class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="menuPanel" aria-label="Open menu">
+        <span class="burger"><span></span><span></span><span></span></span>
+      </button>
+    </div>
+  </header>
+
+  <div id="menuOverlay" class="hm-overlay" aria-hidden="true">
+    <aside id="menuPanel" class="hm-panel" role="dialog" aria-modal="true" aria-label="Navigation menu">
+      <div class="menu-items"><div id="react-menu-root"></div></div>
+    </aside>
+  </div>
+
+  <div class="container">
+    <!-- 히어로 -->
+    <div id="main" class="section page">
+      <div class="scroll-indicator">
+        <p>스크롤을 내려보세요</p>
+        <span class="arrow">&#8595;</span>
+      </div>
+    </div>
+
+    <br><br><br><br><br><br><br><br><br><br>
+
+    <div class="section page" id="about">
+      <div class="about-image-container fade-in">
+        <img src="img/sumak/Group 25.png" alt="수막새 사진">
+      </div>
+    </div>
+
+    <div class="un-section">
+      <img src="img/sumak/Group 27.png" alt="un 이미지" class="fade-in">
+      <div class="un-overlay-text fade-in">
+        <p>
+          막새는 실용적으로 지붕을 보호하면서도,<br>
+          문양을 통해 종교적·상징적·예술적 가치를 더했습니다.<br>
+          이는 당시 사람들의 세계관, 신앙, 그리고<br>
+          미적 감각을 반영한 결과물로, 단순한 건축 요소를 넘어<br>
+          문화유산으로서의 가치를 지닙니다.<br>
+        </p>
+      </div>
+    </div>
+
+    <div class="about-image-container2 fade-in">
+      <img src="img/sumak/Group 28.png" alt="수막새 사진">
+      <div class="overlay-text right fade-in">
+        <p>
+          이때 문양이라는 것은 단지 자연의 형상을 본 뜬 것이 아니라<br>
+          인간의 내면세계를 표현한 것이기에 막새기와에 새겨진 문양의 의미는<br>
+          그 시대 문화의 산물이라고 해도 과언이 아닙니다. <br><br>
+          게다가 같은 연꽃문양이라고 해도 지역에 따라 다르게 표현되었으며,<br>
+          시대에 따라서도 차별화된 특징을 가지고 있어<br>
+          막새기와는 고고학이나 미술학계에서도 관심을 가지고 있는 유물입니다.<br>
+        </p>
+      </div>
+    </div>
+
+    <div class="about-image-container3 fade-in">
+      <img src="img/sumak/Group 29.png" alt="수막새 사진">
+      <div class="overlay-text left fade-in">
+        <p>
+          문화를 연구하는 사람들에게 기와가 주목받고 있는 이유는<br>
+          시대와 지역에 따라 다양하게 변화했기 때문입니다.<br>
+          이런 변화를 증명하는 문양과 제작기법을 알 수 있는 기와가 막새기와입니다.<br>
+          막새에 새겨진 문양은 외관상으로도 아름답지만 그것이 상징하는 것을 풀어보는 재미가 있습니다.<br>
+        </p>
+      </div>
+    </div>
+
+    <div class="about-image-container4 fade-in">
+      <div class="tile-grid">
+        <a href="sumaksae.html?section=1" class="tile-item"><img src="img/sumak/Group 44.png" alt="귀면와 수막새"></a>
+        <a href="sumaksae.html?section=1" class="tile-item"><img src="img/sumak/Group 45.png" alt="원형 수막새"></a>
+        <a href="sumaksae.html?section=4" class="tile-item"><img src="img/sumak/Group 46.png" alt="꽃문양 수막새"></a>
+        <a href="sumaksae.html?section=2" class="tile-item"><img src="img/sumak/Group 47.png" alt="문자 수막새"></a>
+        <a href="sumaksae.html?section=3" class="tile-item"><img src="img/sumak/Group 48.png" alt="원형 문양 수막새"></a>
+        <a href="sumaksae.html?section=1" class="tile-item"><img src="img/sumak/more.png" alt="더 보기"></a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* 메뉴 열고닫기 */
+    (() => {
+      const btn = document.getElementById('menuBtn');
+      const overlay = document.getElementById('menuOverlay');
+      const panel = document.getElementById('menuPanel');
+
+      function setOpen(open){
+        btn.setAttribute('aria-expanded', String(open));
+        overlay.classList.toggle('open', open);
+        overlay.setAttribute('aria-hidden', String(!open));
+
+        if (window.__lenis){
+          if (open){ window.__lenis.stop(); }
+          else { window.__lenis.start(); }
+        } else {
+          document.body.style.overflow = open ? 'hidden' : '';
+        }
+      }
+      btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+      overlay.addEventListener('click', () => setOpen(false));
+      panel?.addEventListener('click', (e) => e.stopPropagation());
+      window.addEventListener('keydown', (e) => { if(e.key === 'Escape') setOpen(false); });
+      window.toggleMenu = function(next){ if (typeof next === 'boolean') setOpen(next); else setOpen(btn.getAttribute('aria-expanded') !== 'true'); };
+    })();
+
+    /* 등장 애니메이션 */
+    const appearOptions = { threshold:0.15, rootMargin:"0px 0px -100px 0px" };
+    const appearOnScroll = new IntersectionObserver((entries, obs)=>{
+      entries.forEach(entry=>{
+        if(!entry.isIntersecting) return;
+        entry.target.classList.add("appear");
+        obs.unobserve(entry.target);
+      });
+    }, appearOptions);
+    document.addEventListener("DOMContentLoaded", ()=>{
+      const fadeElements = document.querySelectorAll(".fade-in");
+      fadeElements.forEach((el, idx)=>{
+        el.style.setProperty('--order', idx);
+        el.classList.add('stagger');
+        appearOnScroll.observe(el);
+      });
+    });
+  </script>
+
+  <script type="text/babel">
+    const { useEffect, useRef } = React;
+
+    function FlowingMenu({ items = [] }) {
+      useEffect(() => {
+        items.forEach(item => {
+          if (item.image) {
+            const img = new Image();
+            img.src = item.image;
+          }
+        });
+      }, [items]);
+      return (
+        <div className="fm-menu-wrap">
+          <nav className="fm-menu" aria-label="Hamburger items">
+            {items.map((it, i) => <MenuItem key={i} {...it} />)}
+          </nav>
+        </div>
+      );
+    }
+
+    function MenuItem({ link = '#', text, image }) {
+      const itemRef = useRef(null);
+      const marqueeRef = useRef(null);
+      const marqueeInnerRef = useRef(null);
+      const animationDefaults = { duration: 0.6, ease: 'expo.out' };
+      const dist = (x,y,x2,y2)=>{ const dx=x-x2, dy=y-y2; return dx*dx+dy*dy; };
+      const closestEdge = (mx,my,w,h)=> dist(mx,my,w/2,0) < dist(mx,my,w/2,h) ? 'top':'bottom';
+
+      const enter = (ev)=>{
+        if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;
+        const rect = itemRef.current.getBoundingClientRect();
+        const x=(ev.clientX??0)-rect.left, y=(ev.clientY??0)-rect.top;
+        const edge=closestEdge(x,y,rect.width,rect.height);
+        gsap.timeline({ defaults: animationDefaults })
+          .set(marqueeRef.current,{ y:edge==='top' ? '-101%':'101%' },0)
+          .set(marqueeInnerRef.current,{ y:edge==='top' ? '101%':'-101%' },0)
+          .to([marqueeRef.current,marqueeInnerRef.current],{ y:'0%' },0);
+      };
+      const leave = (ev)=>{
+        if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;
+        const rect=itemRef.current.getBoundingClientRect();
+        const x=(ev.clientX??0)-rect.left, y=(ev.clientY??0)-rect.top;
+        const edge=closestEdge(x,y,rect.width,rect.height);
+        gsap.timeline({ defaults: animationDefaults })
+          .to(marqueeRef.current,{ y:edge==='top' ? '-101%':'101%' },0)
+          .to(marqueeInnerRef.current,{ y:edge==='top' ? '101%':'-101%' },0);
+      };
+
+      const onClick = () => {
+        if (link && link.startsWith('#')) {
+          if (window.toggleMenu) window.toggleMenu(false);
+        }
+      };
+
+      const repeated = Array.from({ length:4 }).map((_,i)=>(
+        <React.Fragment key={i}>
+          <span>{text}</span>
+          <div className="fm-marquee__img" style={{ backgroundImage:`url(${image})` }} />
+        </React.Fragment>
+      ));
+
+      return (
+        <div className="fm-menu__item" ref={itemRef}>
+          <a className="fm-menu__item-link" href={link}
+            onPointerEnter={enter} onPointerLeave={leave}
+            onFocus={enter} onBlur={leave} onClick={onClick}>
+            {text}
+          </a>
+          <div className="fm-marquee" ref={marqueeRef} aria-hidden="true">
+            <div className="fm-marquee__inner-wrap" ref={marqueeInnerRef}>
+              <div className="fm-marquee__inner">{repeated}</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const menuRoot = document.getElementById('react-menu-root');
+    if (menuRoot) {
+      const menuItems = [
+        { link: 'index.html',    text: '홈',   image: 'img/8.jpg' },
+        { link: 'sumak.html',     text: '수막새', image: 'img/6.jpg' },
+        { link: 'ceramics.html', text: '공예품', image: 'img/gong/do.png' },
+        { link: 'hanbok.html',   text: '한복', image: 'img/han/bg.jpg' },
+      ];
+      ReactDOM.createRoot(menuRoot).render(<FlowingMenu items={menuItems} />);
+    }
+  </script>
+
+  <script>
+    /* Lenis 부드러운 스크롤 */
+    (function(){
+      const lenis = new Lenis({
+        duration: 1.1,
+        smoothWheel: true,
+        smoothTouch: true,
+        touchMultiplier: 1.15,
+        wheelMultiplier: 1.0,
+        gestureOrientation: 'vertical',
+        normalizeWheel: true
+      });
+      function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
+      requestAnimationFrame(raf);
+      window.__lenis = lenis;
+      window.__addLenisCb = (fn)=>{
+        let ticking = false;
+        lenis.on('scroll', () => {
+          if (!ticking){
+            ticking = true;
+            requestAnimationFrame(() => { try{ fn(); } finally { ticking = false; } });
+          }
+        });
+      };
+      // 내부 앵커 이동
+      document.querySelectorAll('a[href^="#"]').forEach(a=>{
+        a.addEventListener('click', (e)=>{
+          const id = a.getAttribute('href');
+          const target = id && document.querySelector(id);
+          if (target){
+            e.preventDefault();
+            lenis.scrollTo(target, { duration: 0.9, easing: (t)=>1-Math.pow(1-t,3) });
+          }
+        });
+      });
+    })();
+
+    /* ===== 커서 이동 + 히어로 전용 상태 토글 ===== */
+    (function(){
+      const $cursor = document.getElementById('custom-cursor');
+      const $hero = document.getElementById('main');
+      if(!$cursor || !$hero) return;
+
+      let cx = window.innerWidth/2, cy = window.innerHeight/2;
+
+      // 마우스 위치 반영
+      window.addEventListener('mousemove', (e)=>{
+        cx = e.clientX; cy = e.clientY;
+        $cursor.style.transform = `translate(${cx}px, ${cy}px)`;
+        if($cursor.style.opacity !== '1') $cursor.style.opacity = '1';
+      });
+      window.addEventListener('mouseleave', ()=>{ $cursor.style.opacity = '0'; });
+      window.addEventListener('mouseenter', ()=>{ $cursor.style.opacity = '1'; });
+
+      // 엘리먼트 뷰포트 내 판단
+      function inView(el){
+        const r = el.getBoundingClientRect();
+        return r.top < window.innerHeight && r.bottom > 0;
+      }
+
+      // 히어로 안에서는 커서 확대 + 텍스트 표시, 벗어나면 기본으로 복귀
+      function updateCursorMode(){
+        if(inView($hero)){ $cursor.classList.add('cursor--hero'); }
+        else { $cursor.classList.remove('cursor--hero'); }
+      }
+
+      // 스크롤/리사이즈/로드 + Lenis 스크롤에 연동
+      ['scroll','resize','load'].forEach(evt => window.addEventListener(evt, updateCursorMode));
+      if(window.__addLenisCb) window.__addLenisCb(updateCursorMode);
+
+      // 초기 보정
+      requestAnimationFrame(()=>{
+        $cursor.style.transform = `translate(${cx}px, ${cy}px)`;
+        updateCursorMode();
+      });
+    })();
+  </script>
+</body>
+</html>

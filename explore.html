@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Explore Collection</title>
+  <link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin>
+  
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <style>
+    @font-face{font-family:'SUIT-Regular';src:url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');font-weight:400;font-style:normal}
+    @font-face {
+        font-family: 'BookkGothic';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkGothic-Lt.woff2') format('woff2');
+        font-weight: 300;
+        font-display: swap;
+    }
+    @font-face {
+        font-family: 'BookkMyungjo';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Lt.woff2') format('woff2');
+        font-weight: 400;
+        font-display: swap;
+    }
+    @font-face {
+        font-family: 'BookkGothic';
+        src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkGothic-Bd.woff2') format('woff2');
+        font-weight: 700;
+        font-display: swap;
+    }
+
+    :root{
+      --cell-size: 320px;
+      --cell-gap:  140px;
+      --cell-pad:  140px;
+      --bg: #f8f8ec;
+      --easing: cubic-bezier(.2,.8,.2,1);
+      --t-panel: .55s;
+      --t-fly:   .45s;
+      --ink:#0a0a0a;
+      --muted:#6b7280;
+      --gutter: clamp(16px, 4vw, 48px);
+      --z-header: 100;
+      --z-overlay: 90;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:#121212;font-family:'SUIT-Regular',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;overflow:hidden;}
+
+    /* ===== Header / Menu ===== */
+    .site-header{
+      position: fixed; inset: 0 0 auto 0; height: 64px; z-index: var(--z-header);
+      display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+      padding: 8px var(--gutter); pointer-events: none;
+    }
+    .header-left{ justify-self: start; }
+    .header-right{ justify-self: end; }
+    .icon-btn{
+      pointer-events: auto; appearance: none; border: 0; background: transparent; cursor: pointer;
+      width: 44px; height: 44px; display: inline-grid; place-items: center;
+      border-radius: 999px; transition: background .2s ease;
+    }
+    .icon-btn:hover{ background: rgba(0,0,0,.06); }
+    .icon-btn:focus-visible{ outline: 2px solid #111; outline-offset: 2px; }
+    .home-svg{ width: 22px; height: 22px; fill:none; stroke:#111; stroke-width:2; }
+
+    .menu-btn .burger{ display:grid; gap:4px; }
+    .menu-btn .burger span{ width:20px; height:2px; background:#111; display:block; transition: transform .25s, opacity .25s; }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(2){ opacity:0; }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(1){ transform: translateY(6px) rotate(45deg); }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(3){ transform: translateY(-6px) rotate(-45deg); }
+
+    .hm-overlay{ position: fixed; inset:0; background: rgba(0,0,0,.35); display:none; z-index: var(--z-overlay); }
+    .hm-overlay.open{ display:grid; place-items: stretch; }
+    .hm-panel{
+      margin-left:auto; width:min(500px, 90vw); height:100%;
+      background:#060010; color:#fff; position:relative;
+      transform: translateX(100%); transition: transform .45s cubic-bezier(.19,1,.22,1);
+      box-shadow: -12px 0 24px rgba(0,0,0,.25);
+    }
+    .hm-overlay.open .hm-panel{ transform: translateX(0); }
+    
+    #react-menu-root{ height:100%; }
+    .fm-menu-wrap{ width:100%; height:100%; overflow:hidden; background:#060010; }
+    .fm-menu{ display:flex; flex-direction:column; height:100%; margin:0; padding:0; }
+    .fm-menu__item{ flex:1; position:relative; overflow:hidden; text-align:center; box-shadow:0 -1px rgba(255,255,255,.3);
+      min-height:120px; display:flex; align-items:center; justify-content:center; }
+    .fm-menu__item-link{ display:flex; align-items:center; justify-content:center; height:100%;
+      cursor:pointer; text-transform:uppercase; text-decoration:none; white-space:nowrap; font-family:'BookkGothic';
+      font-weight:600; color:#fff; font-size:clamp(18px,4vh,42px); outline:none; }
+    .fm-menu__item-link:focus-visible{ outline:2px solid #fff; outline-offset:-4px; }
+    .fm-marquee{ position:absolute; inset:0; overflow:hidden; pointer-events:none; background:#fff;
+      transform: translate3d(0,101%,0); transition: transform .6s cubic-bezier(.19,1,.22,1); }
+    .fm-marquee__inner-wrap{ height:100%; width:200%; display:flex; transform:translateX(0); }
+    .fm-marquee__inner{ display:flex; align-items:center; height:100%; width:200%; will-change:transform; animation: fm-marquee 15s linear infinite; }
+    .fm-marquee span{ color:#060010; white-space:nowrap; text-transform:uppercase; font-weight:400; font-size:clamp(16px,4vh,36px); line-height:1.2; padding:1vh 1vw 0; }
+    .fm-marquee__img{ width:200px; height:7vh; min-height:42px; margin:2em 2vw; padding:1em 0; border-radius:50px; background-size:cover; background-position:50% 50%; }
+    @keyframes fm-marquee{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    @media (prefers-reduced-motion: reduce){ .fm-marquee__inner{ animation:none; } }
+
+    /* ===== Explore (staggered grid) ===== */
+    .pan-grid-section{position:relative;height:100vh;background:var(--bg);overflow:hidden}
+    .pan-viewport{position:relative;width:100%;height:100%;overflow:hidden;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+    .pan-viewport.dragging{cursor:grabbing}
+    .pan-canvas{position:absolute;top:0;left:0;transform:translate3d(0,0,0) scale(1);transform-origin:0 0;will-change:transform;z-index:1}
+    .pan-item{position:absolute;width:var(--cell-size);height:var(--cell-size);display:flex;align-items:center;justify-content:center;cursor:pointer}
+    .pan-item.is-hidden{display:none !important;}
+
+    .pan-item img{
+      height: min(280px, calc(var(--cell-size) - 40px));
+      width: auto;
+      max-width: min(420px, calc(var(--cell-size) + 60px));
+      object-fit: contain;
+      -webkit-user-drag:none; user-select:none; pointer-events:none; display:block;
+      opacity: 0; transform: translateY(12px) scale(.9); filter: blur(8px);
+      will-change: transform, opacity, filter;
+    }
+    .pan-item img.pop-seq{ animation: popIn .9s var(--delay, 0s) var(--easing) both; }
+    @keyframes popIn{
+      0%   { opacity:0; transform: translateY(12px) scale(.88); filter: blur(8px); }
+      60%  { opacity:1; transform: translateY(-2px) scale(1.04); filter: blur(0); }
+      100% { opacity:1; transform: translateY(0)   scale(1);    filter: blur(0); }
+    }
+
+    .pan-hint{
+      position:absolute;right:16px;bottom:82px;display:flex;align-items:center;gap:10px;z-index:5;
+      color:#666;font-size:13px
+    }
+    .zoom-controls{display:flex;gap:8px}
+    .zoom-btn{width:32px;height:32px;border-radius:50%;border:1px solid #bdbdbd;background:transparent;display:flex;align-items:center;justify-content:center;font-size:18px;line-height:1;cursor:pointer}
+    .zoom-btn:active{transform:scale(.96)}
+
+    /* ===== Slide-in Panel ===== */
+    .detail-panel{
+      position:fixed;left:0;top:0;height:100vh;width:50vw;min-width:620px;
+      background:rgba(247,247,236,.92);
+      z-index:20; clip-path: inset(0 100% 0 0);
+      transition: clip-path var(--t-panel) var(--easing); pointer-events:none;
+    }
+    .detail-panel.open{ clip-path: inset(0 0 0 0); pointer-events:auto; }
+    .detail-panel.measuring{visibility:hidden; transition:none !important; pointer-events:none; clip-path: inset(0 0 0 0);}
+    .detail-inner{height:100%;display:grid;grid-template-columns:72px 1fr;gap:28px;padding:48px 44px;color:#121212}
+
+    .detail-title{    font-family: 'BookkMyungjo',serif;font-size:56px;line-height:1;letter-spacing:-1px;margin:0 0 24px 0;display:inline-flex;flex-wrap:wrap;gap:.02em;}
+    .detail-title .mask{display:inline-block;overflow:hidden}
+    .detail-title .char{display:inline-block; transform:translateY(110%);}
+    .detail-panel.open .detail-title .char{animation: maskUp .6s var(--easing) var(--d,0s) both;}
+    @keyframes maskUp{from{transform:translateY(110%)} to{transform:translateY(0%)}}
+
+    .detail-panel .detail-hero,.detail-panel .detail-meta,.detail-panel .detail-cta,.detail-panel .thumbs{transform:translateY(10px);transition: transform .45s var(--easing);}
+    .detail-panel.open .detail-hero{ transform:none; transition-delay:.08s; }
+    .detail-panel.open .detail-meta{ transform:none; transition-delay:.12s; }
+    .detail-panel.open .thumbs    { transform:none; transition-delay:.14s; }
+    .detail-panel.open .detail-cta{ transform:none; transition-delay:.18s; }
+
+    .detail-hero {
+      position: absolute; /* 겹치기 위해 absolute로 변경 */
+      top: 104px; /* 제목 높이에 맞춰 조정 */
+      max-width: 420px;
+      max-height: 350px;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      margin-bottom: 16px;
+      transition: opacity 0.6s ease-in-out; /* 부드러운 전환 효과 */
+    }
+    .detail-meta{color:#666;margin-top:14px}
+    .detail-description {
+      font-family:'SUIT-Regular';
+      color: #333;
+      font-size: 15px;
+      line-height: 1.7;
+      margin-top: 370px; /* 이미지 높이만큼 공간 확보 */
+      margin-bottom: 24px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+    .detail-cta{margin-top:auto;display:none;align-items:center;gap:8px;background:#121212;color:#fff;border:none;border-radius:12px;padding:10px 14px;font-size:13px;cursor:pointer}
+    
+    .thumbs{display:flex;flex-direction:column;gap:12px}
+    .thumb {
+      width: 64px;
+      height: 64px;
+      padding: 4px;
+      border: 1px solid #e0e0d6;
+      border-radius: 4px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .thumb img{
+      max-width: 100%;
+      max-height: 100%;
+      width:auto; height:auto;
+      object-fit:contain;
+      display:block;
+    }
+
+    .detail-body{display:flex;flex-direction:column; position: relative;}
+    .detail-close{position:absolute;right:-6px;top:12px;background:transparent;border:none;color:#333;font-size:22px;cursor:pointer}
+
+    .fly-clone {
+      position: fixed;
+      z-index: 9999;
+      pointer-events: none;
+      transition: all var(--t-fly) var(--easing);
+      overflow: hidden;
+    }
+    .fly-clone img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* ❗FIX: 필터 버튼이 보이도록 display: none 제거 */
+    .filter-wrap{
+      position:fixed;left:16px;bottom:16px;z-index:10;
+      display:flex;align-items:center;gap:10px;
+      height:38px;
+    }
+    .filter-toggle{ display:flex;align-items:center;border:none;background:transparent;padding:0;cursor:pointer; }
+    .seg{
+      display:flex;align-items:center;gap:10px;height:38px;padding:0 12px;background:rgba(255,255,255,.82);
+      border:1px solid rgba(0,0,0,.10);
+      box-shadow:0 6px 22px rgba(0,0,0,.06);
+    }
+    .seg:first-child{border-right:none;border-radius:10px 0 0 10px}
+    .seg:last-child{border-radius:0 10px 10px 0}
+    .seg-icon{width:38px;justify-content:center}
+    .seg-label{font-size:13px;color:#222}
+    .eq{width:18px;height:18px;display:block}
+    .filter-bar{
+      display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.82);border:1px solid rgba(0,0,0,.10);
+      border-radius:999px;padding:0 8px;height:38px;
+      box-shadow:0 6px 22px rgba(0,0,0,.06);
+      overflow:hidden;max-width:0;opacity:0;transform:translateX(-8px);
+      transform-origin:left center;
+      transition: max-width .5s var(--easing), opacity .35s var(--easing), transform .5s var(--easing);
+      pointer-events:none;
+    }
+    .filter-wrap.open .filter-bar{max-width:100vw;opacity:1;transform:translateX(0);pointer-events:auto}
+    .filter-close{
+      width:38px;height:30px;border-radius:999px;border:1px solid rgba(0,0,0,.10);background:transparent;cursor:pointer;font-size:16px;color:#222
+    }
+    .chip{
+      appearance:none;border:1px solid rgba(0,0,0,.10);background:transparent;border-radius:10px;
+      padding:8px 12px;font-size:13px;color:#222;cursor:pointer;opacity:0;transform:translateY(6px);
+      transition:opacity .4s var(--easing), transform .45s var(--easing), background .2s ease, color .2s ease, border-color .2s ease;
+      line-height:1;
+    }
+    .filter-wrap.open .chip{opacity:1;transform:translateY(0)}
+    .chip[aria-pressed="true"]{background:#121212;color:#fff;border-color:#121212}
+    .chip .plus{opacity:.7;margin-left:4px}
+    .chip[data-i="0"]{transition-delay:.05s}
+    .chip[data-i="1"]{transition-delay:.10s}
+    .chip[data-i="2"]{transition-delay:.15s}
+    .chip[data-i="3"]{transition-delay:.20s}
+
+    @media (prefers-reduced-motion: reduce){
+      .filter-bar,.chip{transition:none !important;transform:none !important;opacity:1 !important}
+    }
+    @media (max-width:1200px){ :root{ --cell-size: 300px; --cell-gap:110px; --cell-pad:110px } .detail-panel{min-width:auto;width:60vw} .detail-title{font-size:46px} .detail-hero{max-width:min(60vw - 140px, 420px)} }
+    @media (max-width:900px) { :root{ --cell-size: 260px; --cell-gap: 90px; --cell-pad: 90px } .detail-title{font-size:38px} .detail-inner{padding:36px 32px;grid-template-columns:56px 1fr;gap:20px} .pan-hint{bottom:90px} }
+    @media (max-width:600px){
+      :root{ --cell-size: 220px; --cell-gap: 88px; --cell-pad: 72px }
+      .detail-panel{width:100vw;min-width:0;background:rgba(247,247,236,.96)}
+      .detail-inner{padding:18px 16px;display:flex;flex-direction:column}
+      .detail-title{font-size:30px;margin:8px 0 16px}
+      .detail-hero{width:min(78vw,360px); position:static; /* 모바일에서는 다시 static으로 */}
+      .detail-description { margin-top: 20px; /* 모바일에서는 margin-top 원복 */}
+      .thumbs{flex-direction:row;gap:10px;order:3;overflow-x:auto;padding-bottom:6px}
+      .detail-body{order:2; position: static;}
+    }
+    #panCanvas { will-change: transform; }
+    .pan-item { position: absolute; }
+    .pan-item img{
+      transform-origin: center;
+      transition: transform .35s cubic-bezier(.22,1,.36,1), filter .35s ease, opacity .35s ease;
+    }
+    .pan-item:hover img{
+      transform: translateY(0) scale(1.06);
+    }
+    .hover-label{
+      position: fixed;
+      left: 0; top: 0;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1;
+      color: #fff;
+      background: rgba(0,0,0,.85);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      transform: translate(-50%, calc(-100% - 10px)) scale(.98);
+      transition: opacity .18s ease, transform .18s ease;
+      white-space: nowrap;
+    }
+    .hover-label::before{ content: "+"; margin-right: 6px; }
+    .hover-label.show{
+      opacity: 1;
+      transform: translate(-50%, calc(-100% - 10px)) scale(1);
+    }
+
+    /* ===== explore.html — 4K Desktop Responsive Patch (붙여넣기 전용) ===== */
+@media (min-width: 1600px){
+  :root{
+    /* 그리드 타일/간격/패딩을 화면 비례 값으로 상향 */
+    --cell-size: clamp(360px, 18vw, 520px);
+    --cell-gap:  clamp(120px, 6vw, 220px);
+    --cell-pad:  clamp(120px, 8vw, 320px);
+  }
+
+  /* 헤더/아이콘 약간 키우기 */
+  .site-header{ height:72px; padding:10px max(24px, 4vw); }
+  .icon-btn{ width:52px; height:52px; }
+  .home-svg{ width:24px; height:24px; }
+
+  /* 드래그 힌트/줌 버튼 비례 확대 */
+  .pan-hint{ right:max(16px,2vw); bottom:max(82px,3vh); font-size:clamp(13px, .9vw, 18px); }
+  .zoom-btn{ width:clamp(32px, 2.2vw, 44px); height:clamp(32px, 2.2vw, 44px); font-size:clamp(18px, 1.2vw, 22px); }
+
+  /* 썸네일(그리드 아이템) 이미지도 비례 확대 */
+  .pan-item img{
+    height:    min(420px, calc(var(--cell-size) - 48px));
+    max-width: min(680px, calc(var(--cell-size) + 160px));
+  }
+
+  /* 상세 패널(슬라이드 인) 비율/여백/타이포 조정 */
+  .detail-panel{ width: min(44vw, 1400px); } /* 너무 넓지 않게 상한 */
+  .detail-inner{ grid-template-columns:96px 1fr; gap:clamp(24px,2vw,36px);
+                 padding: clamp(40px,4vh,72px) clamp(36px,3.2vw,64px); }
+  .thumb{ width:clamp(64px,4.6vw,96px); height:clamp(64px,4.6vw,96px); }
+
+  .detail-title{ font-size: clamp(48px, 3.2vw, 72px); }
+  .detail-meta{  font-size: clamp(14px, .95vw, 18px); }
+
+  /* 히어로 이미지와 본문 간격을 화면비례로 */
+  .detail-hero{
+    top:        clamp(84px, 11vh, 140px);
+    max-width:  clamp(420px, 28vw, 760px);
+    max-height: clamp(350px, 34vh, 640px);
+  }
+  .detail-description{
+    font-size: clamp(15px, 1.05vw, 18px);
+    margin-top: clamp(360px, 32vh, 640px);
+  }
+
+  /* 필터 UI(칩/바)도 UHD에서 손맛 좋게 */
+  .filter-wrap{ left:max(16px,2vw); bottom:max(16px,2.2vh); }
+  .filter-bar{ height: clamp(38px, 3.2vh, 52px); }
+  .chip{
+    font-size: clamp(13px, .95vw, 18px);
+    padding: clamp(8px, .7vw, 12px) clamp(12px, 1vw, 16px);
+  }
+  .filter-close{ width:clamp(38px,3vw,52px); height:clamp(30px,2.4vw,44px); }
+}
+
+/* 2560px+ (UHD 이상)에서 조금 더 여유롭게 */
+@media (min-width: 2560px){
+  :root{
+    --cell-size: clamp(440px, 20vw, 640px);
+    --cell-gap:  clamp(140px, 6.5vw, 260px);
+    --cell-pad:  clamp(160px, 9vw, 360px);
+  }
+  .detail-panel{ width: min(40vw, 1500px); }
+}
+
+/* 메뉴(햄버거) 마키 타이포 스케일 조정 */
+@media (min-width: 1600px){
+  .fm-menu__item-link{ font-size: clamp(22px, 2.6vh, 46px); }
+  .fm-marquee span{     font-size: clamp(18px, 2.2vh, 40px); }
+  .fm-marquee__img{     height:  clamp(56px, 8vh, 120px); }
+}
+
+  </style>
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+</head>
+<body>
+
+<header class="site-header" role="banner">
+  <div class="header-left">
+    <a class="icon-btn" href="index.html" aria-label="Home">
+      <svg class="home-svg" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />
+      </svg>
+    </a>
+  </div>
+  <div class="header-right">
+    <button id="menuBtn" class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="menuPanel" aria-label="Open menu">
+      <span class="burger"><span></span><span></span><span></span></span>
+    </button>
+  </div>
+</header>
+<div id="menuOverlay" class="hm-overlay" aria-hidden="true">
+  <aside id="menuPanel" class="hm-panel" role="dialog" aria-modal="true" aria-label="Navigation menu">
+    <div class="menu-items"><div id="react-menu-root"></div></div>
+  </aside>
+</div>
+
+  <section id="explore" class="pan-grid-section">
+    <div class="pan-viewport" id="panViewport">
+      <div class="pan-canvas" id="panCanvas">
+        <div class="pan-item"><img src="img/gong/back/1.png"  alt="Baekja"></div>
+        <div class="pan-item"><img src="img/gong/back/4.png"  alt="Baekja"></div>
+        <div class="pan-item"><img src="img/gong/back/p.png"       alt="Baekja"></div>
+        <div class="pan-item"><img src="img/gong/back/ccc.png"     alt="Baekja"></div>
+        <div class="pan-item"><img src="img/gong/back/a1.png"      alt="Baekja"></div>
+        <div class="pan-item"><img src="img/gong/back/9.png"       alt="Baekja"></div>
+        <div class="pan-item"><img src="img/gong/back/crafts.png"       alt="Baekja"></div>         
+        <div class="pan-item"><img src="img/gong/back/peach.png"       alt="Baekja"></div>       
+        <div class="pan-item"><img src="img/gong/back/15.png"       alt="Baekja"></div>              
+        <div class="pan-item"><img src="img/gong/back/13.png"       alt="Baekja"></div> 
+        <div class="pan-item"><img src="img/gong/back/12.png"       alt="Baekja"></div> 
+
+        <div class="pan-item"><img src="img/gong/ch/1.png" alt="Celadon"></div>
+        <div class="pan-item"><img src="img/gong/ch/ch1.png" alt="Celadon"></div>
+        <div class="pan-item"><img src="img/gong/ch/ch4.png" alt="Celadon"></div>                                
+        <div class="pan-item"><img src="img/gong/ch/6.png" alt="Celadon"></div>
+        <div class="pan-item"><img src="img/gong/ch/8.png" alt="Celadon"></div>
+        <div class="pan-item"><img src="img/gong/ch/h.png" alt="Celadon"></div>       
+        <div class="pan-item"><img src="img/gong/ch/33.png" alt="Celadon"></div>       
+
+        
+        <div class="pan-item"><img src="img/gong/na/1.png" alt="Najeon"></div>
+        <div class="pan-item"><img src="img/gong/na/2.png" alt="Najeon"></div>
+        <div class="pan-item"><img src="img/gong/na/3.png" alt="Najeon"></div>
+        <div class="pan-item"><img src="img/gong/na/4.png" alt="Najeon"></div>
+        <div class="pan-item"><img src="img/gong/na/5.png"    alt="Najeon"></div>
+        <div class="pan-item"><img src="img/gong/na/6.png"    alt="Najeon"></div>
+        <div class="pan-item"><img src="img/gong/na/7.png"    alt="Najeon"></div> 
+        <div class="pan-item"><img src="img/gong/na/8.png"    alt="Najeon"></div>               
+      </div>
+
+      <div class="pan-hint">
+        <span>⤧ Drag / Pinch / Wheel</span>
+        <div class="zoom-controls">
+          <button class="zoom-btn" id="zoomOut" aria-label="zoom out">−</button>
+          <button class="zoom-btn" id="zoomIn"  aria-label="zoom in">+</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <aside class="detail-panel" id="detailPanel" aria-hidden="true">
+    <button class="detail-close" id="detailClose" aria-label="close">×</button>
+    <div class="detail-inner">
+      <div class="thumbs" id="detailThumbs"></div>
+      <div class="detail-body" id="detailBody">
+        <h1 class="detail-title" id="detailTitle">Wisteria</h1>
+        <img class="detail-hero" id="detailHero" src="img/gong/back/1.png" alt="">
+        <div class="detail-meta" id="detailMeta">Deep Plate · Ø 22</div>
+        <p class="detail-description" id="detailDescription"></p>
+        <button class="detail-cta" id="detailCTA">explore collection</button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="filter-wrap" id="filterWrap">
+    <button class="filter-toggle" id="filterToggle" aria-expanded="false" aria-controls="filterBar">
+      <div class="seg seg-icon" aria-hidden="true">
+        <svg class="eq" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="7"  x2="14" y2="7" />
+          <circle cx="16" cy="7" r="2"/>
+          <line x1="4" y1="17" x2="10" y2="17" />
+          <circle cx="12" cy="17" r="2"/>
+          <line x1="4" y1="12" x2="8" y2="12" />
+          <circle cx="10" cy="12" r="2"/>
+        </svg>
+      </div>
+      <div class="seg seg-label"><span>filter</span></div>
+    </button>
+
+    <div class="filter-bar" id="filterBar" role="toolbar" aria-label="collection filters" aria-hidden="true">
+      <button class="filter-close" id="filterClose" aria-label="close">×</button>
+      <button class="chip" data-filter="all"      data-i="0" aria-pressed="true">전체<span class="plus"> +</span></button>
+      <button class="chip" data-filter="baekja"   data-i="1">백자<span class="plus"> +</span></button>
+      <button class="chip" data-filter="cheongja" data-i="2">청자<span class="plus"> +</span></button>
+      <button class="chip" data-filter="najeon"   data-i="3">나전칠기<span class="plus"> +</span></button>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const imageData = [
+    { src: "img/gong/back/1.png", title: "백자 주전자", meta: "白磁注子", description: "이 주전자는 경덕진요(景德鎭窯)에서 제작한 것으로 봉황의 머리가 입 둘레에 장식되어 있다. 백자에 봉황을 그려 넣는 것은 나라의 평화, 왕실의 번영, 세상의 조화를 기원하는 의미가 있다.", thumbs: ["img/gong/back/1.png", "img/gong/back/2.png"] },
+    { src: "img/gong/back/4.png", title: "백자음각새모양잔", meta: "白磁陰刻鳥形盞", description: "동물 형상의 잔은 조선 백자에서는 드물며, 특히 새 모양은 상징적 의미가 강하다. 새는 보통 자유, 고결함, 소망 등을 의미하며, 선비들의 이상적인 정신세계를 투영한 상징이기도 하다.", thumbs: ["img/gong/back/3.png", "img/gong/back/4.png"] },
+    { src: "img/gong/back/p.png", title: "청화백자 어문필통", meta: "靑華白磁漁文筆筒", description: "물속에서도 자유롭게 유영하는 물고기는 총명하고 민첩한 지혜의 상징으로 여겨졌다. 이러한 뜻은 선비들의 이상, 즉 과거에 급제하고 입신양명하길 바라는 마음과 연결된다.", thumbs: ["img/gong/back/p.png"] },
+    { src: "img/gong/back/ccc.png", title: "백자 청화 운룡문", meta: "白磁 靑畵 雲龍文 角匙", description: "전통적인 조선 백자에는 볼 수 없던 이국적인 무늬가 표현된 접시이다.", thumbs: ["img/gong/back/ccc.png", "img/gong/back/cc.png"] },
+    { src: "img/gong/back/a1.png", title: "백자 청화 태극 팔괘무늬 연적", meta: "白磁靑畵太極八卦文硯滴", description: "이 형식의 태극무늬는 송(宋)나라의 유학자 주돈이가 지은 『태극도설(太極圖說)』에서 최초로 나타나는 것으로 보고 있다. 주돈이가 사용한 이 형식의 태극문은 주로 유학자들이 우주 만물 및 심성 등을 설명할 때 자주 거론하였다.", thumbs: ["img/gong/back/a1.png", "img/gong/back/a2.png"] },
+    { src: "img/gong/back/9.png", title: "백자 청화 모란무늬 사발", meta: "白磁靑畵牡丹文沙鉢", description: "조선 시대에 모란은 귀한 신분과 복된 삶을 기원하는 의미였다. 특히 왕실이나 상류층이 사용하는 기물에서 자주 나타났다.", thumbs: ["img/gong/back/9.png", "img/gong/back/10.png"] },
+    { src: "img/gong/back/crafts.png", title: "청화백자운룡문호", meta: "靑畵白磁雲龍文壺", description: "용은 하늘과 땅, 바다를 모두 다스릴 수 있는 존재로 인식되었으며, 임금이 천자(天子, 하늘의 아들)로서 세상을 다스릴 정당성을 상징했다.", thumbs: ["img/gong/back/crafts.png"] },
+    { src: "img/gong/back/peach.png", title: "백자 청화 복숭아 모양 연적", meta: "白磁 桃形 硯滴", description: "복숭아의 특징을 잘 나타낸 연적이다. 복숭아는 전통적으로 다양한 의미를 지니고 있는데, ′서왕모(西王母) 전설′의 영향으로 다수(多壽)를 의미하며 한편으로 아들과 다남(多男)을 상징하기도 한다.", thumbs: ["img/gong/back/peach.png", "img/gong/back/peach2.png","img/gong/back/peach3.png"] },
+    { src: "img/gong/back/15.png", title: "백자 청화 투각 포도무늬 지통", meta: "白磁靑畵透刻葡萄文紙筒", description: "포도송이의 알이 꽉 찬 모습은 풍요와 재물의 상징으로 여겨졌다. 따라서 포도무늬는 풍요로운 삶, 행복이 가득한 집안을 기원하는 의미로 사용되었다.", thumbs: ["img/gong/back/peach.png", "img/gong/back/peach2.png","img/gong/back/peach3.png"] },
+    { src: "img/gong/back/13.png", title: "백자 각화 인물 파도 무늬 완", meta: "白磁陽刻人物波狀文碗", description: "포도송이의 알이 꽉 찬 모습은 풍요와 재물의 상징으로 여겨졌다. 따라서 포도무늬는 풍요로운 삶, 행복이 가득한 집안을 기원하는 의미로 사용되었다.", thumbs: ["img/gong/back/15.png","img/gong/back/163.png"] },
+    { src: "img/gong/back/12.png", title: "백자 청화 장생 무늬 항아리", meta: "白磁靑畫銅畫長生文壺", description: "파도무늬는 끊임없이 밀려오는 물결을 표현한 것으로, 끊이지 않는 복(福), 풍요로움을 상징한다. 특히 조선시대에는 파도무늬가 곡식, 재물, 복이 끊이지 않고 들어온다는 뜻으로 여겨져 번영과 다복을 기원하는 길상 문양으로 즐겨 사용되었다.", thumbs: ["img/gong/back/12.png","img/gong/back/11.png"] },
+
+    { src: "img/gong/ch/1.png", title: "청자 상감운학문 매병", meta: "고려 12세기 · 국보 제68호", description: "고려 청자의 대표작으로, 유려한 S자 곡선과 비색의 표면에 상감기법으로 구름과 학을 정교하게 새겨 넣었습니다.", thumbs: ["img/gong/ch/2.png", "img/gong/ch/y.png"] },
+    { src: "img/gong/ch/ch1.png", title: "청자 상감 모란당초문 표형 주자", meta: "靑磁 象嵌牡丹文 瓢形 注子", description: "모란은 꽃 중의 왕(花王)이라 불릴 만큼 화려하고 크며, 봄에 가장 먼저 피는 꽃 중 하나다. 고려·조선 시대에는 부귀영화(富貴榮華), 즉 재물과 영화로운 삶을 상징하는 길상문으로 여겨졌다.", thumbs: ["img/gong/ch/ch1.png", "img/gong/ch/ch7.png"] },
+    { src: "img/gong/ch/ch4.png", title: "청자 사자장식 뚜껑 향로", meta: "靑磁 獅子形蓋 香爐", description: "향로 뚜껑 위의 사자는 향연이 피어오를 때 사자의 포효처럼 불법이 퍼져나가 악귀를 물리치고 공간을 정화한다는 뜻을 담고 있다.", thumbs: ["img/gong/ch/ch4.png", "img/gong/ch/ch2.png", "img/gong/ch/ch3.png"] },
+    { src: "img/gong/ch/6.png", title: "청자 양각 연꽃 모양 향로", meta: "靑磁陽刻蓮花形香爐", description: "고려의 연꽃 모양 청자 향로는 중국에서 전래된 향로를 모방한데서 비롯되었으며, 특히 여요(汝窯)의 영향이 컸던 것으로 여겨진다.", thumbs: ["img/gong/ch/6.png", "img/gong/ch/y.png"] },
+    { src: "img/gong/ch/8.png", title: "청자 상감 모란 줄기 무늬 기름병", meta: "靑磁 象嵌 牡丹折枝文 油甁", description: "왕실, 귀족들이 선호한 길상문으로 사치·화려함의 상징이 아니라 번창하고 풍요로운 삶을 기원하는 의미로 사용하였다.", thumbs: ["img/gong/ch/8.png", "img/gong/ch/g.png"] },
+    { src: "img/gong/ch/h.png", title: "청자 상감 구름 학 무늬 네귀 항아리", meta: "靑磁 象嵌 雲鶴文 四耳壺", description: "학은 고고함과 천년의 장수를 상징하는 때문인지 상감청자의 무늬 소재로 자주 등장한다. 우아한 문양 표현에서 고려 귀족 세계의 일면을 엿볼 수 있다.", thumbs: ["img/gong/ch/h.png", "img/gong/ch/hh.png"] },
+    { src: "img/gong/ch/33.png", title: "청자 상감 연꽃 넝쿨 무늬 합", meta: "靑磁 象嵌 蓮唐草文 盒", description: "연꽃은 진흙 속에서 피어나지만 꽃잎은 더럽혀지지 않는다. 이 특징 때문에 불교에서는 번뇌 속에서도 깨끗함을 잃지 않는 마음을 상징한다.", thumbs: ["img/gong/ch/33.png", "img/gong/ch/44.png"] },
+
+    { src: "img/gong/na/1.png", title: "나전 굽다리 접시", meta: "螺鈿漆器高杯", description: "참외 모양의 몸체는 세로로 된 골을 내어 여덟 면으로 나누었고, 각 면마다 국화와 모란꽃을 한 줄기씩 교대로 흑백 상감하였다.", thumbs: ["img/gong/na/1.png"] },
+    { src: "img/gong/na/2.png", title: "나전 사자무늬 상자", meta: "螺鈿漆器獅子文箱子", description: "사자는 용맹한 동물로, 잡귀와 악한 기운을 쫓는 힘이 있다고 여겨졌다. 상자를 사용하는 사람을 보호하고 불길한 일을 막아준다는 의미를 부여했다.", thumbs: ["img/gong/na/2.png"] },
+    { src: "img/gong/na/3.png", title: "나전 신수 무늬 접시", meta: "	螺鈿漆器皿", description: "그릇 안쪽 중앙에복(福) 자가 있고, 사방에 용, 거북, 공작 등 사신(四神)과 비슷한 동물들이 있다. 원으로 구분된 바깥쪽에는 쥐, 소, 호랑이, 토끼 등 12지(支)에 해당하는 동물들이 나무, 풀, 바위와 함께 표현되어 있다.", thumbs: ["img/gong/na/3.png"] },
+    { src: "img/gong/na/4.png", title: "나전칠기모란당초매죽문함", meta: "靑磁 象嵌 牡丹折枝文 油甁", description: "모란꽃은 백상감이, 잎은 흑상감이 되었는데, 도안화되어 사실적인 것과는 차이가 있으나, 몸체와 어우러진 크기와 배치로 조화를 이룬다.", thumbs: ["img/gong/na/4.png"] },
+    { src: "img/gong/na/5.png", title: "호랑이 무늬 나전칠기 베갯모", meta: "螺鈿漆器虎文枕頭頂", description: "호랑이는 우리 전통에서 악귀와 잡귀를 물리치는 가장 강력한 수호 동물로 여겨졌다. 베갯모에 호랑이를 새긴 이유는 자는 동안 꿈속에서 액운이 침범하지 못하게 막기 위해서이다.", thumbs: ["img/gong/na/5.png"] },
+    { src: "img/gong/na/6.png", title: "나전칠기 봉황 운문 상자", meta: "螺鈿漆器鳳凰雲文箱子", description: "연꽃넝쿨 무늬[蓮唐草文]와 국화 무늬[菊花文]가 빈틈없이 상감되어 있다.", thumbs: ["img/gong/na/6.png"] },
+    { src: "img/gong/na/7.png", title: "나전 칠기 호랑이 무늬 베갯모", meta: "조선 19세기", description: "호랑이는 우리 전통에서 악귀와 잡귀를 물리치는 가장 강력한 수호 동물로 여겨졌다. 베갯모에 호랑이를 새긴 이유는 자는 동안 꿈속에서 액운이 침범하지 못하게 막기 위해서이다.", thumbs: ["img/gong/na/7.png"] },
+    { src: "img/gong/na/8.png", title: "나전칠기 베겟모", meta: "螺鈿漆器枕飾", description: "중앙에 서로 마주 보고 있는 두 마리의 닭이 크게 표현되어있다. 부부 한 쌍의 닭은 화합과 부부의 금실을 상징한다.", thumbs: ["img/gong/na/8.png"] }
+  ];
+
+  const viewport = document.getElementById('panViewport');
+  const canvas   = document.getElementById('panCanvas');
+  const panel    = document.getElementById('detailPanel');
+  const closeBtn = document.getElementById('detailClose');
+  const titleEl  = document.getElementById('detailTitle');
+  const detailBodyEl = document.getElementById('detailBody');
+  let   heroEl   = document.getElementById('detailHero'); // Let, as it will be replaced
+  const thumbsEl = document.getElementById('detailThumbs');
+  const metaEl   = document.getElementById('detailMeta');
+  const ctaEl    = document.getElementById('detailCTA');
+  const zoomInBtn  = document.getElementById('zoomIn');
+  const zoomOutBtn = document.getElementById('zoomOut');
+  const wrap         = document.getElementById('filterWrap');
+  const filterBar    = document.getElementById('filterBar');
+  const filterToggle = document.getElementById('filterToggle');
+  const filterClose  = document.getElementById('filterClose');
+  const chips        = filterBar.querySelectorAll('.chip');
+  if(!viewport || !canvas) return;
+
+  const pxVar = name => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name).trim())||0;
+  const Z_MIN=.6, Z_MAX=2, Z_STEP=.15;
+
+  let pos={x:0,y:0}, targetPos={x:0,y:0};
+  let scale=Z_MIN, targetScale=Z_MIN;
+  let vel={x:0,y:0};
+
+  let isDown=false, moved=false, start={x:0,y:0}, downAt={x:0,y:0};
+  const pointers = new Map();
+  let isPinching=false, pinchStartDist=0, pinchStartScale=1, pinchCenter={x:0,y:0};
+
+  const moveSamples=[];
+  function sampleTarget(now){
+    moveSamples.push({x:targetPos.x, y:targetPos.y, t:now});
+    while (moveSamples.length>0 && now - moveSamples[0].t > 160) moveSamples.shift();
+  }
+  function releaseVelocity(){
+    if(moveSamples.length<2) return {x:0,y:0};
+    const last = moveSamples[moveSamples.length-1];
+    let idx = moveSamples.length-2;
+    for (; idx>=0; idx--){
+      if (last.t - moveSamples[idx].t >= 60) break;
+    }
+    if (idx<0) idx=moveSamples.length-2;
+    const prev = moveSamples[idx];
+    const dt = Math.max(1, last.t - prev.t);
+    const vx_ms = (last.x - prev.x) / dt;
+    const vy_ms = (last.y - prev.y) / dt;
+    const frame = 16.66;
+    return { x: vx_ms * frame, y: vy_ms * frame };
+  }
+
+  function deriveCat(img){
+    const src = (img.getAttribute('src')||'').toLowerCase();
+    const alt = (img.getAttribute('alt')||'').toLowerCase();
+    if (src.includes('/ch/') || alt.includes('celadon') || alt.includes('청자')) return 'cheongja';
+    if (src.includes('/na/') || alt.includes('najeon') || alt.includes('나전칠기'))  return 'najeon';
+    return 'baekja';
+  }
+  function tagCategories(){
+    canvas.querySelectorAll('.pan-item img').forEach(img=>{
+      img.closest('.pan-item').dataset.cat = deriveCat(img);
+    });
+  }
+
+  function layoutStaggered(){
+    const SIZE = pxVar('--cell-size'), GAP=pxVar('--cell-gap'), PAD=pxVar('--cell-pad'), PITCH=SIZE+GAP;
+    const items = Array.from(canvas.querySelectorAll('.pan-item:not(.is-hidden)'));
+    const idealCols = Math.max(6, Math.floor((viewport.clientWidth * 1.6) / PITCH));
+    const COLS = Math.min(12, idealCols);
+
+    items.forEach((item, idx)=>{
+      const col = idx % COLS, row = Math.floor(idx / COLS), stagger = (col % 2 === 0) ? 0 : PITCH / 2;
+      const x = PAD + col * PITCH + (Math.random()-0.5)*8;
+      const y = PAD + stagger + row * PITCH + (Math.random()-0.5)*12;
+      item.style.width  = SIZE + 'px';
+      item.style.height = SIZE + 'px';
+      item.style.transform = `translate(${x}px, ${y}px)`;
+    });
+
+    const rows = Math.ceil(items.length / COLS) + 1;
+    const width  = PAD*2 + COLS*SIZE + (COLS-1)*GAP;
+    const height = PAD*2 + rows*PITCH + PITCH/2;
+    canvas.style.width  = width  + 'px';
+    canvas.style.height = height + 'px';
+  }
+
+  function bounds(s=scale){
+    const vw=viewport.clientWidth, vh=viewport.clientHeight;
+    const cw=canvas.scrollWidth*s, ch=canvas.scrollHeight*s;
+    const minX=(cw<=vw)?(vw-cw)/2:(vw-cw), maxX=(cw<=vw)?(vw-cw)/2:0;
+    const minY=(ch<=vh)?(vh-ch)/2:(vh-ch), maxY=(ch<=vh)?(vh-ch)/2:0;
+    return {minX,maxX,minY,maxY};
+  }
+  function clampTarget(){
+    const b=bounds(targetScale);
+    targetPos.x=Math.min(b.maxX,Math.max(b.minX,targetPos.x));
+    targetPos.y=Math.min(b.maxY,Math.max(b.minY,targetPos.y));
+  }
+
+  let lastRenderPos = {x:0,y:0};
+  let moveVelForReveal = {x:0,y:0};
+  let revealScheduled=false;
+
+  function revealNewlyVisible(){
+    const rect = viewport.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top  + rect.height/2;
+
+    const toReveal = [];
+    canvas.querySelectorAll('.pan-item img').forEach(img=>{
+      if (img.dataset.revealed === '1') return;
+      if (img.closest('.pan-item').classList.contains('is-hidden')) return;
+      const r = img.getBoundingClientRect();
+      const intersects = r.right>rect.left && r.left<rect.right && r.bottom>rect.top && r.top<rect.bottom;
+      if (!intersects) return;
+
+      const vx = moveVelForReveal.x, vy = moveVelForReveal.y;
+      const speed = Math.hypot(vx, vy);
+      let key;
+      if (speed > 0.5) {
+        if (Math.abs(vx) >= Math.abs(vy)) key = (vx > 0) ? r.left : -r.right;
+        else key = (vy > 0) ? r.top : -r.bottom;
+      } else {
+        const icx = r.left + r.width/2, icy = r.top + r.height/2;
+        key = Math.hypot(icx - cx, icy - cy);
+      }
+      toReveal.push({img, key});
+    });
+
+    toReveal.sort((a,b)=> a.key - b.key);
+    const base = .06, step = .05;
+    toReveal.forEach((o,i)=>{
+      o.img.style.setProperty('--delay', (base + i*step + Math.random()*0.04).toFixed(3)+'s');
+      o.img.classList.add('pop-seq');
+      o.img.dataset.revealed = '1';
+    });
+  }
+  function scheduleReveal(){
+    if (revealScheduled) return;
+    revealScheduled = true;
+    requestAnimationFrame(()=>{ revealScheduled=false; revealNewlyVisible(); });
+  }
+
+  const LERP = 0.18;
+  const FRICTION = 0.92;
+  const BOUNCE = 0.35;
+
+  function tick(){
+    if(!isDown && !isPinching){
+      targetPos.x += vel.x;
+      targetPos.y += vel.y;
+      vel.x *= FRICTION; vel.y *= FRICTION;
+
+      const b = bounds(targetScale);
+      if (targetPos.x < b.minX || targetPos.x > b.maxX){
+        targetPos.x = Math.max(b.minX, Math.min(b.maxX, targetPos.x));
+        vel.x *= -BOUNCE;
+      }
+      if (targetPos.y < b.minY || targetPos.y > b.maxY){
+        targetPos.y = Math.max(b.minY, Math.min(b.maxY, targetPos.y));
+        vel.y *= -BOUNCE;
+      }
+      if (Math.abs(vel.x) < 0.02) vel.x = 0;
+      if (Math.abs(vel.y) < 0.02) vel.y = 0;
+    }
+
+    clampTarget();
+    pos.x += (targetPos.x - pos.x) * LERP;
+    pos.y += (targetPos.y - pos.y) * LERP;
+    scale += (targetScale - scale) * LERP;
+
+    canvas.style.transform = `translate3d(${pos.x}px,${pos.y}px,0) scale(${scale})`;
+
+    moveVelForReveal.x = pos.x - lastRenderPos.x;
+    moveVelForReveal.y = pos.y - lastRenderPos.y;
+    lastRenderPos.x = pos.x; lastRenderPos.y = pos.y;
+
+    scheduleReveal();
+    requestAnimationFrame(tick);
+  }
+
+  function topCenter(immediate=true){
+    const vw=viewport.clientWidth, cw=canvas.scrollWidth*scale;
+    const b=bounds(scale);
+    targetPos.x=(vw-cw)/2;
+    targetPos.y=b.maxY;
+    if (immediate){ pos.x=targetPos.x; pos.y=targetPos.y; }
+  }
+
+  function zoomTo(ns, ax, ay){
+    ns=Math.max(Z_MIN,Math.min(Z_MAX,ns));
+    ax ??= viewport.clientWidth/2;
+    ay ??= viewport.clientHeight/2;
+    const k = ns/scale;
+    targetPos.x = ax - (ax - pos.x) * k;
+    targetPos.y = ay - (ay - pos.y) * k;
+    targetScale = ns;
+    clampTarget();
+  }
+
+  const CLICK_SLOP=10;
+
+  viewport.addEventListener('pointerdown',e=>{
+    e.preventDefault();
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pointers.size===1){
+      isDown=true; moved=false; vel.x=0; vel.y=0;
+      start={x:targetPos.x,y:targetPos.y}; downAt={x:e.clientX,y:e.clientY};
+      moveSamples.length=0;
+      viewport.classList.add('dragging');
+      try{ viewport.setPointerCapture(e.pointerId);}catch(_){}
+    }else if(pointers.size===2){
+      isPinching=true;
+      const arr=[...pointers.values()];
+      pinchStartDist = Math.hypot(arr[0].x - arr[1].x, arr[0].y - arr[1].y);
+      pinchStartScale= targetScale;
+      pinchCenter    = { x:(arr[0].x+arr[1].x)/2, y:(arr[0].y+arr[1].y)/2 };
+      viewport.classList.add('dragging');
+    }
+    hideHoverLabel();
+  });
+
+  viewport.addEventListener('pointermove',e=>{
+    if(!pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    const now = performance.now();
+
+    if(isPinching && pointers.size===2){
+      const arr=[...pointers.values()];
+      const dist = Math.hypot(arr[0].x - arr[1].x, arr[0].y - arr[1].y);
+      const factor = dist / pinchStartDist;
+      zoomTo(Math.max(Z_MIN,Math.min(Z_MAX,pinchStartScale*factor)), pinchCenter.x, pinchCenter.y);
+      sampleTarget(now);
+    }else if(isDown && pointers.size===1){
+      const dx=e.clientX-downAt.x, dy=e.clientY-downAt.y;
+      if(Math.hypot(dx,dy)>CLICK_SLOP) moved=true;
+      targetPos.x = start.x + dx;
+      targetPos.y = start.y + dy;
+      sampleTarget(now);
+    }
+  });
+
+  function endPointer(e){
+    const wasPinch = isPinching;
+    pointers.delete(e.pointerId);
+    if(pointers.size<2) isPinching=false;
+    if(pointers.size===0){
+      if(isDown && !wasPinch){
+        vel = releaseVelocity();
+      }
+      isDown=false;
+      viewport.classList.remove('dragging');
+    }
+  }
+  viewport.addEventListener('pointerup',e=>{
+    const wasMoved = moved || isPinching;
+    endPointer(e);
+    if(wasMoved) return;
+
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const hitPanel = el && el.closest && el.closest('#detailPanel');
+    const hitItem  = el && el.closest && el.closest('.pan-item');
+    const panelOpen = panel.classList.contains('open');
+
+    if(panelOpen){
+      if(hitPanel){ return; }
+      if(hitItem){
+        const img = hitItem.querySelector('img');
+        openPanelFor(img,true);
+        flyToHero(img);
+      }else{
+        closePanel();
+      }
+    }else{
+      if(hitItem){
+        const img = hitItem.querySelector('img');
+        const targetRect = measureHeroTargetRect(img);
+        requestAnimationFrame(()=>{
+          panel.classList.add('open');
+          panel.setAttribute('aria-hidden','false');
+          openPanelFor(img,true);
+          flyToHero(img,targetRect);
+        });
+      }
+    }
+  });
+  viewport.addEventListener('pointercancel', endPointer);
+  viewport.addEventListener('pointerleave',  endPointer);
+
+  ['pointerdown','pointerup','click'].forEach(ev=>{
+    zoomInBtn.addEventListener(ev, e=>{ e.stopPropagation(); });
+    zoomOutBtn.addEventListener(ev, e=>{ e.stopPropagation(); });
+  });
+  zoomInBtn.addEventListener('click', e=>{ e.preventDefault(); zoomTo(targetScale+Z_STEP); });
+  zoomOutBtn.addEventListener('click', e=>{ e.preventDefault(); zoomTo(targetScale-Z_STEP); });
+  viewport.addEventListener('wheel',(e)=>{
+    e.preventDefault();
+    const d=Math.sign(e.deltaY);
+    const rect = viewport.getBoundingClientRect();
+    const ax = Math.max(0, Math.min(rect.width,  e.clientX - rect.left));
+    const ay = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+    zoomTo(targetScale+(d>0?-Z_STEP:Z_STEP), ax, ay);
+  },{passive:false});
+
+  function setMaskedTitle(el, text){
+    el.innerHTML = '';
+    Array.from(text).forEach((ch,i)=>{
+      const wrap=document.createElement('span'); wrap.className='mask';
+      const inner=document.createElement('span'); inner.className='char';
+      inner.textContent=ch; inner.style.setProperty('--d',(i*0.04)+'s');
+      wrap.appendChild(inner); el.appendChild(wrap);
+    });
+  }
+  
+  function openPanelFor(imgEl){
+    const clickedSrc = imgEl.getAttribute('src');
+    const dataForImage = imageData.find(item => item.src === clickedSrc);
+    const descEl = document.getElementById('detailDescription');
+
+    const title = dataForImage ? dataForImage.title : (imgEl.getAttribute('alt') || 'Collection');
+    const meta = dataForImage ? dataForImage.meta : '상세 정보 없음';
+    const description = dataForImage ? dataForImage.description : '이 작품에 대한 상세 설명이 준비되지 않았습니다.';
+    const collectionLink = dataForImage ? dataForImage.collectionLink : '#';
+    const thumbs = dataForImage ? dataForImage.thumbs : [clickedSrc];
+
+    setMaskedTitle(titleEl, title);
+    
+    // Clear any old hero images before creating the new one
+    const oldHeroes = detailBodyEl.querySelectorAll('.detail-hero');
+    oldHeroes.forEach(h => h.remove());
+
+    heroEl = document.createElement('img');
+    heroEl.id = 'detailHero';
+    heroEl.className = 'detail-hero';
+    heroEl.src = clickedSrc;
+    detailBodyEl.insertBefore(heroEl, metaEl);
+    
+    heroEl.style.visibility = 'hidden';
+    metaEl.textContent = meta;
+    descEl.textContent = description;
+
+    ctaEl.onclick = () => {
+      if (collectionLink && collectionLink !== '#') {
+        window.location.href = collectionLink;
+      } else {
+        alert('관련 컬렉션이 준비되지 않았습니다.');
+      }
+    };
+    
+    thumbsEl.innerHTML = '';
+    thumbs.forEach(s => {
+      const t = document.createElement('div');
+      t.className = 'thumb';
+      const i = new Image();
+      i.src = s;
+      t.appendChild(i);
+      t.addEventListener('click', () => {
+        const newSrc = i.src;
+        if (heroEl.src === newSrc) return;
+
+        // Preload image to prevent flicker
+        const tempImg = new Image();
+        tempImg.src = newSrc;
+        tempImg.onload = () => {
+            const newHero = document.createElement('img');
+            newHero.className = 'detail-hero';
+            newHero.src = newSrc;
+            newHero.style.opacity = 0;
+            detailBodyEl.insertBefore(newHero, heroEl);
+
+            requestAnimationFrame(() => {
+                newHero.style.opacity = 1;
+                heroEl.style.opacity = 0;
+            });
+
+            setTimeout(() => {
+                heroEl.remove();
+                heroEl = newHero;
+            }, 600); // must match CSS transition time
+        };
+      });
+      thumbsEl.appendChild(t);
+    });
+  }
+
+  function closePanel(){ panel.classList.remove('open'); panel.setAttribute('aria-hidden','true'); }
+  closeBtn.addEventListener('click', closePanel);
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePanel(); });
+
+  function measureHeroTargetRect(imgEl){
+    openPanelFor(imgEl);
+    panel.classList.add('measuring');
+    const rect=heroEl.getBoundingClientRect();
+    panel.classList.remove('measuring');
+    return rect;
+  }
+  
+  function flyToHero(imgEl, preRect){
+    const start = imgEl.getBoundingClientRect();
+    
+    const flyer = document.createElement('div');
+    flyer.className = 'fly-clone';
+    const cloneImg = imgEl.cloneNode(true);
+    cloneImg.style = '';
+    flyer.appendChild(cloneImg);
+    
+    flyer.style.left   = start.left + 'px';
+    flyer.style.top    = start.top + 'px';
+    flyer.style.width  = start.width + 'px';
+    flyer.style.height = start.height + 'px';
+    
+    document.body.appendChild(flyer);
+
+    const target = preRect || heroEl.getBoundingClientRect();
+    
+    requestAnimationFrame(()=>{
+      flyer.style.left   = target.left + 'px';
+      flyer.style.top    = target.top + 'px';
+      flyer.style.width  = target.width + 'px';
+      flyer.style.height = target.height + 'px';
+    });
+
+    flyer.addEventListener('transitionend', ()=>{
+      flyer.remove();
+      heroEl.style.visibility = 'visible';
+    }, {once:true});
+  }
+
+  const hoverLabel = document.createElement('div');
+  hoverLabel.className = 'hover-label';
+  document.body.appendChild(hoverLabel);
+
+  function showHoverLabel(name){
+    if (!name) return;
+    hoverLabel.textContent = name;
+    hoverLabel.classList.add('show');
+  }
+  function hideHoverLabel(){ hoverLabel.classList.remove('show'); }
+
+  canvas.addEventListener('mousemove', (e)=>{
+    if (!hoverLabel.classList.contains('show')) return;
+    const margin = 12;
+    const x = Math.max(margin, Math.min(window.innerWidth  - margin, e.clientX));
+    const y = Math.max(margin, Math.min(window.innerHeight - margin, e.clientY));
+    hoverLabel.style.left = x + 'px';
+    hoverLabel.style.top  = y + 'px';
+  });
+  canvas.addEventListener('mouseover', (e)=>{
+    const item = e.target.closest('.pan-item');
+    if(!item) return;
+    const img = item.querySelector('img');
+    const name = img?.dataset.name || img?.getAttribute('alt') || '';
+    showHoverLabel(name);
+  });
+  canvas.addEventListener('mouseout', (e)=>{
+    const to = e.relatedTarget;
+    if (to && canvas.contains(to) && to.closest('.pan-item')) return;
+    hideHoverLabel();
+  });
+  viewport.addEventListener('pointerdown', hideHoverLabel);
+
+  let introPlayed=false;
+  function playIntro(){
+    if(introPlayed) return; introPlayed=true;
+    const rect = viewport.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top  + rect.height/2;
+
+    const items = Array.from(canvas.querySelectorAll('.pan-item:not(.is-hidden)'))
+      .map(it=>({ it, r: it.getBoundingClientRect() }))
+      .filter(({r})=> r.right>rect.left && r.left<rect.right && r.bottom>rect.top && r.top<rect.bottom)
+      .map(({it,r})=>{
+        const img = it.querySelector('img');
+        const cxI = r.left + r.width/2;
+        const cyI = r.top  + r.height/2;
+        const d   = Math.hypot(cxI - cx, cyI - cy);
+        return {img, d};
+      })
+      .sort((a,b)=>a.d-b.d);
+
+    const base = .12, step = .05;
+    items.forEach((o,i)=>{
+      o.img.style.setProperty('--delay', (base + i*step + Math.random()*0.06).toFixed(3)+'s');
+      o.img.classList.add('pop-seq');
+      o.img.dataset.revealed = '1';
+    });
+  }
+  function scheduleIntro(){
+    const imgs=Array.from(canvas.querySelectorAll('.pan-item img'));
+    const decodes=imgs.map(i=>i.decode().catch(()=>{}));
+    let fail=setTimeout(()=>playIntro(),700);
+    Promise.allSettled(decodes).then(()=>{ clearTimeout(fail); playIntro(); });
+  }
+
+  function applyFilter(mode){
+    chips.forEach(chip=>{
+      const pressed = chip.dataset.filter === mode || (mode==='all' && chip.dataset.filter==='all');
+      chip.setAttribute('aria-pressed', pressed ? 'true' : 'false');
+    });
+    closePanel();
+
+    canvas.querySelectorAll('.pan-item img').forEach(img => {
+        img.removeAttribute('data-revealed');
+        img.classList.remove('pop-seq');
+    });
+
+    canvas.querySelectorAll('.pan-item').forEach(el=>{
+      const cat = el.dataset.cat || 'baekja';
+      if (mode==='all' || mode===cat) {
+        el.classList.remove('is-hidden');
+      } else {
+        el.classList.add('is-hidden');
+      }
+    });
+
+    requestAnimationFrame(() => {
+      layoutStaggered();
+      scheduleReveal();
+      const b=bounds(targetScale);
+      targetPos.x = (viewport.clientWidth - canvas.scrollWidth*targetScale)/2;
+      targetPos.y = b.maxY;
+      vel.x=0; vel.y=0;
+    });
+  }
+  chips.forEach(chip=> chip.addEventListener('click', ()=> applyFilter(chip.dataset.filter)));
+
+  function openFilterUI(){
+    wrap.classList.add('open');
+    filterToggle.setAttribute('aria-expanded','true');
+    filterBar.setAttribute('aria-hidden','false');
+  }
+  function closeFilterUI(){
+    wrap.classList.remove('open');
+    filterToggle.setAttribute('aria-expanded','false');
+    filterBar.setAttribute('aria-hidden','true');
+  }
+  filterToggle.addEventListener('click', (e)=>{ e.stopPropagation(); openFilterUI(); });
+  filterClose .addEventListener('click', (e)=>{ e.stopPropagation(); closeFilterUI(); });
+  document.addEventListener('pointerdown',(e)=>{
+    const inWrap = e.target.closest && e.target.closest('#filterWrap');
+    if(!inWrap) closeFilterUI();
+  });
+
+  /* ===== Init ===== */
+  const init = ()=>{
+    tagCategories();
+    layoutStaggered();
+    scale = targetScale = Z_MIN;
+    topCenter(true);
+    targetPos.x = pos.x; targetPos.y = pos.y;
+    requestAnimationFrame(tick);
+
+    const params = new URLSearchParams(window.location.search);
+    const initial = params.get('filter');
+    if (initial && ['all','baekja','cheongja','najeon'].includes(initial)) {
+      openFilterUI();
+      applyFilter(initial);
+    } else {
+      scheduleIntro();
+      closeFilterUI();
+    }
+  };
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+  window.addEventListener('resize', ()=>{
+    layoutStaggered();
+    clampTarget();
+  });
+})();
+</script>
+
+<script type="text/babel" data-presets="env,react">
+    const { useRef, useEffect, Fragment } = React;
+    function FlowingMenu({ items = [] }) {
+      useEffect(() => { items.forEach(it => { if (it.image){ const img=new Image(); img.src=it.image; } }); }, [items]);
+      return ( <div className="fm-menu-wrap"><nav className="fm-menu" aria-label="Hamburger items">{items.map((it, i) => <MenuItem key={i} {...it} />)}</nav></div> );
+    }
+    
+    function MenuItem({ link = '#', text, image }) {
+      const itemRef = useRef(null);
+      const marqueeRef = useRef(null);
+      const marqueeInnerRef = useRef(null);
+      const animationDefaults = { duration: 0.6, ease: 'expo.out' };
+      const dist = (x,y,x2,y2)=>{ const dx=x-x2, dy=y-y2; return dx*dx+dy*dy; };
+      const closestEdge = (mx,my,w,h)=> dist(mx,my,w/2,0) < dist(mx,my,w/2,h) ? 'top':'bottom';
+
+      const enter = (ev)=>{
+        if (typeof gsap === 'undefined') return;
+        if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;
+        const rect = itemRef.current.getBoundingClientRect();
+        const x=(ev.clientX??0)-rect.left, y=(ev.clientY??0)-rect.top;
+        const edge=closestEdge(x,y,rect.width,rect.height);
+        gsap.timeline({ defaults: animationDefaults })
+          .set(marqueeRef.current,{ y:edge==='top' ? '-101%':'101%' },0)
+          .set(marqueeInnerRef.current,{ y:edge==='top' ? '101%':'-101%' },0)
+          .to([marqueeRef.current,marqueeInnerRef.current],{ y:'0%' },0);
+      };
+      const leave = (ev)=>{
+        if (typeof gsap === 'undefined') return;
+        if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;
+        const rect=itemRef.current.getBoundingClientRect();
+        const x=(ev.clientX??0)-rect.left, y=(ev.clientY??0)-rect.top;
+        const edge=closestEdge(x,y,rect.width,rect.height);
+        gsap.timeline({ defaults: animationDefaults })
+          .to(marqueeRef.current,{ y:edge==='top' ? '-101%':'101%' },0)
+          .to(marqueeInnerRef.current,{ y:edge==='top' ? '101%':'-101%' },0);
+      };
+
+      const onClick = () => {
+        if (link && link.startsWith('#')) {
+          if (window.toggleMenu) window.toggleMenu(false);
+        }
+      };
+
+      const repeated = Array.from({ length:4 }).map((_,i)=>(
+        <Fragment key={i}>
+          <span>{text}</span>
+          <div className="fm-marquee__img" style={{ backgroundImage:`url(${image})` }} />
+        </Fragment>
+      ));
+
+      return (
+        <div className="fm-menu__item" ref={itemRef}>
+          <a className="fm-menu__item-link" href={link}
+            onPointerEnter={enter} onPointerLeave={leave}
+            onFocus={enter} onBlur={leave} onClick={onClick}>
+            {text}
+          </a>
+          <div className="fm-marquee" ref={marqueeRef} aria-hidden="true">
+            <div className="fm-marquee__inner-wrap" ref={marqueeInnerRef}>
+              <div className="fm-marquee__inner">{repeated}</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    
+    (function mountMenu(){
+      const menuRoot = document.getElementById('react-menu-root');
+      if (!menuRoot) return;
+
+      const menuItems = [
+        { link: 'index.html',    text: '홈',   image: 'img/8.jpg' },
+        { link: 'sumak.html',     text: '수막새', image: 'img/6.jpg' },
+        { link: 'ceramics.html', text: '공예품', image: 'img/gong/do.png' },
+        { link: 'hanbok.html',   text: '한복', image: 'img/han/bg.jpg' },
+      ];
+
+      if (menuRoot.__mounted) return;
+      menuRoot.__mounted = true;
+
+      try {
+        if (ReactDOM.createRoot) {
+          const root = ReactDOM.createRoot(menuRoot);
+          root.render(<FlowingMenu items={menuItems} />);
+        } else {
+          ReactDOM.render(React.createElement(FlowingMenu, { items: menuItems }), menuRoot);
+        }
+      } catch (err) {
+        console.error('Menu mount failed:', err);
+      }
+    })();
+
+</script>
+
+<script>
+  (() => {
+    const btn = document.getElementById('menuBtn');
+    const overlay = document.getElementById('menuOverlay');
+    const panel = document.getElementById('menuPanel');
+    if(!btn || !overlay || !panel) return;
+    
+    function setOpen(open){
+      btn.setAttribute('aria-expanded', String(open));
+      overlay.classList.toggle('open', open);
+      overlay.setAttribute('aria-hidden', String(!open));
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+    btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+    overlay.addEventListener('click', () => setOpen(false));
+    panel.addEventListener('click', (e) => e.stopPropagation());
+    window.addEventListener('keydown', (e) => { if(e.key === 'Escape') setOpen(false); });
+    window.toggleMenu = function(next){ if (typeof next === 'boolean') setOpen(next); else setOpen(btn.getAttribute('aria-expanded') !== 'true'); };
+  })();
+</script>
+
+</body>
+</html>

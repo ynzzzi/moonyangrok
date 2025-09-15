@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>한복 아카이브</title>
+
+  <style>
+    @font-face { font-family:'BookkMyungjo'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Bd.woff2') format('woff2'); font-weight:700; font-display:swap }
+    @font-face{ font-family:'SUIT-Regular'; src:url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2'); font-weight:400; font-style:normal }
+    @font-face { font-family:'Suit'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Light.woff2') format('woff2'); font-weight:300; font-display:swap }
+    @font-face { font-family:'BookkGothic'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkGothic-Bd.woff2') format('woff2'); font-weight:700; font-display:swap }
+    @font-face { font-family: 'BookkGothic'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkGothic-Lt.woff2') format('woff2'); font-weight: 300; font-display: swap; }
+  </style>
+
+  <style>
+    html{scroll-behavior:auto}
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{font-family:'Chosunilbo_myungjo',serif;background:#fff;color:#111; overflow-x: hidden;}
+    .container{max-width:1400px;margin:0 auto;padding:20px;position:relative}
+
+    /* 갤러리 */
+    section#gallery{position:relative}
+    .gallery-container{position:relative;width:100%;height:80vh;margin-top:50px;overflow:hidden}
+    .background-image{position:absolute;width:auto;height:auto;z-index:0;pointer-events:none}
+    .gallery-item{position:absolute;border-radius:2px;box-shadow:0 4px 8px rgba(0,0,0,.1);transition:all .3s ease;background:#fff;z-index:1;cursor:pointer}
+    .gallery-item:hover{transform:scale(1.03);z-index:10;box-shadow:0 8px 16px rgba(0,0,0,.2)}
+    .gallery-item img,.gallery-item video{width:100%;height:100%;object-fit:cover;display:block}
+    .item2{width:450px;height:250px;top:20px;right:50px;z-index:2}
+    .item3{width:300px;height:300px;top:250px;right:30px;z-index:1}
+    .item4{width:250px;height:250px;top:200px;left:700px;z-index:2}
+    .item5{width:450px;height:300px;top:250px;left:200px;z-index:1}
+    .item6{width:350px;height:380px;top:40px;left:50px;z-index:4}
+
+    /* intro-cta */
+    section.intro-cta{
+      position:relative; min-height:100vh; border-top:1px solid #eaeaea; border-bottom:1px solid #eaeaea;
+      display:grid; grid-template-columns:1fr 1fr; gap:clamp(32px, 6vw, 96px); padding:72px 16px;
+    }
+    .blurb-wrap{grid-column:2/3;align-self:start;justify-self:end;max-width:1200px;text-align:right;position:sticky;top:40px;}
+    .mask-block{overflow:hidden}
+    .mask-text{
+      transform:translateY(120%); clip-path:inset(100% 0 0 0);
+      transition:transform 800ms ease, clip-path 800ms ease;
+      font-family:'BookkMyungjo'; line-height:1.25; font-size:22px; color:#222; letter-spacing:.2px; margin:0 0 14px 0;
+    }
+    .mask-text.show{ transform:translateY(0); clip-path:inset(0 0 0 0); }
+    @media (max-width:640px){ .mask-text{ font-size:18px } }
+
+    .mask-on .mask-text{transform:translateY(0);clip-path:inset(0 0 0 0)}
+    .cta-wrap{grid-column:1/2;align-self:end;justify-self:stretch;width:100%;max-width:680px;}
+    .cta-row{position:relative;display:flex;align-items:center;justify-content:flex-start;padding:22px 16px 22px 24px;border-top:1px solid #dcdcdc;cursor:pointer;user-select:none}
+    .cta-row:last-child{border-bottom:1px solid #dcdcdc}
+    .cta-row a{font-family:'BookkMyungjo';text-decoration:none;color:#111;display:inline-flex;gap:14px;align-items:center;font-size:28px;letter-spacing:.5px}
+    .hover-icon{position:absolute;left:200px;width:38px;height:38px;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease}
+    .cta-row:hover .hover-icon{opacity:1}
+    .spin{animation:spin 3.2s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* marquee-stack */
+    #marquee{ margin-block:clamp(40px, 12vh, 140px); }
+    .marquee-stack{
+      position:relative; height:100vh; background:#fff; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+      width:100vw; margin-left:calc(50% - 50vw); margin-right:calc(50% - 50vw);
+    }
+    .marquee-bg{ position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.22; }
+    .marquee-wrap{ position:absolute; inset:0; display:flex; align-items:center; justify-content:flex-start; }
+    .marquee-row{
+      white-space:nowrap; font-size:18vw; line-height:1; font-weight:800; letter-spacing:.02em;
+      font-family:'SUIT-Regular', system-ui, -apple-system, sans-serif;
+      will-change:transform; animation:marquee 28s linear infinite;
+    }
+    @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    .stack{ position:relative; z-index:2; width:min(64vw, 820px); aspect-ratio:16/9; }
+    .card{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) rotate(var(--rot,0deg));
+      width:100%; height:100%; overflow:hidden; transition:transform .4s cubic-bezier(.22,.61,.36,1);}
+    .card img{ width:100%; height:100%; object-fit:cover;}
+    .card.bg1{ width:86%} .card.bg2{ width:92%; top:48%}
+    .card.main{ z-index:5; background:none; border:none; padding:0; width:94%; cursor:pointer}
+    .card.main:hover{ transform:translate(-50%,-50%) rotate(calc(var(--rot,0deg) - 2deg)) scale(1.02)}
+    
+    .stack-hint {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 24px;
+        z-index: 6;    
+      font-size: 14px;
+      letter-spacing: .12em;
+      color: #111;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translate(-50%, -30px); }
+      50% { opacity: 1; transform: translate(-50%, 0); }
+      100% { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+
+    .card.main{position:relative;contain:layout paint style;will-change:transform;}
+    .card.main img{
+      position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+      backface-visibility:hidden;transform:translateZ(0);
+      transition: opacity 400ms cubic-bezier(0.4, 0, 0.2, 1), transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card.main img.front {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .card.main img.back {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    .card.main.is-swapping img.front {
+      opacity: 0;
+      transform: scale(1.05);
+    }
+    .card.main.is-swapping img.back {
+      opacity: 1;
+      transform: scale(1);
+    }
+    @media (prefers-reduced-motion: reduce){ .card.main img{ transition: none !important; } }
+
+    /* Split Portfolio */
+    section#split-portfolio{
+      width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);border-top:1px solid #eaeaea;background:#fff;
+    }
+    #split-portfolio .sp-app{display:grid;grid-template-columns: 1fr 1.45fr;min-height:100vh;}
+    #split-portfolio .sp-left{
+      position:sticky; top:0; height:100vh; display:flex; flex-direction:column; justify-content:space-between;
+      border-right:1px solid #ddd; background:#fff;
+      padding: 80px 40px 40px 40px;
+    }
+    #split-portfolio .sp-title-line{font-family:ui-serif,Georgia,serif;letter-spacing:-.02em;user-select:none;font-size:clamp(40px,8vw,96px);line-height:.95;margin:0}
+    .sp-title-desc {
+        color: #555;
+        font-family: 'Suit', sans-serif;
+        font-size: 15px;
+        line-height: 1.6;
+        margin-top: 20px;
+        max-width: 35ch;
+    }
+    #split-portfolio .sp-meta{margin-top:24px;color:#555;font-size:14px}
+    
+    #split-portfolio .sp-thumbs{
+      display: flex;
+      flex-direction: row;
+      gap: 36px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    #split-portfolio .sp-thumbs::-webkit-scrollbar {
+        display: none;
+    }
+
+    #split-portfolio .sp-thumb{
+      flex-shrink: 0;
+      position:relative;
+      width: 80px;
+      height:80px;
+      aspect-ratio:1/1;
+      border-radius:8px;
+      overflow:hidden;
+      border:1px solid #ddd;
+      opacity:.95;
+      transition:transform .2s, opacity .2s, outline-color .2s;
+      outline:2px solid transparent
+    }
+    #split-portfolio .sp-thumb:hover{transform:translateY(-1px) scale(1.01);opacity:1}
+    #split-portfolio .sp-thumb.active{outline-color:#7c5cff}
+    #split-portfolio .sp-thumb img{width:100%;height:100%;object-fit:cover}
+    #split-portfolio .sp-thumb-caption{margin-top:6px;color:#777;font-size:12px}
+
+    #split-portfolio .sp-right{ background:#fff; }
+    #split-portfolio .sp-header{position:sticky; top:0; z-index:10; border-bottom:1px solid #ddd; background:rgba(255,255,255,.9)}
+    #split-portfolio .sp-header-inner{padding:20px 28px}
+    #split-portfolio .sp-h1{font-size:clamp(22px,2.5vw,28px); font-family:ui-serif,Georgia,serif; margin:0}
+    #split-portfolio .sp-article{max-width:880px; margin:0 auto; padding:24px 28px 120px}
+
+    .sp-layout-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: clamp(24px, 4vw, 48px);
+      align-items: start;
+      padding-top: 40px;
+    }
+    .sp-details-wrapper {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 70vh;
+    }
+    .sp-hero {
+      position:relative; border-radius:12px; overflow:hidden; border:1px solid #ddd;
+      box-shadow:0 30px 60px -20px rgba(0,0,0,.1); aspect-ratio: 3 / 4;
+    }
+    .sp-hero img{width:100%; height:100%; object-fit:cover; transition:transform .5s ease, opacity .3s ease;}
+    .sp-hero:hover img{transform:scale(1.02)}
+
+    .sp-eyebrow{text-transform:uppercase; letter-spacing:.2em; color:#555; font-size:13px}
+    .sp-title2{margin:8px 0 0; font-family:ui-serif,Georgia,serif; font-size:clamp(28px,4vw,40px); letter-spacing:-.02em}
+    .sp-copy{margin-top:24px; color:#333; line-height:1.8; font-family: 'BookkGothic'; font-weight: 300;}
+    .sp-copy p{margin:0 0 16px}
+
+    .sp-mini-gallery {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 32px;
+    }
+    .sp-mini-gallery img {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 1/1;
+      object-fit: contain;
+      opacity: .9;
+      transition: opacity .2s ease;
+    }
+    .sp-mini-gallery img:hover { opacity: 1; }
+    
+    .sp-secondary-feature {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+        margin-top: clamp(48px, 8vh, 96px);
+        padding: 32px 0;
+        border-top: 1px solid #eee;
+    }
+    .sp-secondary-text {
+        flex: 1;
+        padding-right: 24px;
+    }
+    .sp-secondary-text h3 {
+        font-family: 'BookkGothic', serif;
+        font-size: 20px;
+        margin: 0 0 12px;
+    }
+    .sp-secondary-text p {
+        font-family: 'Suit', sans-serif;
+        line-height: 1.7;
+        font-size: 15px;
+        color: #555;
+    }
+    .sp-secondary-image {
+        flex-basis: 50%;
+    }
+    .sp-secondary-image img {
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    .sp-fullbleed{
+      margin-top: clamp(48px, 8vh, 96px);
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #ddd;
+    }
+    .sp-fullbleed img {
+      width: 100%;
+      display: block;
+    }
+    .magnifier-lens {
+      display: none;
+      position: absolute;
+      border: 3px solid #fff;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      border-radius: 50%;
+      width: 180px;
+      height: 180px;
+      background-repeat: no-repeat;
+      pointer-events: none;
+    }
+
+    #pattern-buttons-container {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .pattern-button {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0,0,0,0.2);
+      cursor: pointer;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      color: #111;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      animation: pulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .pattern-button::before {
+      content: '+';
+    }
+    .pattern-button:hover {
+      transform: translate(-50%, -50%) scale(1.25);
+      box-shadow: 0 5px 18px rgba(0,0,0,0.3);
+    }
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+      50% { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+    }
+    
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(10, 10, 10, 0.65);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.4s;
+    }
+    .popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .popup-box {
+      background-color: #fff;
+      padding: 32px 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 550px;
+      position: relative;
+      transform: scale(0.92) translateY(15px);
+      opacity: 0;
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.05s, opacity 0.3s ease 0.05s;
+    }
+    .popup-overlay.active .popup-box {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+    .popup-box h3 {
+      font-family: 'BookkGothic', serif;
+      font-size: 24px;
+      margin: 0 0 16px;
+      color: #111;
+    }
+    .popup-image {
+      width: 100%;
+      height: auto;
+      max-height: 250px;
+      object-fit: contain;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      background-color: #f7f7f7;
+    }
+    .popup-box p {
+      font-family: 'Suit', sans-serif;
+      font-size: 16px;
+      line-height: 1.8;
+      color: #444;
+      margin: 0;
+    }
+    .popup-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      color: #888;
+    }
+
+    #sp-feature, .sp-body, #sp-desc { display: none; }
+
+    @media (max-width:1024px){
+      section.intro-cta{grid-template-columns:1fr;gap:32px;grid-template-columns:0.8fr 1.4fr;}
+      .blurb-wrap{grid-column:1;justify-self:end;max-width:none;width:min(92vw,700px)}
+      .cta-wrap{grid-column:1;align-self:end}
+      .cta-row a{font-size:24px}
+      .hover-icon{left:130px}
+      .stack{ width:88vw }
+    }
+    @media (max-width:768px){
+      section.intro-cta{ grid-template-columns:1fr; }
+      .blurb-wrap{ width:min(92vw,720px); }
+      #split-portfolio .sp-app{grid-template-columns:1fr}
+      #split-portfolio .sp-left{position:relative; height:auto; border-right:none; border-bottom:1px solid #ddd}
+      #split-portfolio .sp-right{height:auto; overflow:visible}
+      .sp-layout-grid { grid-template-columns: 1fr; }
+      .sp-secondary-feature { flex-direction: column-reverse; }
+    }
+    @media (max-width:640px){
+      .cta-row a{font-size:22px}
+      .hover-icon{left:120px;width:34px;height:34px}
+      .mask-text{font-size:16px}
+    }
+
+    :root{
+      --ink:#0a0a0a; --muted:#6b7280; --gutter: clamp(16px, 4vw, 48px);
+      --z-header: 100; --z-overlay: 90;
+      --fm-bg:#060010; --fm-fg:#fff; --fm-divider:rgba(255,255,255,.3);
+      --fm-font:'BookkGothic';
+    }
+    *{ cursor: none; }
+    .cursor {
+      position: fixed; width: 20px; height: 20px; background: rgba(100,100,100,.7);
+      border-radius: 50%; pointer-events: none; z-index: 9999; mix-blend-mode: difference;
+      transition: transform .15s ease-out; top: 0; left: 0;
+    }
+    .site-header{
+      position: fixed; inset: 0 0 auto 0; height: 64px; z-index: var(--z-header);
+      display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+      padding: 8px var(--gutter); pointer-events: none;
+    }
+    .header-left{ justify-self: start; }
+    .header-right{ justify-self: end; }
+    .icon-btn{
+      pointer-events: auto; appearance: none; border: 0; background: transparent; cursor: pointer;
+      width: 44px; height: 44px; display: inline-grid; place-items: center;
+      border-radius: 999px; transition: background .2s ease;
+    }
+    .icon-btn:hover{ background: rgba(0,0,0,.06); }
+    .icon-btn:focus-visible{ outline: 2px solid #111; outline-offset: 2px; }
+    .home-svg{ width: 22px; height: 22px; fill:none; stroke:#111; stroke-width:2; }
+    .menu-btn .burger{ display:grid; gap:4px; }
+    .menu-btn .burger span{ width:20px; height:2px; background:#111; display:block; transition: transform .25s, opacity .25s; }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(2){ opacity:0; }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(1){ transform: translateY(6px) rotate(45deg); }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(3){ transform: translateY(-6px) rotate(-45deg); }
+    .hm-overlay{ position: fixed; inset:0; background: rgba(0,0,0,.35); display:none; z-index: var(--z-overlay); }
+    .hm-overlay.open{ display:grid; place-items: stretch; }
+    .hm-panel{
+      margin-left:auto; width:min(500px, 90vw); height:100%;
+      background:#060010; color:#fff; position:relative;
+      transform: translateX(100%); transition: transform .45s cubic-bezier(.19,1,.22,1);
+      box-shadow: -12px 0 24px rgba(0,0,0,.25);
+    }
+    .hm-overlay.open .hm-panel{ transform: translateX(0); }
+    #react-menu-root{ height:100%; }
+    .fm-menu-wrap{ width:100%; height:100%; overflow:hidden; background:var(--fm-bg); }
+    .fm-menu{ display:flex; flex-direction:column; height:100%; margin:0; padding:0; }
+    .fm-menu__item{ flex:1; position:relative; overflow:hidden; text-align:center; box-shadow:0 -1px var(--fm-divider); min-height:120px; display:flex; align-items:center; justify-content:center; }
+    .fm-menu__item-link{ display:flex; align-items:center; justify-content:center; height:100%; cursor:pointer; text-transform:uppercase; text-decoration:none; white-space:nowrap; font-family: var(--fm-font); font-weight:600; color:var(--fm-fg); font-size:clamp(18px,4vh,42px); outline:none; }
+    .fm-menu__item-link:focus-visible{ outline:2px solid #fff; outline-offset:-4px; }
+    .fm-marquee{ position:absolute; inset:0; overflow:hidden; pointer-events:none; background:#fff; transform: translate3d(0,101%,0); transition: transform .6s cubic-bezier(.19,1,.22,1); }
+    .fm-marquee__inner-wrap{ height:100%; width:200%; display:flex; transform:translateX(0); }
+    .fm-marquee__inner{ display:flex; align-items:center; height:100%; width:200%; will-change:transform; animation: fm-marquee 15s linear infinite; }
+    .fm-marquee span{ color:#060010; white-space:nowrap; text-transform:uppercase; font-weight:400; font-size:clamp(16px,4vh,36px); line-height:1.2; padding:1vh 1vw 0; }
+    .fm-marquee__img{ width:200px; height:7vh; min-height:42px; margin:2em 2vw; padding:1em 0; border-radius:50px; background-size:cover; background-position:50% 50%; }
+    @keyframes fm-marquee{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    @media (prefers-reduced-motion: reduce){ .fm-marquee__inner{ animation:none; } }
+
+    /* --- Hint base --- */
+.stack-hint {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 24px;
+  font-size: 14px;
+  letter-spacing: .12em;
+  color: #111;               /* 요구 사항: 검정색 */
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;                /* 초기 숨김 */
+}
+
+/* 요소 분리(괄호/텍스트) */
+.stack-hint .hint-bracket,
+.stack-hint .hint-text {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+/* 괄호가 양옆으로 벌어지는 거리(원하면 조절) */
+.stack-hint .hint-bracket { --dx: 12px; opacity: 0; }
+.stack-hint .hint-bracket.left  { --dx: -12px; }
+.stack-hint .hint-bracket.right { --dx:  12px; }
+
+/* 나타날 때 실행될 상태 클래스 */
+.stack-hint.reveal { opacity: 1; }
+
+/* ❶ 괄호: 좌우로 벌어지며 나타난다 */
+.stack-hint.reveal .hint-bracket {
+  animation: revealHint 0.8s cubic-bezier(.2,.7,.2,1) forwards;
+}
+
+/* ❷ 본문: 아래에서 위로 떠오른다(괄호 이후 약간 딜레이) */
+.stack-hint.reveal .hint-text {
+  opacity: 0;
+  animation: hintRise 0.65s cubic-bezier(.2,.7,.2,1) 0.35s forwards;
+}
+
+/* 신규 키프레임: 괄호 벌어짐 */
+@keyframes revealHint {
+  0%   { transform: translateX(0);      opacity: 0; }
+  100% { transform: translateX(var(--dx)); opacity: 1; }
+}
+
+/* 본문 상승 */
+@keyframes hintRise {
+  0%   { transform: translateY(10px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+
+/* ===== 4K & 초광폭 대응 패치 (붙여넣기 전용) ===== */
+
+/* 1) 전역 타이포/컨테이너 유연화 */
+.container{
+  max-width: min(92vw, 2000px);
+}
+.mask-text{
+  font-size: clamp(18px, 1.2vw, 26px);
+}
+.cta-row a{
+  font-size: clamp(22px, 1.6vw, 34px);
+}
+.sp-title-desc{
+  font-size: clamp(14px, .9vw, 18px);
+}
+
+/* 2) 갤러리 카드: vw/% 기반으로 확대 재배치 (초대형 화면에서만) */
+@media (min-width: 1600px){
+  .gallery-container{ height: 78vh; }
+
+  .gallery-item{ box-shadow: 0 10px 30px rgba(0,0,0,.12); }
+
+  .item2{ width: 28vw; height: 15.5vw; top: 4vh; right: 6vw; }
+  .item3{ width: 18vw; height: 18vw;  top: 28vh; right: 5vw; }
+  .item4{ width: 16vw; height: 16vw;  top: 24vh; left: 52vw; }
+  .item5{ width: 26vw; height: 17vw;  top: 30vh; left: 14vw; }
+  .item6{ width: 22vw; height: 24vw;  top: 6vh;  left: 6vw;  }
+}
+
+/* 3) 스택/마키: 초대형에서 살짝 키움 */
+@media (min-width: 1600px){
+  .stack{ width: min(52vw, 1100px); }
+  .marquee-row{ font-size: clamp(12vw, 18vw, 18vw); }
+}
+
+/* 4) Split Portfolio 영역 여백/그리드 미세 조정 */
+@media (min-width: 1600px){
+  #split-portfolio .sp-app{
+    grid-template-columns: 1fr 1.5fr;
+  }
+  #split-portfolio .sp-left{
+    padding: 96px 56px 48px 56px;
+  }
+  #split-portfolio .sp-article{
+    max-width: 1000px;
+    padding: 28px 36px 140px;
+  }
+  .sp-title2{ font-size: clamp(32px, 2.6vw, 48px); }
+  .sp-copy{ font-size: clamp(14px, 1.05vw, 18px); }
+}
+
+/* 5) 돋보기 렌즈도 화면비례로 키우기 */
+.magnifier-lens{
+  width: clamp(140px, 12vw, 240px);
+  height: clamp(140px, 12vw, 240px);
+}
+
+/* 6) 커스텀 커서: 초대형에 약간 키우기(선택) */
+@media (min-width: 1600px){
+  .cursor{ width: 24px; height: 24px; }
+}
+
+
+  </style>
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/@studio-freight/lenis/dist/lenis.min.js"></script>
+</head>
+<body>
+  <div class="cursor" id="custom-cursor"></div>
+  <header class="site-header" role="banner">
+    <div class="header-left">
+      <a class="icon-btn" href="index.html" aria-label="Home">
+        <svg class="home-svg" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />
+        </svg>
+      </a>
+    </div>
+    <div class="header-right">
+      <button id="menuBtn" class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="menuPanel" aria-label="Open menu">
+        <span class="burger"><span></span><span></span><span></span></span>
+      </button>
+    </div>
+  </header>
+
+  <div id="menuOverlay" class="hm-overlay" aria-hidden="true">
+    <aside id="menuPanel" class="hm-panel" role="dialog" aria-modal="true" aria-label="Navigation menu">
+      <div class="menu-items"><div id="react-menu-root"></div></div>
+    </aside>
+  </div>
+
+  <div class="container">
+    <section id="gallery">
+      <div class="gallery-container">
+        <div class="background-image"><img src="" alt="" /></div>
+        <div class="gallery-item item2">
+          <video id="mainVideo" loop autoplay muted playsinline>
+            <source src="img/han/1.mp4" type="video/mp4"/>
+          </video>
+        </div>
+        <div class="gallery-item item3"><img src="img/han/m.jpg" alt="아트워크 이미지"/></div>
+        <div class="gallery-item item4"><img src="img/han/bu.gif" alt="그룹 사진"/></div>
+        <div class="gallery-item item5"><img src="img/han/f.gif" alt="텍스트가 있는 인물 사진"/></div>
+        <div class="gallery-item item6">
+          <video id="secondVideo" loop autoplay muted playsinline>
+            <source src="img/han/2.mp4" type="video/mp4"/>
+          </video>
+        </div>
+      </div>
+    </section>
+
+    <section class="intro-cta" id="intro-cta">
+      <div class="cta-wrap">
+        <div class="cta-row">
+          <a href="#marquee" aria-label="Go to marquee">GALLERY</a>
+          <svg class="hover-icon spin" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,5 58,34 90,10 66,42 95,50 66,58 90,90 58,66 50,95 42,66 10,90 34,58 5,50 34,42 10,10 42,34" fill="#2F5DC9"/></svg>
+        </div>
+        <div class="cta-row">
+          <a href="#split-portfolio" aria-label="Go to split portfolio">EXPLORE</a>
+          <svg class="hover-icon spin" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,5 58,34 90,10 66,42 95,50 66,58 90,90 58,66 50,95 42,66 10,90 34,58 5,50 34,42 10,10 42,34" fill="#2F5DC9"/></svg>
+        </div>
+      </div>
+      <div class="blurb-wrap">
+        <div class="mask-block" id="blurbMask">
+          <p class="mask-text">(*)</p>
+          <p class="mask-text">한복에 수놓인 자수는 단순한 장식이 아니라,</p><p class="mask-text">조상들의 바람과 철학이 담긴 상징의 언어입니다.</p>
+          <p class="mask-text">꽃 한 송이, 새 한 마리에도</p><p class="mask-text">복, 장수, 사랑 같은 깊은 의미가 숨어 있습니다.</p>
+          <p class="mask-text">이 웹페이지는 한복 자수 문양에 담긴 이야기를 소개합니다.</p><p class="mask-text">실과 바늘로 전해지는 우리 전통의 속뜻을 천천히 들여다보세요.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="marquee-stack" id="marquee">
+      <div class="marquee-bg" aria-hidden="true">
+        <div class="marquee-wrap">
+          <div class="marquee-row">HANBOK &nbsp; HANBOK &nbsp; HANBOK &nbsp; HANBOK &nbsp;</div>
+        </div>
+      </div>
+      <div class="stack pre">
+        <div class="card bg1" data-rot="-8"><img src="img/han/2.jpg" alt=""></div>
+        <div class="card bg2" data-rot="6"><img src="img/han/5.jpg" alt=""></div>
+        <button class="card main" id="photoMain" aria-label="사진 변경">
+          <img id="photoMainFront" class="front" src="img/han/4.jpg" alt="앞">
+          <img id="photoMainBack" class="back" src="img/han/5.jpg" alt="뒤">
+        </button>
+      </div>
+<p class="stack-hint" id="stackHint" aria-hidden="true">
+  <span class="hint-bracket left" aria-hidden="true">[</span>
+  <span class="hint-text">click for image</span>
+  <span class="hint-bracket right" aria-hidden="true">]</span>
+</p>
+    </section>
+
+    <section id="split-portfolio" aria-label="Split Portfolio">
+      <div class="sp-app">
+        <aside class="sp-left">
+          <div>
+            <h2 class="sp-title-line">HANBOK</h2>
+            <p class="sp-title-desc">우리 고유의 아름다움과 철학이 담긴 의복, 한복의 다채로운 종류를 탐색해 보세요.</p>
+          </div>
+          <div>
+            <div class="sp-thumbs" id="sp-thumbs"></div>
+            <p class="sp-thumb-caption"></p>
+          </div>
+        </aside>
+
+        <main class="sp-right" role="main">
+          <header class="sp-header" role="banner">
+            <div class="sp-header-inner"><h1 class="sp-h1">한복</h1></div>
+          </header>
+
+          <article class="sp-article" aria-live="polite">
+            <div class="sp-layout-grid">
+              <div class="sp-hero-wrapper">
+                <div class="sp-hero"><img id="sp-hero" src="" alt="히어로 이미지" loading="eager" /></div>
+              </div>
+              <div class="sp-details-wrapper">
+                <div class="sp-text-content">
+                  <p class="sp-eyebrow" id="sp-category"></p>
+                  <h2 class="sp-title2" id="sp-title2"></h2>
+                  <div class="sp-copy" id="sp-copy-content"></div>
+                </div>
+                <div class="sp-mini-gallery" id="sp-mini-gallery"></div>
+              </div>
+            </div>
+
+            <section class="sp-secondary-feature" id="sp-secondary-feature">
+              <div class="sp-secondary-text" id="sp-secondary-text">
+                <h3></h3>
+                <p></p>
+              </div>
+              <div class="sp-secondary-image">
+                <img id="sp-secondary-img" src="" alt="Secondary feature image">
+              </div>
+            </section>
+
+            <section class="sp-fullbleed" id="sp-fullbleed">
+              <img id="spf-full" src="" alt="풀사이즈 이미지">
+              <div id="magnifier-lens" class="magnifier-lens"></div>
+              <div id="pattern-buttons-container"></div>
+            </section>
+
+            <p class="sp-desc" id="sp-desc"></p>
+            <section class="sp-feature" id="sp-feature">
+              <div class="sp-feature__media"><img id="spf-main" src="" alt="상세 이미지"></div>
+              <div class="sp-feature__text">
+                <h3 id="spf-title"></h3>
+                <div class="sp-mini">
+                  <img id="spf-mini" src="" alt="설명 이미지">
+                  <p id="spf-miniText"></p>
+                </div>
+                <div class="body" id="spf-body"></div>
+              </div>
+            </section>
+            <div class="sp-body"></div>
+          </article>
+        </main>
+      </div>
+    </section>
+  </div>
+
+  <div id="popup-overlay" class="popup-overlay">
+    <div id="popup-box" class="popup-box">
+      <button id="popup-close" class="popup-close" aria-label="닫기">&times;</button>
+      <h3 id="popup-title"></h3>
+      <img id="popup-image" src="" alt="문양 상세 이미지" class="popup-image">
+      <p id="popup-content"></p>
+    </div>
+  </div>
+
+  <script>
+    /* 스크립트는 이전 버전과 동일합니다 */
+    (function(){
+      const vids = [document.getElementById('mainVideo'), document.getElementById('secondVideo')].filter(Boolean);
+      vids.forEach(v=>{ if(!v) return; const tryPlay=()=>v.play().catch(()=>{document.addEventListener('click',()=>v.play(),{once:true})}); tryPlay(); });
+    })();
+    (function(){
+      const items = document.querySelectorAll('.gallery-item');
+      let isDragging=false, current=null, startX=0,startY=0, offX=0,offY=0;
+      items.forEach(item=>{
+        const rot = (Math.random()-0.5)*3;
+        item.style.transform = `rotate(${rot}deg)`;
+        item.addEventListener('mouseenter',()=> item.style.transform='rotate(0deg) scale(1.03)');
+        item.addEventListener('mouseleave',()=>{ if(!isDragging) item.style.transform=`rotate(${rot}deg)`; });
+        const start = e=>{ e.preventDefault(); const t = e.touches ? e.touches[0] : e; startX=t.clientX; startY=t.clientY; const r=item.getBoundingClientRect(); offX=startX-r.left; offY=startY-r.top; current=item; isDragging=true; item.style.zIndex=100; item.style.cursor='grabbing'; };
+        const move = e=>{ if(!isDragging||!current) return; const t = e.touches ? e.touches[0] : e; const cont=document.querySelector('.gallery-container').getBoundingClientRect(); let x=t.clientX-cont.left-offX, y=t.clientY-cont.top-offY; x=Math.max(0,Math.min(x,cont.width-current.offsetWidth)); y=Math.max(0,Math.min(y,cont.height-current.offsetHeight)); current.style.left=x+'px'; current.style.top=y+'px'; };
+        const end = ()=>{ if(!isDragging) return; isDragging=false; if(current){ current.style.cursor='grab'; current.style.zIndex=10; } current=null; };
+        item.addEventListener('mousedown',start); item.addEventListener('touchstart',start,{passive:false});
+        window.addEventListener('mousemove',move,{passive:false}); window.addEventListener('touchmove',move,{passive:false});
+        window.addEventListener('mouseup',end); window.addEventListener('touchend',end);
+      });
+    })();
+    (function(){
+      const target = document.getElementById('blurbMask');
+      if(!target) return;
+      const io = new IntersectionObserver((entries)=>{ entries.forEach(en=>{ if(en.isIntersecting){ target.classList.add('mask-on'); io.unobserve(en.target); } }); }, {threshold: .3});
+      io.observe(target);
+    })();
+    (function(){
+      const section = document.getElementById('marquee');
+      if (!section) return;
+      const stack = section.querySelector('.stack');
+      const cards = section.querySelectorAll('.card');
+      const hint = document.getElementById('stackHint');
+      cards.forEach(el => el.style.setProperty('--rot', '0deg'));
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(en => {
+          if (!en.isIntersecting) return;
+          stack.classList.remove('pre');
+          cards.forEach((el, i) => {
+            const deg = (el.dataset.rot || '0') + 'deg';
+            setTimeout(() => el.style.setProperty('--rot', deg), i * 150);
+          });
+          if (hint) setTimeout(() => hint.classList.add('reveal'), 400);
+          io.unobserve(en.target);
+        });
+      }, { threshold: .35 });
+      io.observe(section);
+      const PHOTOS = ['img/han/4.jpg', 'img/han/5.jpg', 'img/han/2.jpg'];
+      let idx = 0;
+      let busy = false;
+      const btn = document.getElementById('photoMain');
+      if (btn) {
+        function preload(src) {
+          return new Promise(resolve => {
+            const img = new Image();
+            img.onload = img.onerror = () => resolve(true);
+            img.src = src;
+          });
+        }
+        function rafSwap(on) {
+          return new Promise(r => requestAnimationFrame(() => {
+            btn.classList.toggle('is-swapping', !!on);
+            requestAnimationFrame(r);
+          }));
+        }
+        const initialFront = btn.querySelector('.front');
+        const initialBack = btn.querySelector('.back');
+        if(initialFront) initialFront.src = PHOTOS[0];
+        if(initialBack) initialBack.src = PHOTOS[1];
+        preload(PHOTOS[2]);
+        btn.addEventListener('click', async () => {
+          if (busy) return;
+          busy = true;
+          const currentFront = btn.querySelector('.front');
+          const currentBack = btn.querySelector('.back');
+          idx = (idx + 1) % PHOTOS.length;
+          currentBack.src = PHOTOS[idx];
+          await preload(PHOTOS[idx]);
+          preload(PHOTOS[(idx + 1) % PHOTOS.length]);
+          await rafSwap(true);
+          setTimeout(async () => {
+            currentFront.classList.replace('front', 'back');
+            currentBack.classList.replace('back', 'front');
+            await rafSwap(false);
+            busy = false;
+          }, 400);
+        });
+      }
+    })();
+    (function(){
+      const root = document.getElementById('split-portfolio');
+      if(!root) return;
+      const projects = [
+        { id:0,
+          title:"당의(唐衣)", category:"궁중·사대부 여성의 예복",
+          description:"당의는 저고리에서 길이가 늘어나 치마 위에 겹쳐 입는 겉옷으로, 앞길이보다 뒤길이가 약간 길고 둥근 도련·흰 동정(깃)이 특징입니다. 왕실에선 소례와 조회 같은 격식 있는 자리에, 민간에선 예복이나 혼례 때 착용했습니다.",
+          featureBody:"당의는 동정·깃·고름·곁마기 등의 구성요소가 간결하게 균형을 이루며, 직선 재단임에도 착용자의 움직임을 따라 유려한 곡선이 살아납니다. 평상복보다는 ‘격식 있는 날의 단정함’을 표현하는 예복 성격이 강합니다.",
+          image:"img/han/h2.jpg", thumb:"img/han/h2.jpg", hoverThumb:"img/han/y.jpg",
+          mini_images: ["img/han/1.png", "img/han/3.png"],
+          secondary_feature: {
+            title: "보(補)의 미학",
+            text: "당의의 가슴, 등, 어깨에는 '보(補)'라 불리는 사각형의 장식판을 붙여 착용자의 신분과 등급을 나타냈습니다. 보는 주로 용, 봉황, 꽃 등 상서로운 문양을 정교하게 수놓아 만들었으며, 이는 단순한 장식을 넘어 왕실의 권위와 질서를 시각적으로 표현하는 중요한 역할을 했습니다.",
+            image: "img/han/bo.jpg"
+          },
+          detail_image: "img/han/d.png",
+          patterns: [
+            { name: "봉황문", description: "봉황은 상서롭고 고귀한 새로, 왕비의 복식에 주로 사용되었습니다. 태평성대를 상징하며, 암컷과 수컷이 함께 그려져 부부의 화합과 금슬을 의미합니다.", position: { top: '30%', left: '55%' }, image: "img/han/bonghwang.jpg" },
+            { name: "화문", description: "작은 꽃 문양은 아름다움과 생명력을 상징합니다. 여러 종류의 꽃이 어우러져 조화와 번영의 의미를 더하며, 당의 전체에 화사함을 부여하는 역할을 합니다.", position: { top: '75%', left: '45%' }, image: "img/han/flower.jpg" }
+          ]
+        },
+        { id:1,
+          title:"활옷(闊衣)", category:"신부 예복(혼례복)",
+          description:"활옷은 붉은 계열의 바탕에 넓은 소매를 갖춘 신부 예복으로, 모란·봉황·박쥐 등 길상 문양을 정교한 자수로 수놓아 복과 번영을 기원합니다. 본래 궁중 예복 계통의 형식이 민간 혼례로 확장되어 널리 쓰였으며, 짙은 색 대비와 화사한 자수가 의식의 중심을 강조합니다.",
+          featureBody:"활옷의 자수는 상징의 사전입니다. 봉황은 기품과 화합, 모란은 부귀, 박쥐는 복(福)을 뜻해 혼례의 의미를 시각적으로 드러냅니다. 넉넉한 품과 긴 길이는 신부의 동선을 우아하게 만듭니다.",
+          image:"img/han/5.jpg", thumb:"img/han/5.jpg", hoverThumb:"img/han/yo.jpg",
+          mini_images: ["img/han/h3.jpg", "img/han/yo.jpg", "img/han/5.jpg"],
+          secondary_feature: {
+            title: "자수의 상징성",
+            text: "활옷의 가장 큰 특징은 옷 전체를 화려하게 뒤덮은 자수입니다. 연꽃, 모란, 봉황, 원앙 등은 각각 부부애, 부귀, 장수와 같은 길상의 의미를 담고 있습니다. 신부의 행복한 미래를 축원하는 마음을 가득 담아 한 땀 한 땀 수를 놓은 조상들의 정성을 엿볼 수 있습니다.",
+            image: "img/han/jasu.jpg"
+          },
+          detail_image: "img/han/h3.jpg",
+          patterns: [
+            { name: "모란문", description: "부귀영화를 상징하는 모란은 활옷의 중심 문양으로 자주 사용됩니다. 풍성하고 화려한 형태로 수놓아 신부의 행복과 번영을 기원하는 의미를 담고 있습니다.", position: { top: '50%', left: '50%' }, image: "img/han/moran.jpg" }
+          ]
+        },
+        { id:2,
+          title:"원삼(圓衫)", category:"왕비·빈의 소례복 / 신부 예복",
+          description:"원삼은 품이 넓고 길이가 긴 겉옷으로, 상·하의의 색 대비와 소매 단의 장식이 돋보이는 의례복입니다. 본래 왕비와 빈의 소례복이지만, 민간에서도 신부 예복로 널리 전해졌습니다.",
+          featureBody:"원삼은 넓은 품과 곧게 떨어지는 선으로 장중함을 표현합니다. 소매와 몸판의 색 배치가 리듬을 만들어 움직임마다 화면이 달라지며, 치마 위에 겹쳐 입어 실루엣을 정제합니다.",
+          image:"img/han/h4.jpg", thumb:"img/han/2.jpg", hoverThumb:"img/han/1.jpg",
+          mini_images: ["img/han/h4.jpg", "img/han/2.jpg", "img/han/1.jpg"],
+           secondary_feature: {
+            title: "색동 소매의 의미",
+            text: "원삼 소매 끝에 여러 색의 천을 이어 붙인 '색동'은 음양오행설에 기반하여 나쁜 기운을 막고 복을 부르는 벽사(辟邪)와 길상(吉祥)의 의미를 담고 있습니다. 화려한 색동은 원삼의 장식미를 더하는 동시에 의복에 좋은 기운을 불어넣는 역할을 합니다.",
+            image: "img/han/sekdong.jpg"
+          },
+          detail_image: "img/han/h4.jpg",
+          patterns: [
+            { name: "운봉문", description: "구름과 봉황을 함께 수놓은 운봉문은 왕실의 권위와 신성함을 상징합니다. 봉황은 왕비를, 구름은 상서로운 기운을 뜻하여 국가의 태평과 왕실의 영원한 번영을 기원하는 최고 등급의 문양입니다.", position: { top: '45%', left: '60%' }, image: "img/han/unbong.jpg" }
+          ]
+        },
+        { id:3,
+          title:"법복(적의)", category:"왕비·세자빈의 의례복",
+          description:"적의는 왕실의 적통을 잇는 여인만이 입을 수 있는 최고의 예복으로 왕실의 권위를 상징하는 의복입니다.",
+          featureBody: "대비, 왕, 왕비 등 왕실 어른께 존호를 올리는 존숭(尊崇)과 잔치[진연(進宴)]에 입을 때는 법복에 갖추는 옥대, 패옥, 규 등의 몇몇 부속품을 생략하여 왕의 상복에 준하는 용도로 착용했습니다.",
+          image:"img/han/cheolik_main.jpg", thumb:"img/han/cheolik_thumb.jpg", hoverThumb:"img/han/cheolik_hover.jpg",
+          mini_images: ["img/han/bub.jpg", "img/han/bub2.jpg"],
+          secondary_feature: {
+            title: "실용성과 위엄의 조화",
+            text: "심청색 바탕에 황후 12줄[등(等)], 황태자비 9줄의 꿩문양과 꽃문양을 배치했고, 문양의 줄 수로 신분을 구별했습니다.",
+            image: "img/han/cheolik_secondary.jpg"
+          },
+          detail_image: "img/han/cheolik_detail.jpg",
+          patterns: [
+            { name: "띠 장식 (Belt)", description: "철릭과 함께 착용하는 띠(광다회)는 신분을 나타내는 중요한 장신구였습니다. 띠의 색상과 재질, 문양을 통해 착용자의 품계를 알 수 있었습니다.", position: { top: '55%', left: '50%' }, image: "img/han/belt_pattern.jpg" }
+          ]
+        },
+        { id:4,
+          title:"도포(道袍)", category:"선비의 외출복",
+          description: "도포는 조선시대 선비들이 일상적으로 입던 대표적인 겉옷입니다. 품이 넓고 소매가 길며, 등 부분에 전삼(뒷자락)이 한 겹 더 덧대어져 있는 것이 특징입니다. 이는 유학자의 단정하고 학식 높은 풍모를 상징합니다.",
+          featureBody: "도포의 뒷면 중앙이 트여 있고 그 위에 전삼이 덮여 있는 구조는 실용성과 예를 동시에 고려한 디자인입니다. 앉거나 움직일 때 불편함이 없도록 하면서도, 겉모습은 항상 단정하게 유지될 수 있도록 고안되었습니다.",
+          image:"img/han/dopo_main.jpg", thumb:"img/han/dopo_thumb.jpg", hoverThumb:"img/han/dopo_hover.jpg",
+          mini_images: ["img/han/dopo_mini1.jpg", "img/han/dopo_mini2.jpg", "img/han/dopo_mini3.jpg"],
+          secondary_feature: {
+            title: "선비의 정신",
+            text: "도포의 넓고 유려한 실루엣은 학문과 사색에 잠긴 선비의 여유로운 정신세계를 상징합니다. 바람에 휘날리는 옷자락은 마치 자연과 하나 된 듯한 물아일체(物我一體)의 경지를 시각적으로 표현하며, 조선 선비 문화의 정수를 담고 있습니다.",
+            image: "img/han/dopo_secondary.jpg"
+          },
+          detail_image: "img/han/dopo_detail.jpg",
+          patterns: [
+            { name: "전삼 (Back Panel)", description: "도포의 가장 큰 특징인 등판의 덧자락 '전삼'은 예를 갖추어야 할 때 뒷트임을 가려주는 역할을 했습니다. 이는 선비들이 항상 몸가짐을 바르게 하고자 했던 정신을 반영합니다.", position: { top: '40%', left: '50%' }, image: "img/han/jeonsam_pattern.jpg" }
+          ]
+        }
+      ];
+
+      let active=-1;
+      const elCategory = root.querySelector('#sp-category');
+      const elTitle    = root.querySelector('#sp-title2');
+      const elHero     = root.querySelector('#sp-hero');
+      const thumbs     = root.querySelector('#sp-thumbs');
+      const elCopyContent = root.querySelector('#sp-copy-content');
+      const elMiniGallery = root.querySelector('#sp-mini-gallery');
+      const elFullBleedImg = root.querySelector('#spf-full');
+      const elPatternButtons = root.querySelector('#pattern-buttons-container');
+      const elSecondaryText = root.querySelector('#sp-secondary-text');
+      const elSecondaryImg = root.querySelector('#sp-secondary-img');
+
+      projects.forEach(p=>{ [p.image, p.thumb, p.hoverThumb, p.detail_image, p.secondary_feature?.image, ...(p.mini_images || [])].forEach(s=>{ if(s){ const im=new Image(); im.src=s; } }); });
+
+      function setActive(i){
+        if (i === active) return;
+        active=i; const p=projects[i];
+
+        elCategory.textContent=p.category;
+        elTitle.textContent=p.title;
+        elCopyContent.innerHTML = `<p>${p.description}</p><p>${p.featureBody}</p>`;
+
+        elHero.style.transition='opacity .22s ease, transform .22s ease';
+        elHero.style.opacity='0'; elHero.style.transform='scale(.99)';
+        setTimeout(()=>{
+          elHero.src=p.image;
+          elHero.alt=`${p.title} — 히어로 이미지`;
+          elHero.onload=()=>{ elHero.style.opacity='1'; elHero.style.transform='scale(1)'; };
+        },120);
+
+        elMiniGallery.innerHTML = '';
+        if (p.mini_images?.length){
+          p.mini_images.forEach(src=>{
+            const img=document.createElement('img');
+            img.src=src; img.alt=`${p.title} 상세 이미지`; img.loading='lazy';
+            elMiniGallery.appendChild(img);
+          });
+        }
+        
+        if (p.secondary_feature) {
+          elSecondaryText.querySelector('h3').textContent = p.secondary_feature.title;
+          elSecondaryText.querySelector('p').textContent = p.secondary_feature.text;
+          elSecondaryImg.src = p.secondary_feature.image;
+          elSecondaryImg.alt = p.secondary_feature.title;
+        }
+
+        if(p.detail_image) {
+          elFullBleedImg.src = p.detail_image;
+          elFullBleedImg.alt = `${p.title} — 상세 보기 이미지`;
+        }
+
+        elPatternButtons.innerHTML = '';
+        if(p.patterns?.length) {
+          p.patterns.forEach(pattern => {
+            const btn = document.createElement('button');
+            btn.className = 'pattern-button';
+            btn.style.top = pattern.position.top;
+            btn.style.left = pattern.position.left;
+            btn.dataset.name = pattern.name;
+            btn.dataset.description = pattern.description;
+            btn.dataset.image = pattern.image;
+            btn.setAttribute('aria-label', `${pattern.name} 상세 정보 보기`);
+            btn.addEventListener('click', () => {
+              window.showHanbokPopup(btn.dataset.name, btn.dataset.description, btn.dataset.image);
+            });
+            elPatternButtons.appendChild(btn);
+          });
+        }
+
+        thumbs.querySelectorAll('.sp-thumb').forEach(btn=>{
+          const on=Number(btn.dataset.index)===active;
+          btn.classList.toggle('active',on);
+          btn.setAttribute('aria-pressed', String(on));
+        });
+      }
+
+      function createThumb(p,i){
+        const btn=document.createElement('button');
+        btn.className='sp-thumb'; btn.type='button'; btn.dataset.index=String(i);
+        btn.setAttribute('aria-label', `${p.title} 보기`);
+        btn.setAttribute('aria-pressed', String(i===active));
+        const img=document.createElement('img');
+        img.loading='lazy'; img.src = p.thumb || p.image; img.alt = `${p.title} 썸네일`;
+        btn.appendChild(img);
+        const enter = ()=>{ if(!p.hoverThumb) return; img.style.opacity='0'; setTimeout(()=>{ img.src=p.hoverThumb; img.onload=()=> img.style.opacity='1'; }, 100); };
+        const leave = ()=>{ const back=p.thumb||p.image; img.style.opacity='0'; setTimeout(()=>{ img.src=back; img.onload=()=> img.style.opacity='1'; }, 100); };
+        btn.addEventListener('mouseenter', enter); btn.addEventListener('mouseleave', leave);
+        btn.addEventListener('touchstart', enter, {passive:true}); btn.addEventListener('touchend', leave);
+        btn.addEventListener('click',()=> setActive(i));
+        return btn;
+      }
+
+      projects.forEach((p,i)=> thumbs.appendChild(createThumb(p,i)));
+      setActive(0);
+    })();
+    
+    (function() {
+      const container = document.getElementById('sp-fullbleed');
+      const img = document.getElementById('spf-full');
+      const lens = document.getElementById('magnifier-lens');
+      if(!container || !img || !lens) return;
+      const zoomLevel = 2.5;
+      function moveMagnifier(e) {
+        const rect = img.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+        let lensX = x - lens.offsetWidth / 2;
+        let lensY = y - lens.offsetHeight / 2;
+        if (lensX < 0) lensX = 0;
+        if (lensY < 0) lensY = 0;
+        if (lensX > img.width - lens.offsetWidth) lensX = img.width - lens.offsetWidth;
+        if (lensY > img.height - lens.offsetHeight) lensY = img.height - lens.offsetHeight;
+        lens.style.left = lensX + 'px';
+        lens.style.top = lensY + 'px';
+        const bgPosX = (x / img.width) * 100;
+        const bgPosY = (y / img.height) * 100;
+        lens.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
+      }
+      container.addEventListener('mouseenter', () => {
+        const onImgLoad = () => {
+            lens.style.backgroundImage = `url('${img.src}')`;
+            lens.style.backgroundSize = `${img.width * zoomLevel}px ${img.height * zoomLevel}px`;
+            lens.style.display = 'block';
+        };
+        if (img.complete) { onImgLoad(); } else { img.addEventListener('load', onImgLoad, {once: true}); }
+      });
+      container.addEventListener('mouseleave', () => { lens.style.display = 'none'; });
+      container.addEventListener('mousemove', moveMagnifier);
+    })();
+
+    (function() {
+      const overlay = document.getElementById('popup-overlay');
+      const box = document.getElementById('popup-box');
+      const titleEl = document.getElementById('popup-title');
+      const contentEl = document.getElementById('popup-content');
+      const imageEl = document.getElementById('popup-image');
+      const closeBtn = document.getElementById('popup-close');
+      function showPopup(title, content, imageUrl) {
+        titleEl.textContent = title;
+        contentEl.textContent = content;
+        if (imageUrl) {
+          imageEl.src = imageUrl;
+          imageEl.style.display = 'block';
+        } else {
+          imageEl.style.display = 'none';
+        }
+        overlay.classList.add('active');
+      }
+      function hidePopup() {
+        overlay.classList.remove('active');
+      }
+      closeBtn.addEventListener('click', hidePopup);
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          hidePopup();
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('active')) {
+          hidePopup();
+        }
+      });
+      window.showHanbokPopup = showPopup;
+    })();
+
+    /* 앵커 스크롤 */
+    document.querySelectorAll('a[href="#marquee"], a[href="#split-portfolio"]').forEach(link=>{
+      link.addEventListener('click', function(e){
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (window.__lenis && target){ window.__lenis.scrollTo(target); }
+        else if(target){ target.scrollIntoView({ behavior: 'smooth' }); }
+      });
+    });
+  </script>
+
+  <script>
+    /* 커서, 메뉴, Lenis */
+    (function(){
+      const cursor = document.querySelector('.cursor');
+      if (!cursor) return;
+      document.addEventListener('mousemove', (e) => { cursor.style.transform = `translate(${e.clientX - 10}px, ${e.clientY - 10}px)`; });
+    })();
+    (() => {
+      const btn = document.getElementById('menuBtn');
+      const overlay = document.getElementById('menuOverlay');
+      const panel = document.getElementById('menuPanel');
+      function setOpen(open){
+        btn.setAttribute('aria-expanded', String(open));
+        overlay.classList.toggle('open', open);
+        overlay.setAttribute('aria-hidden', String(!open));
+        document.body.style.overflow = open ? 'hidden' : '';
+      }
+      btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+      overlay.addEventListener('click', () => setOpen(false));
+      panel?.addEventListener('click', (e) => e.stopPropagation());
+      window.addEventListener('keydown', (e) => { if(e.key === 'Escape') setOpen(false); });
+      window.toggleMenu = function(next){ if (typeof next === 'boolean') setOpen(next); else setOpen(btn.getAttribute('aria-expanded') !== 'true'); };
+    })();
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const lenis  = new Lenis({ lerp: reduce ? 0 : 0.085, smoothWheel: !reduce, smoothTouch: false });
+    function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
+    window.__lenis = lenis;
+  </script>
+
+  <script type="text/babel">
+    /* React 메뉴 */
+    const { useRef, useEffect, Fragment } = React;
+    function FlowingMenu({ items = [] }) {
+      useEffect(() => { items.forEach(it => { if (it.image){ const img=new Image(); img.src=it.image; } }); }, [items]);
+      return ( <div className="fm-menu-wrap"><nav className="fm-menu" aria-label="Hamburger items">{items.map((it, i) => <MenuItem key={i} {...it} />)}</nav></div> );
+    }
+    function MenuItem({ link = '#', text, image }) {
+      const itemRef = useRef(null); const marqueeRef = useRef(null); const marqueeInnerRef = useRef(null);
+      const animationDefaults = { duration: 0.6, ease: 'expo.out' };
+      const dist = (x,y,x2,y2)=>{ const dx=x-x2, dy=y-y2; return dx*dx+dy*dy; };
+      const closestEdge = (mx,my,w,h)=> dist(mx,my,w/2,0) < dist(mx,my,w/2,h) ? 'top':'bottom';
+      const enter = (ev)=>{
+        if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;
+        const rect = itemRef.current.getBoundingClientRect(); const x=(ev.clientX??0)-rect.left, y=(ev.clientY??0)-rect.top;
+        const edge=closestEdge(x,y,rect.width,rect.height);
+        gsap.timeline({ defaults: animationDefaults }).set(marqueeRef.current,{ y:edge==='top' ? '-101%':'101%' },0).set(marqueeInnerRef.current,{ y:edge==='top' ? '101%':'-101%' },0).to([marqueeRef.current,marqueeInnerRef.current],{ y:'0%' },0);
+      };
+      const leave = (ev)=>{
+        if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;
+        const rect=itemRef.current.getBoundingClientRect(); const x=(ev.clientX??0)-rect.left, y=(ev.clientY??0)-rect.top;
+        const edge=closestEdge(x,y,rect.width,rect.height);
+        gsap.timeline({ defaults: animationDefaults }).to(marqueeRef.current,{ y:edge==='top' ? '-101%':'101%' },0).to(marqueeInnerRef.current,{ y:edge==='top' ? '101%':'-101%' },0);
+      };
+      const onClick = () => { if (link && link.startsWith('#')) { if (window.toggleMenu) window.toggleMenu(false); } };
+      const repeated = Array.from({ length:4 }).map((_,i)=>( <Fragment key={i}><span>{text}</span><div className="fm-marquee__img" style={{ backgroundImage:`url(${image})` }} /></Fragment> ));
+      return (
+        <div className="fm-menu__item" ref={itemRef}>
+          <a className="fm-menu__item-link" href={link} onPointerEnter={enter} onPointerLeave={leave} onFocus={enter} onBlur={leave} onClick={onClick}>{text}</a>
+          <div className="fm-marquee" ref={marqueeRef} aria-hidden="true"><div className="fm-marquee__inner-wrap" ref={marqueeInnerRef}><div className="fm-marquee__inner">{repeated}</div></div></div>
+        </div>
+      );
+    }
+    (function mountMenu(){
+      const menuRoot = document.getElementById('react-menu-root');
+    if (menuRoot) {
+      const menuItems = [
+        { link: 'index.html',    text: '홈',   image: 'img/8.jpg' },
+        { link: 'sumak.html',     text: '수막새', image: 'img/6.jpg' },
+        { link: 'ceramics.html', text: '공예품', image: 'img/gong/do.png' },
+        { link: 'hanbok.html',   text: '한복', image: 'img/han/bg.jpg' },
+      ];
+        ReactDOM.createRoot(menuRoot).render(<FlowingMenu items={menuItems} />);
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CRAFT WORK</title>
+
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/@studio-freight/lenis/dist/lenis.min.js"></script>
+
+<style>
+  /* ===== Fonts ===== */
+  @font-face {
+    font-family: 'Suit';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Light.woff2') format('woff2');
+    font-weight: 300; font-display: swap;
+  }
+  @font-face {
+    font-family: 'BookkMyungjo';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Lt.woff2') format('woff2');
+    font-weight: 400; font-display: swap;
+  }
+  @font-face {
+    font-family: 'BookkGothic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkGothic-Bd.woff2') format('woff2');
+    font-weight: 700; font-display: swap;
+  }
+
+  :root{
+    --ink:#0a0a0a;
+    --muted:#6b7280;
+    --gutter: clamp(16px, 4vw, 48px);
+    --z-header: 100;
+    --z-overlay: 90;
+    --hero-bg:#ffffff;
+    --panels: 3;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; }
+  html{ scroll-behavior:auto; }
+  body{
+    margin:0; color:var(--ink); background:var(--hero-bg);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+    line-height:1.45; overflow-x:hidden;
+    background-color: #f0f0f0;
+  }
+
+  /* ===== Header / Menu ===== */
+  .site-header{
+    position: fixed; inset: 0 0 auto 0; height: 64px; z-index: var(--z-header);
+    display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+    padding: 8px var(--gutter); pointer-events: none;
+  }
+  .header-left{ justify-self: start; }
+  .header-right{ justify-self: end; }
+  .icon-btn{
+    pointer-events: auto; appearance: none; border: 0; background: transparent; cursor: pointer;
+    width: 44px; height: 44px; display: inline-grid; place-items: center;
+    border-radius: 999px; transition: background .2s ease;
+  }
+  .icon-btn:hover{ background: rgba(0,0,0,.06); }
+  .icon-btn:focus-visible{ outline: 2px solid #111; outline-offset: 2px; }
+  .home-svg{ width: 22px; height: 22px; fill:none; stroke:#111; stroke-width:2; }
+  .menu-btn .burger{ display:grid; gap:4px; }
+  .menu-btn .burger span{ width:20px; height:2px; background:#111; display:block; transition: transform .25s, opacity .25s; }
+  .menu-btn[aria-expanded="true"] .burger span:nth-child(2){ opacity:0; }
+  .menu-btn[aria-expanded="true"] .burger span:nth-child(1){ transform: translateY(6px) rotate(45deg); }
+  .menu-btn[aria-expanded="true"] .burger span:nth-child(3){ transform: translateY(-6px) rotate(-45deg); }
+  .hm-overlay{ position: fixed; inset:0; background: rgba(0,0,0,.35); display:none; z-index: var(--z-overlay); }
+  .hm-overlay.open{ display:grid; place-items: stretch; }
+  .hm-panel{
+    margin-left:auto; width:min(500px, 90vw); height:100%;
+    background:#060010; color:#fff; position:relative;
+    transform: translateX(100%); transition: transform .45s cubic-bezier(.19,1,.22,1);
+    box-shadow: -12px 0 24px rgba(0,0,0,.25);
+  }
+  .hm-overlay.open .hm-panel{ transform: translateX(0); }
+  #react-menu-root{ height:100%; }
+
+  /* ===== React Flowing Menu (explore.html 스타일) ===== */
+  .fm-menu-wrap{ width:100%; height:100%; overflow:hidden; background:#060010; }
+  .fm-menu{ display:flex; flex-direction:column; height:100%; margin:0; padding:0; }
+  .fm-menu__item{ flex:1; position:relative; overflow:hidden; text-align:center; box-shadow:0 -1px rgba(255,255,255,.22);
+    min-height: 120px; display:flex; align-items:center; justify-content:center; }
+  .fm-menu__item-link{
+    display:flex; align-items:center; justify-content:center; height:100%;
+    cursor:pointer; text-transform:uppercase; text-decoration:none; white-space:nowrap;
+    font-weight:600; color:#fff; font-size:clamp(18px,4vh,42px); outline:none;
+  }
+  .fm-menu__item-link:focus-visible{ outline:2px solid #fff; outline-offset: -4px; }
+  .fm-marquee{ position:absolute; inset:0; overflow:hidden; pointer-events:none; background:#fff;
+    transform: translate3d(0,101%,0); transition: transform .6s cubic-bezier(.19,1,.22,1); }
+  .fm-marquee__inner-wrap{ height:100%; width:200%; display:flex; transform:translateX(0); }
+  .fm-marquee__inner{ display:flex; align-items:center; height:100%; width:200%; will-change:transform; animation: fm-marquee 15s linear infinite; }
+  .fm-marquee span{ color:#060010; white-space:nowrap; text-transform:uppercase; font-weight:400;
+    font-size:clamp(16px,4vh,36px); line-height:1.2; padding:1vh 1vw 0; }
+  .fm-marquee__img{ width:200px; height:7vh; min-height:42px; margin:2em 2vw; padding:1em 0; border-radius:50px; background-size:cover; background-position:50% 50%; }
+  @keyframes fm-marquee{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  /* ===== Hero + ImageTrail ===== */
+  .hero{ position:relative; min-height:100svh; padding: clamp(12px, 2vw, 24px) var(--gutter) max(10vh, 64px);
+    display:grid; align-items:center; justify-content:center; background:var(--hero-bg); overflow:hidden; }
+  .hero-inner{ width:100%; text-align:center; position:relative; z-index:1; }
+  .hero-title-wrap{ position:relative; display:inline-block; }
+  .hero-title{ margin:0 auto; font-size: max(40vw, 78vh); line-height:.86; letter-spacing:-.02em; font-weight:900; color:#000;
+    white-space:nowrap; display:inline-block; transform-origin:center; }
+  .hero-desc{
+    font-family: 'BookkMyungjo', serif; max-width:100ch; margin: clamp(16px, 2vh, 32px) auto 0;
+    font-size: clamp(13px, 1.5vw, 16px); line-height: 1.9; color: #2b2b2b; letter-spacing: -0.01em;
+  }
+  .image-trail-layer{ position:absolute; inset:0; z-index:60; pointer-events:auto; }
+  .content{ width:100%; height:100%; position:relative; z-index:60; background: transparent; overflow: visible; }
+  .content__img { position: absolute; top: 0; left: 0; opacity: 0; overflow: hidden; will-change: transform, filter; border-radius: 15px; width: 190px; aspect-ratio: 1.1; }
+  .content__img-inner { display: block; width: 100%; height: 100%; object-fit: contain; background: none !important; }
+
+  /* ===== Interlude ===== */
+  .interlude{ height: 350vh; padding: 0 var(--gutter); display:block; background:var(--hero-bg); border-block: 1px solid #e5e5dc; }
+  .interlude--circle .interlude__wrap{ position: sticky; top: 0; min-height: 100svh; max-width: 1100px; margin: 0 auto;
+    display:grid; place-content:center; justify-items:center; text-align:center; gap: 24px; padding: clamp(48px,  8vw, 120px) 0; }
+  .interlude--circle .interlude__desc{ font-family: 'BookkMyungjo', serif; color:#2b2b2b; letter-spacing:-.01em; line-height:1.9;
+    font-size: clamp(14px, 1.6vw, 18px); max-width: 72ch; margin: 0 auto; white-space: normal; }
+  .interlude__desc .w{ display:inline-block; opacity:0; transform: translateY(16px); will-change: transform, opacity; margin-right:.28em; vertical-align:baseline; white-space:nowrap; }
+  .circle-hero{ width: min(52vw, 440px); aspect-ratio: 16 / 10; border-radius: 9999px; overflow:hidden; display:grid; place-items:center; background:#f3f3eb; box-shadow: 0 12px 34px rgba(0,0,0,.08); will-change: transform; }
+  .circle-hero img{ width:110%; height:110%; object-fit:cover; transform: translate3d(0,0,0) scale(1); transform-origin:50% 50%; will-change: transform; }
+
+  /* ===== Horizontal Scroll Section Layout (panel-reveal style) ===== */
+  .hscroll-new {
+    --side-width: 120px;
+    --gap: 40px;
+    height: calc(var(--panels) * 100vh);
+    background-color: #f0f0f0;
+  }
+  .hscroll-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0;
+    align-items: stretch;
+  }
+  .hscroll-title { display:none !important;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: clamp(60px, 10vw, 120px);
+    font-weight: 800;
+    color: #cbd5e1;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .hscroll-track {
+    display: flex;
+    height: 100vh;
+    gap: 0;
+  }
+  .panel {
+    border-left: 1px solid #e5e7eb;
+    padding: 0 32px;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 0;
+    flex-shrink: 0;
+    flex-grow: 1;
+    background: #fff;
+    box-shadow: 0 12px 30px rgba(0,0,0,.04);
+    transition: box-shadow .35s ease, background .35s ease;
+    height: 100vh;
+  }
+  .panel.is-active{ box-shadow: 0 16px 48px rgba(0,0,0,.08); }
+
+  /* Header: 번호 + 제목은 항상 노출 */
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 20px 0 18px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .panel-number { font-size: 18px; font-weight: 700; color: #94a3b8; }
+  .panel-title { font-size: 24px; font-weight: 700; margin: 0; color:#111; }
+
+  .panel-image {
+    margin-top: 4px;
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 0;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .panel-image img {
+    width: auto;
+    max-width: 88%;
+    height: min(70%, 70vh);
+    object-fit: contain;
+    margin: 0 auto;
+    transform: scale(0.95);
+    opacity: 0;
+    will-change: transform, opacity;
+    transition: transform 0.9s cubic-bezier(.22,.61,.36,1), opacity 0.6s ease-in-out 0.2s;
+  }
+  .panel.is-active .panel-image img {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+
+  /* Discrete open/close sizing */
+  .panel { flex: 1 0 0; transition: flex-grow 1.1s cubic-bezier(.22,.61,.36,1), box-shadow .9s ease; }
+  .panel.is-active { flex: 3.6 0 0; }
+  
+  /* 설명(footer)은 기본 감춤 → 활성 패널에서만 슬라이드/펼침 */
+  .panel-footer {
+    padding-top: 8px;
+    font-size: 14px;
+    opacity: 0;
+    transform: translateY(10px);
+    max-height: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: opacity .35s ease, transform .35s ease, max-height .5s ease;
+  }
+  .panel.show-footer .panel-footer {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: none;
+    overflow: visible;
+    pointer-events: auto;
+  }
+  .panel-meta {
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: .08em;
+  }
+  .panel-desc {
+    margin-top: 10px;
+    color: #374151;
+    line-height: 1.7;
+    font-family: 'Suit';
+  }
+  .panel-link {
+    display: inline-block;
+    margin-top: 16px;
+    color: #111;
+    text-decoration: underline;
+  }
+
+  /* ===== Gallery after ===== */
+  .un-section{display:flex;justify-content:center;align-items:center;width:100%;padding:60px 0; background:var(--hero-bg);}
+  .image-list{display:flex;flex-direction:column;align-items:center;gap:60px}
+  .image-item{display:flex;flex-direction:column;align-items:center;width:460px}
+  .image-item img{width:100%;height:auto;margin:0;transform:scale(1);transition:transform .35s cubic-bezier(.22,.61,.36,1)}
+  .image-item img:hover{ transform: scale(1.05); }
+
+  /* ===== 4K 대응 패치: ceramics.html 맨 아래 <style> 끝에 추가 ===== */
+
+/* 전역 여백 살짝 유연화 */
+:root{
+  --gutter: clamp(16px, 3.5vw, 64px);
+}
+
+/* Hero 설명 글자: 4K에서 너무 작지 않게 */
+.hero-desc{
+  font-size: clamp(16px, 1.1vw, 22px);
+  max-width: 85ch;
+}
+
+/* ImageTrail 썸네일도 화면비례로 키우기 */
+.content__img{
+  width: clamp(140px, 10vw, 280px);
+  border-radius: clamp(10px, 1vw, 18px);
+}
+
+/* Interlude 본문/이미지 크기 상향 */
+.interlude--circle .interlude__desc{
+  font-size: clamp(16px, 1.2vw, 22px);
+}
+.interlude--circle .interlude__wrap{
+  max-width: min(1400px, 86vw);
+}
+.circle-hero{
+  width: clamp(360px, 40vw, 720px); /* 기존 min(52vw, 440px) → 초대형에서 더 큼 */
+}
+
+/* 가로 패널 타이포 & 이미지 스케일 */
+.panel-title{  font-size: clamp(20px, 1.6vw, 34px); }
+.panel-number{ font-size: clamp(16px, 1.1vw, 22px); }
+.panel-meta{   font-size: clamp(12px, 0.9vw, 16px); letter-spacing: .1em; }
+.panel-desc{   font-size: clamp(14px, 1.0vw, 18px); }
+
+.panel-image img{
+  max-width: min(92%, 1200px); /* 4K에서 이미지도 살짝 더 크게 */
+  height: min(72%, 72vh);
+}
+
+/* 초광폭 화면에서 활성 패널 더 크게 열어 집중감 확보 */
+@media (min-width: 1600px){
+  .panel{ flex: 1 0 0; }
+  .panel.is-active{ flex: 4.2 0 0; } /* 기존 3.6 → 4.2 */
+}
+
+/* 아래 갤러리 카드도 고정폭 → 유연폭 */
+.image-list{
+  gap: clamp(40px, 6vh, 100px);
+}
+.image-item{
+  width: clamp(280px, 24vw, 720px); /* 기존 460px 고정폭 개선 */
+}
+.image-item img{
+  border-radius: clamp(8px, 0.8vw, 16px);
+}
+
+/* 상단 헤더 여백 조금 확대 (초대형에서 답답함 방지) */
+@media (min-width: 1600px){
+  .site-header{ height: 72px; padding-inline: max(24px, 4vw); }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header" role="banner">
+  <div class="header-left">
+    <a class="icon-btn" href="index.html" aria-label="Home">
+      <svg class="home-svg" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />
+      </svg>
+    </a>
+  </div>
+  <div class="header-right">
+    <button id="menuBtn" class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="menuPanel" aria-label="Open menu">
+      <span class="burger"><span></span><span></span><span></span></span>
+    </button>
+  </div>
+</header>
+<div id="menuOverlay" class="hm-overlay" aria-hidden="true">
+  <aside id="menuPanel" class="hm-panel" role="dialog" aria-modal="true" aria-label="Navigation menu">
+    <div class="menu-items"><div id="react-menu-root"></div></div>
+  </aside>
+</div>
+
+<section class="hero" id="hero">
+  <div class="hero-inner">
+    <div class="image-trail-layer" id="image-trail-root">
+      <div id="trail-srcs" data-variant="1" style="display:none">
+        <img src="img/gong/back/5.png" alt=""> <img src="img/gong/back/a1.png" alt=""> <img src="img/gong/b.png" alt="">
+        <img src="img/gong/back/ccc.png" alt=""> <img src="img/gong/ch.png" alt=""> <img src="img/gong/back/crafts.png" alt="">
+        <img src="img/gong/back/cup.png" alt=""> <img src="img/gong/back/p.png" alt="">
+      </div>
+    </div>
+    <div class="hero-title-wrap">
+      <h1 class="hero-title" id="heroTitle">CRAFT&nbsp;&nbsp;&nbsp;WORK*</h1>
+    </div>
+    <p class="hero-desc">
+      우리나라의 전통공예품은 실용성과 예술성을 조화롭게 갖춘 생활 속의 예술입니다.<br />
+      자연에서 얻은 재료로 오랜 시간 다듬고 정성껏 만든 공예품에는 조상들의 지혜와 미적 감각이 고스란히 담겨 있습니다.
+    </p>
+  </div>
+</section>
+
+<section class="interlude interlude--circle" id="overview">
+  <div class="interlude__wrap">
+    <p id="interlude-desc" class="interlude__desc">
+      도자기는 흙으로 빚은 그릇을 구워내는 방법에 따라 토기(土器), 도기(陶器), 자기(瓷器)로 나누어지는데,
+      백토 등이 혼합되어 높은 온도에서 구워낸 그릇을 사기(자기)라고 합니다.
+    </p>
+    <figure class="circle-hero" aria-hidden="true">
+      <img id="circleImg" src="img/gong/do.png" alt="도자기 제작 장면">
+    </figure>
+  </div>
+</section>
+
+<section class="hscroll-new" id="crafts-hscroll">
+  <div class="hscroll-sticky">
+    <div class="hscroll-title">Work</div>
+    <div class="hscroll-track" id="crafts-track">
+      <article class="panel" id="hs-baekja">
+        <div class="panel-header">
+          <span class="panel-number">01</span>
+          <h3 class="panel-title">Baekja · White Porcelain</h3>
+        </div>
+        <div class="panel-image">
+          <img src="img/gong/b.png" alt="백자">
+        </div>
+        <div class="panel-footer">
+          <p class="panel-meta">CERAMICS / JOSEON DYNASTY</p>
+          <p class="panel-desc">
+            백자는 순수와 절제미를 상징하며, 조선시대 선비들의 정신을 담은 대표 도자기입니다. 순백의 유약과 단정한 비례감, 군더더기 없는 선이 특징으로, 일상용기부터 의례용, 달항아리 같은 대형 기물까지 폭넓게 제작되었습니다. 광주 분원 관요 등에서 정제된 백토와 높은 온도의 가마 소성이 더해져 맑고 단단한 질감을 얻었습니다.
+          </p>
+        </div>
+      </article>
+      <article class="panel" id="hs-cheongja">
+        <div class="panel-header">
+          <span class="panel-number">02</span>
+          <h3 class="panel-title">Cheongja · Celadon</h3>
+        </div>
+        <div class="panel-image">
+          <img src="img/gong/ch.png" alt="청자">
+        </div>
+        <div class="panel-footer">
+          <p class="panel-meta">CERAMICS / GORYEO DYNASTY</p>
+          <p class="panel-desc">
+            청자는 비취빛(비색) 유약이 포인트로, 깊고 은은한 색조와 매끄러운 표면감이 돋보입니다. 연꽃·학·운문 등의 문양을 상감·음각 등 다양한 기법으로 표현했으며, 정교하면서도 절제된 장식미로 고려 귀족 문화의 미감을 보여줍니다. 가마의 위치와 소성 조건에 따라 색조가 미묘하게 달라지는 것도 매력입니다.
+          </p>
+        </div>
+      </article>
+      <article class="panel" id="hs-najeon">
+        <div class="panel-header">
+          <span class="panel-number">03</span>
+          <h3 class="panel-title">Najeon Chilgi</h3>
+        </div>
+        <div class="panel-image">
+          <img src="img/gong/n.png" alt="나전칠기">
+        </div>
+        <div class="panel-footer">
+          <p class="panel-meta">LACQUERWARE / TRADITIONAL</p>
+          <p class="panel-desc">
+            나전칠기는 얇게 간 자개 조각을 정교하게 배열하고, 여러 차례의 옻칠과 연마를 거쳐 깊은 광택을 완성하는 공예입니다. 전복·진주조개의 오묘한 색이 어두운 칠 바탕과 대비되어 화려하면서도 고급스러운 분위기를 만듭니다. 긴 건조·연마 공정을 통해 내구성과 표면 강도가 높아 실용성과 장식성이 함께 충족됩니다.
+          </p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<div class="un-section" id="un">
+  <div class="image-list">
+    <div class="image-item"><a href="explore.html?filter=baekja"><img src="img/gong/stack1.png" class="fade-in" alt="백자"></a></div>
+    <div class="image-item"><a href="explore.html?filter=cheongja"><img src="img/gong/stack3.png" class="fade-in" alt="청자"></a></div>
+    <div class="image-item"><a href="explore.html?filter=najeon"><img src="img/gong/stack2.png" class="fade-in" alt="나전칠기"></a></div>
+  </div>
+</div>
+
+<script type="text/babel" data-presets="env,react">
+  const { useEffect, useRef } = React;
+
+  /* ===== Utils ===== */
+  function lerp(a,b,n){ return (1-n)*a + n*b; }
+  function getLocalPointerPos(e, rect){
+    let clientX = 0, clientY = 0;
+    if (e.touches && e.touches.length > 0){ clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
+    else { clientX = e.clientX; clientY = e.clientY; }
+    return { x: clientX - rect.left, y: clientY - rect.top };
+  }
+  function getMouseDistance(p1, p2){ const dx=p1.x-p2.x, dy=p1.y-p2.y; return Math.hypot(dx, dy); }
+
+  /* ===== ImageTrail ===== */
+  class ImageItem {
+    DOM = { el:null, inner:null }; defaultStyle = { scale:1, x:0, y:0, opacity:0 }; rect=null;
+    constructor(DOM_el){ this.DOM.el = DOM_el; this.DOM.inner = this.DOM.el.querySelector('.content__img-inner'); this.getRect(); this.initEvents(); }
+    initEvents(){ this.resize = () => { gsap.set(this.DOM.el, this.defaultStyle); this.getRect(); }; window.addEventListener('resize', this.resize); }
+    getRect(){ this.rect = this.DOM.el.getBoundingClientRect(); }
+  }
+  class ImageTrailVariant1{
+    constructor(container){
+      this.container = container; this.DOM = { el: container };
+      this.images = [...this.DOM.el.querySelectorAll('.content__img')].map(img => new ImageItem(img));
+      this.imagesTotal = this.images.length; this.imgPosition = 0; this.zIndexVal = 1; this.isIdle = true;
+      this.threshold = 90; this.minDelay  = 220; this._lastShownAt = 0;
+      this.mousePos = { x:0, y:0 }; this.lastMousePos = { x:0, y:0 }; this.cacheMousePos = { x:0, y:0 };
+      const handlePointerMove = ev => { const rect = this.container.getBoundingClientRect(); this.mousePos = getLocalPointerPos(ev, rect); };
+      container.addEventListener('mousemove', handlePointerMove); container.addEventListener('touchmove', handlePointerMove);
+      const initRender = ev => {
+        const rect = this.container.getBoundingClientRect(); this.mousePos = getLocalPointerPos(ev, rect); this.cacheMousePos = { ...this.mousePos };
+        requestAnimationFrame(() => this.render()); container.removeEventListener('mousemove', initRender); container.removeEventListener('touchmove', initRender);
+      };
+      container.addEventListener('mousemove', initRender); container.addEventListener('touchmove', initRender);
+    }
+    render(){
+      const distance = getMouseDistance(this.mousePos, this.lastMousePos);
+      this.cacheMousePos.x = lerp(this.cacheMousePos.x, this.mousePos.x, 0.1); this.cacheMousePos.y = lerp(this.cacheMousePos.y, this.mousePos.y, 0.1);
+      const now = performance.now();
+      if (distance > this.threshold && (now - this._lastShownAt) > this.minDelay){
+        this.showNextImage(); this.lastMousePos = { ...this.mousePos }; this._lastShownAt = now;
+      }
+      requestAnimationFrame(() => this.render());
+    }
+    showNextImage(){
+      ++this.zIndexVal; this.imgPosition = this.imgPosition < this.imagesTotal - 1 ? this.imgPosition + 1 : 0;
+      const img = this.images[this.imgPosition];
+      if (typeof gsap === 'undefined') return;
+      gsap.killTweensOf(img.DOM.el);
+      gsap.timeline()
+        .fromTo(img.DOM.el, { opacity: 1, scale: 1, zIndex: this.zIndexVal, x: this.cacheMousePos.x - img.rect.width/2, y: this.cacheMousePos.y - img.rect.height/2 },
+          { duration: 0.6, ease: 'power1', x: this.mousePos.x - img.rect.width/2, y: this.mousePos.y - img.rect.height/2 }, 0)
+        .to(img.DOM.el, { duration: 0.6, ease: 'power3', opacity: 0, scale: 0.2 }, 0.6);
+    }
+  }
+  const variantMap = { 1: ImageTrailVariant1 };
+  function ImageTrail({ items=[], variant=1 }){
+    const containerRef = useRef(null);
+    useEffect(() => {
+      if(!containerRef.current) return;
+      const Cls = variantMap[variant] || variantMap[1];
+      new Cls(containerRef.current);
+    }, [variant, items]);
+    return (<div className="content" ref={containerRef}>{items.map((it, i) => { const src = typeof it === 'string' ? it : it.src;
+          return (<div className="content__img" key={i}><img className="content__img-inner" src={src} alt="" decoding="async" onError={(e)=>{ e.currentTarget.parentElement.style.display='none'; }} /></div>);
+        })}</div>);
+  }
+
+  /* ===== React Flowing Menu (explore와 동일 구조/가드) ===== */
+  function FlowingMenu({ items = [] }) {
+    useEffect(() => { items.forEach(item => { if (item.image) { const img = new Image(); img.src = item.image; } }); }, [items]);
+    return (<div className="fm-menu-wrap"><nav className="fm-menu" aria-label="Hamburger items">{items.map((it, i) => <MenuItem key={i} {...it} />)}</nav></div>);
+  }
+  function MenuItem({ link = '#', text, image }) {
+    const itemRef = useRef(null); const marqueeRef = useRef(null); const marqueeInnerRef = useRef(null);
+    const animationDefaults = { duration: 0.6, ease: 'expo.out' };
+    const dist = (x,y,x2,y2)=>{ const dx=x-x2, dy=y-y2; return dx*dx+dy*dy; };
+    const closestEdge = (mx,my,w,h)=> dist(mx,my,w/2,0) < dist(mx,my,w/2,h) ? 'top':'bottom';
+    const enter = (ev)=>{
+      if (typeof gsap === 'undefined') return;
+      if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return; const rect = itemRef.current.getBoundingClientRect();
+      const x=(ev.clientX??0)-rect.left, y=(ev.clientY??0)-rect.top; const edge=closestEdge(x,y,rect.width,rect.height);
+      gsap.timeline({ defaults: animationDefaults }).set(marqueeRef.current,{ y:edge==='top' ? '-101%':'101%' },0).set(marqueeInnerRef.current,{ y:edge==='top' ? '101%':'-101%' },0).to([marqueeRef.current,marqueeInnerRef.current],{ y:'0%' },0);
+    };
+    const leave = (ev)=>{
+      if (typeof gsap === 'undefined') return;
+      if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return; const rect=itemRef.current.getBoundingClientRect();
+      const x=(ev.clientX??0)-rect.left, y=(ev.clientY??0)-rect.top; const edge=closestEdge(x,y,rect.width,rect.height);
+      gsap.timeline({ defaults: animationDefaults }).to(marqueeRef.current,{ y:edge==='top' ? '-101%':'101%' },0).to(marqueeInnerRef.current,{ y:edge==='top' ? '101%':'-101%' },0);
+    };
+    const onClick = () => { if (link && link.startsWith('#')) { if (window.toggleMenu) window.toggleMenu(false); } };
+    const repeated = Array.from({ length:4 }).map((_,i)=>( <React.Fragment key={i}><span>{text}</span><div className="fm-marquee__img" style={{ backgroundImage:`url(${image})` }} /></React.Fragment> ));
+    return (<div className="fm-menu__item" ref={itemRef}>
+        <a className="fm-menu__item-link" href={link} onPointerEnter={enter} onPointerLeave={leave} onFocus={enter} onBlur={leave} onClick={onClick}>{text}</a>
+        <div className="fm-marquee" ref={marqueeRef} aria-hidden="true"><div className="fm-marquee__inner-wrap" ref={marqueeInnerRef}><div className="fm-marquee__inner">{repeated}</div></div></div>
+      </div>);
+  }
+
+  /* ===== Mount React bits ===== */
+  (async () => {
+    // ImageTrail mount
+    const trailRoot = document.getElementById('image-trail-root');
+    if (trailRoot) {
+      const box = document.getElementById('trail-srcs'); const requested = box ? Array.from(box.querySelectorAll('img')).map(el => el.getAttribute('src')).filter(Boolean) : [];
+      const testLoad = (url) => new Promise((res) => { const im = new Image(); im.onload  = () => res(url); im.onerror = () => res(null); im.src = url; });
+      const results = await Promise.allSettled(requested.map(testLoad));
+      const ok = results.map(r => (r.status==='fulfilled' ? r.value : null)).filter(Boolean);
+      const fallback = ['https://picsum.photos/id/287/300/300','https://picsum.photos/id/1001/300/300','https://picsum.photos/id/1025/300/300','https://picsum.photos/id/1026/300/300',];
+      const usable = (ok.length ? ok : fallback).map(src => ({ src })); const variant = box?.dataset?.variant ? parseInt(box.dataset.variant, 10) : 1;
+      ReactDOM.createRoot(trailRoot).render(<ImageTrail items={usable} variant={variant} />);
+    }
+
+    // FlowingMenu mount (explore 스타일, 중복 마운트 가드)
+    const menuRoot = document.getElementById('react-menu-root');
+    if (menuRoot && !menuRoot.__mounted) {
+      menuRoot.__mounted = true;
+      const menuItems = [
+        { link: 'index.html',    text: '홈',   image: 'img/8.jpg' },
+        { link: 'sumak.html',     text: '수막새', image: 'img/6.jpg' },
+        { link: 'ceramics.html', text: '공예품', image: 'img/gong/do.png' },
+        { link: 'hanbok.html',   text: '한복', image: 'img/han/bg.jpg' },
+      ];
+      if (ReactDOM.createRoot) {
+        ReactDOM.createRoot(menuRoot).render(<FlowingMenu items={menuItems} />);
+      } else {
+        ReactDOM.render(React.createElement(FlowingMenu, { items: menuItems }), menuRoot);
+      }
+    }
+  })();
+</script>
+
+<script>
+  /* ===== Menu open/close ===== */
+  (() => {
+    const btn = document.getElementById('menuBtn');
+    const overlay = document.getElementById('menuOverlay');
+    const panel = document.getElementById('menuPanel');
+    if(!btn || !overlay || !panel) return;
+    function setOpen(open){
+      btn.setAttribute('aria-expanded', String(open));
+      overlay.classList.toggle('open', open);
+      overlay.setAttribute('aria-hidden', String(!open));
+      if (window.__lenis){ open ? window.__lenis.stop() : window.__lenis.start(); }
+      else { document.body.style.overflow = open ? 'hidden' : ''; }
+    }
+    btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+    overlay.addEventListener('click', () => setOpen(false));
+    panel?.addEventListener('click', (e) => e.stopPropagation());
+    window.addEventListener('keydown', (e) => { if(e.key === 'Escape') setOpen(false); });
+    window.toggleMenu = function(next){ if (typeof next === 'boolean') setOpen(next); else setOpen(btn.getAttribute('aria-expanded') !== 'true'); };
+  })();
+
+  /* ===== Fit hero title ===== */
+  document.addEventListener('DOMContentLoaded', () => {
+    document.documentElement.classList.add('js');
+    function fitHeroTitle(){
+      const hero  = document.getElementById('hero');
+      const title = document.getElementById('heroTitle');
+      if(!hero || !title) return;
+      title.style.transform = 'none';
+      const W_MARGIN = .96, H_MARGIN = .88;
+      const cs   = getComputedStyle(hero);
+      const wMax = (hero.clientWidth  - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0)) * W_MARGIN;
+      const hMax = (hero.clientHeight - (parseFloat(cs.paddingTop)||0)  - (parseFloat(cs.paddingBottom)||0)) * H_MARGIN;
+      const rect = title.getBoundingClientRect();
+      const scale = Math.min(1, wMax/rect.width, hMax/rect.height);
+      title.style.transformOrigin = 'center';
+      title.style.transform = `scale(${scale})`;
+    }
+    (document.fonts?.ready || Promise.resolve()).then(() => { requestAnimationFrame(() => { fitHeroTitle(); }); });
+    window.addEventListener('resize', fitHeroTitle);
+  });
+
+  /* ===== Lenis smooth scroll ===== */
+  const lenis = new Lenis({ lerp: 0.09, smoothWheel: true, normalizeWheel: true });
+  function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
+  requestAnimationFrame(raf);
+  window.__lenis = lenis;
+
+  /* ===== Interlude text progressive reveal ===== */
+  (function () {
+    const section = document.getElementById('overview');
+    const p = document.getElementById('interlude-desc');
+    if (!section || !p) return;
+    const raw = p.textContent;
+    const text = (raw || '').replace(/\s+/g, ' ').trim();
+    if (!text) return;
+    const words = text.split(' ');
+    p.textContent = '';
+    const spans = words.map((w) => {
+      const s = document.createElement('span');
+      s.className = 'w';
+      s.textContent = w;
+      p.appendChild(s);
+      return s;
+    });
+    function pinProgress() {
+      const rect = section.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const denom = rect.height - vh;
+      if (denom <= 0) return 1;
+      return Math.max(0, Math.min(1, (0 - rect.top) / denom));
+    }
+    function render() {
+      const prog = pinProgress();
+      const N = spans.length;
+      for (let i = 0; i < N; i++) {
+        const t = (i + 1) / (N + 1);
+        const a = Math.max(0, Math.min(1, (prog - t) / 0.12));
+        const op = 1 - Math.pow(1 - a, 3);
+        const ty = (1 - op) * 16;
+        const el = spans[i];
+        el.style.opacity = op.toFixed(3);
+        el.style.transform = `translateY(${ty.toFixed(2)}px)`;
+      }
+      if (prog >= 1) {
+        spans.forEach((el) => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
+      }
+    }
+    addEventListener('scroll', render, { passive: true });
+    addEventListener('resize', render);
+    requestAnimationFrame(render);
+  })();
+
+  /* ===== Interlude circle parallax/scale ===== */
+  (function(){
+    const sec = document.getElementById('overview');
+    const img = document.getElementById('circleImg');
+    if(!sec || !img) return;
+    function progress(){
+      const rect = sec.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const denom = rect.height - vh;
+      if (denom <= 0) return 1;
+      return Math.max(0, Math.min(1, (0 - rect.top) / denom));
+    }
+    function render(){
+      const p = progress();
+      const s = 1 + 0.12*p;
+      const ty = - (window.innerHeight * 0.06) * p;
+      img.style.transform = `translateY(${ty}px) scale(${s})`;
+    }
+    addEventListener('scroll', render, { passive:true });
+    addEventListener('resize', render);
+    requestAnimationFrame(render);
+  })();
+
+  
+  
+  
+  /* ===== Horizontal panels: one-by-one opening (discrete steps) ===== */
+  (function(){
+    const sec = document.getElementById('crafts-hscroll');
+    const track = document.getElementById('crafts-track');
+    if (!sec || !track) return;
+
+    const panels = Array.from(track.querySelectorAll('.panel'));
+    const count = panels.length;
+    document.documentElement.style.setProperty('--panels', String(count));
+
+    const steps = Math.max(1, count - 1);
+    const vh = () => window.innerHeight || document.documentElement.clientHeight;
+
+    function progress(){
+      const r = sec.getBoundingClientRect();
+      const denom = r.height - vh();
+      if (denom <= 0) return 0;
+      return Math.max(0, Math.min(1, (0 - r.top)/denom));
+    }
+    function idxFromProgress(p){ return Math.round(Math.max(0, Math.min(1, p)) * steps); }
+    function inPinnedView(){
+      const r = sec.getBoundingClientRect();
+      return r.top <= 0 && r.bottom >= vh();
+    }
+
+    /* --- Active state helper + delayed footer reveal (stable) --- */
+    let activeIdx = 0;
+    let footerTimer = null;
+    const FLEX_DUR_MS = 1100; // match CSS flex-grow duration
+    function setActive(idx, opts = { preserveIfSame: true }){
+      const target = Math.max(0, Math.min(count-1, idx));
+      if (opts.preserveIfSame && target === activeIdx) {
+        // Same panel request; keep current footer state and avoid resetting timer.
+        return;
+      }
+      activeIdx = target;
+      // Remove active/footer from non-active only to avoid flicker on same index
+      panels.forEach((el, i) => {
+        if (i !== activeIdx) el.classList.remove('is-active', 'show-footer');
+      });
+      const active = panels[activeIdx];
+      if (active) active.classList.add('is-active');
+      clearTimeout(footerTimer);
+      footerTimer = setTimeout(() => {
+        const current = panels[activeIdx];
+        if (current) current.classList.add('show-footer');
+      }, Math.round(FLEX_DUR_MS * 0.85));
+    }
+    setActive(0, { preserveIfSame: false });
+
+    /* --- Smooth snap helper --- */
+    const easing = t => 1 - Math.pow(1 - t, 4);
+    function snapToIndex(idx){
+      const i = Math.max(0, Math.min(steps, idx));
+      const rect  = sec.getBoundingClientRect();
+      const denom = rect.height - vh();
+      const targetY = window.scrollY + rect.top + denom * (i/steps);
+      if (window.__lenis && typeof window.__lenis.scrollTo === 'function'){
+        window.__lenis.scrollTo(targetY, { duration: 1.05, easing });
+      } else {
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+      }
+    }
+
+    /* --- Hysteresis (deadzone) for natural thresholding --- */
+    const FORWARD_THRESHOLD = 0.6;
+    const BACKWARD_THRESHOLD = -0.6;
+    function maybeAdvanceByProgress(){
+      const p = progress();
+      const cp = p * steps - activeIdx; // -1..+1 around current
+      if (cp >= FORWARD_THRESHOLD && activeIdx < steps){
+        setActive(activeIdx + 1, { preserveIfSame: false });
+        snapToIndex(activeIdx);
+        return true;
+      } else if (cp <= BACKWARD_THRESHOLD && activeIdx > 0){
+        setActive(activeIdx - 1, { preserveIfSame: false });
+        snapToIndex(activeIdx);
+        return true;
+      }
+      return false;
+    }
+
+    /* --- Idle snap after a pause --- */
+    let idleTimer = null;
+    function scheduleIdleSnap(){
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(()=>{
+        if (!inPinnedView()) return;
+        if (!maybeAdvanceByProgress()) {
+          const target = idxFromProgress(progress());
+          if (target !== activeIdx) {
+            setActive(target, { preserveIfSame: false });
+          }
+          snapToIndex(target);
+        }
+      }, 420);
+    }
+
+    window.addEventListener('scroll', ()=>{
+      if (!inPinnedView()) return;
+      scheduleIdleSnap();
+    }, { passive:true });
+    window.addEventListener('resize', scheduleIdleSnap);
+
+    /* --- Wheel handling: accumulate + cooldown --- */
+    let wheelAccum = 0;
+    let lastWheelSign = 0;
+    let lastWheelAt = 0;
+    const WHEEL_STEP_THRESHOLD = 120;
+    const WHEEL_COOLDOWN = 550;
+
+    window.addEventListener('wheel', (e)=>{
+      if (!inPinnedView()) return;
+      const now = Date.now();
+      const dy = e.deltaY || 0;
+      const sign = Math.sign(dy);
+
+      if (sign !== 0 && sign !== lastWheelSign) {
+        wheelAccum = 0;
+      }
+      lastWheelSign = sign;
+
+      wheelAccum += dy;
+
+      const ready = Math.abs(wheelAccum) >= WHEEL_STEP_THRESHOLD && (now - lastWheelAt) >= WHEEL_COOLDOWN;
+      if (ready){
+        e.preventDefault();
+        lastWheelAt = now;
+        const dir = Math.sign(wheelAccum);
+        wheelAccum = 0;
+        const next = activeIdx + (dir > 0 ? 1 : -1);
+        setActive(next, { preserveIfSame: false });
+        snapToIndex(next);
+      }
+    }, { passive:false });
+
+    /* --- Touch swipe threshold stricter --- */
+    let touchStartY = null;
+    sec.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive:true });
+    sec.addEventListener('touchend',   e => {
+      if (touchStartY == null) return;
+      const dy = (e.changedTouches[0].clientY - touchStartY);
+      if (Math.abs(dy) > 70) {
+        const next = activeIdx + (dy < 0 ? 1 : -1);
+        setActive(next, { preserveIfSame: false });
+        snapToIndex(next);
+      } else {
+        scheduleIdleSnap();
+      }
+      touchStartY = null;
+    }, { passive:true });
+  })();
+
+
+
+</script>
+
+</body>
+</html>

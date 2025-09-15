@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CodePen - Horizontal scroll</title>
+    <link rel="stylesheet" href="./style.css">]
+    <style>
+        @font-face {
+            font-family: 'BookkMyungjo-Bd';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Bd.woff2') format('woff2');
+            font-weight: 700;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'SUIT-Regular';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+
+        * {
+            cursor: none;
+        }
+
+
+        /* Custom Cursor */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: rgba(128, 128, 128, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+        }
+
+        .extra-section {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            justify-content: space-between;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #extra-text {
+            background-color: #000;
+            color: #fff;
+            padding: 100px 0;
+            min-height: 300vh;
+            z-index: 1;
+            /* 낮은 값으로 설정 */
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #extra-text .extra-inner {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 80px;
+            gap: 80px;
+        }
+
+        .big_txt {
+            font-family: 'BookkMyungjo-Bd';
+            flex: 1;
+            padding: 20px;
+            z-index: 2;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+
+        #extra-text .big_txt .b_txt {
+            position: relative;
+            width: max-content;
+            background: linear-gradient(to right, #fff, #fff) no-repeat;
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-size: 0% 100%;
+            transition: background-size cubic-bezier(0.1, 0.5, 0.5, 1) 0.5s;
+            font-size: clamp(24px, 4vw, 30px);
+            /* 반응형 폰트 크기 */
+            font-weight: 700;
+            margin-bottom: 40px;
+            color: rgba(255, 255, 255, 0.2);
+            line-height: 1.4;
+        }
+
+        .extra-right-box {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 35vw;
+            /* 오른쪽 갤러리 너비 조정 */
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            pointer-events: none;
+            /* 텍스트 클릭 가능하게 */
+        }
+
+        .gallery-frame {
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            margin-right: 60px;
+            /* 갤러리 이미지 클릭 가능 */
+        }
+
+        .gallery-track {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            will-change: transform;
+            position: relative;
+        }
+
+        .gallery-track img {
+            width: 100%;
+            height: auto;
+            border-radius: 16px;
+            object-fit: cover;
+        }
+
+
+        .extra-images {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            margin-left: 40%;
+        }
+
+        .extra-images {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .extra-images img {
+            width: 200px;
+            opacity: 0;
+            transform: translateY(50px);
+            position: absolute;
+            z-index: 3;
+        }
+
+        .img1 {
+            top: 35%;
+            left: 20%;
+        }
+
+        .img2 {
+            top: 45%;
+            left: 35%;
+        }
+
+        .img3 {
+            top: 35%;
+            left: 50%;
+        }
+
+        .img4 {
+            top: 45%;
+            left: 65%;
+        }
+
+        .image-text {
+            position: absolute;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            width: 180px;
+            margin-top: 10px;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        .text1 {
+            top: calc(50% - 50px);
+            left: 20%;
+        }
+
+        .text2 {
+            top: calc(30% + 180px);
+            left: 35%;
+        }
+
+        .text3 {
+            bottom: calc(40% + 200px);
+            left: 50%;
+        }
+
+        .text4 {
+            bottom: calc(40% + 80px);
+            left: 65%;
+        }
+
+        .extra-scroll-section {
+            height: 300vh;
+            /* 스크롤 길이 확보 */
+            background: black;
+            position: relative;
+            z-index: 1;
+        }
+
+        .extra-scroll-box-wrapper {
+            position: relative;
+            top: auto;
+            height: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 200px 0;
+            /* 여유 높이 확보 */
+        }
+
+
+
+        .extra-scroll-box-wrapper {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: black;
+        }
+
+        .panel {
+            flex-shrink: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            color: rgb(255, 255, 255);
+        }
+
+        .panel-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            padding: 5vw;
+            position: relative;
+        }
+
+        .horizontal-scroll__panel.hanbok {
+  position: relative;
+}
+
+        .horizontal-scroll__panel.hanbok img.hanbok-img {
+  width: 40vw;
+  height: 40vw;
+  object-fit: cover;
+  border-radius: 0%;
+  transition: border-radius 0.5s ease;
+}
+
+.horizontal-scroll__panel.hanbok img.hanbok-img:hover {
+  border-radius: 50%;
+}
+
+        .text-block {
+            display: flex;
+            flex-direction: column;
+            gap: 2vh;
+        }
+
+        .first-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 2vw;
+        }
+
+        .large-text {
+            font-size: 12vw;
+            font-family: 'BookkMyungjo-Bd';
+            line-height: 1.2;
+            letter-spacing: -0.05em;
+            white-space: nowrap;
+  pointer-events: none; /* 이미지 클릭 막지 않게 */
+    z-index: 10;
+        }
+
+        .circle-text {
+            font-family: 'SUIT-Regular';
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: white;
+            color: black;
+            padding: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .art-image {
+  width: 100%; /* 또는 고정값: 예: 300px */
+  aspect-ratio: 1 / 1; /* 정사각형 비율 보장 */
+  border-radius: 12px;
+  transition: border-radius 0.4s ease, transform 0.3s ease;
+  overflow: hidden;
+        }
+
+        .art-image:hover {
+  border-radius: 50%; /* 호버 시 완전한 원형으로 */
+}
+
+.hanbok-img {
+  width: 40vw;
+  height: 40vw;
+  object-fit: cover;
+  border-radius: 0%; /* 시작은 네모 */
+  transition: border-radius 0.5s ease;
+  display: block; /* inline 이미지에 필요한 경우 */
+  z-index: 10000;
+}
+
+.hanbok-img:hover {
+  border-radius: 50%;
+}
+
+        .circle-wrapper {
+            position: absolute;
+            bottom: 10vh;
+            right: 10vw;
+            display: flex;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .rotating-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .horizontal-scroll__panel {
+  flex: 0 0 auto;
+  width: 100vw;
+  height: 100vh; /* 화면 전체 높이로 설정 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.horizontal-scroll__panel img {
+  width: 100vw;
+  height: auto;
+  object-fit: cover;
+}
+
+.hanbok-img {
+  width: 40vw;
+  height: 40vw;
+  object-fit: cover;
+  border-radius: 0%;
+  transition: border-radius 0.5s ease;
+  display: block;
+  z-index: 2;
+  position: relative;
+  pointer-events: auto;
+}
+
+        .circle-wrapper .circle-text {
+            width: 200px;
+            height: 200px;
+            font-size: 0.8rem;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'SUIT-Regular';
+            margin-left: -20px;
+            /* 더 붙이기 위해 마진 조절 */
+            z-index: 1;
+        }
+
+
+        .panel:nth-child(1) {
+            background: #000000;
+        }
+
+        .panel:nth-child(2) {
+            background: #000000;
+        }
+
+        .panel:nth-child(3) {
+            background: #000000;
+        }
+
+        .panel:nth-child(4) {
+            background: #000000;
+        }
+
+        .vertical-sections {
+            position: relative;
+            z-index: 1;
+        }
+
+
+
+
+
+        .image-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            transition: flex 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .image-container .overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 2rem;
+            font-family: 'BookkMyungjo-Bd', serif;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .image-container:hover {
+            flex: 1.1;
+            /* 70% 정도 확장 */
+        }
+
+        .image-container:hover img {
+            transform: scale(1.02);
+        }
+
+
+
+        .image-container:hover::before {
+            opacity: 1;
+        }
+
+
+
+        .image-container:hover .overlay-text {
+            opacity: 1;
+        }
+
+        .image-container:not(:hover) {
+            flex: 0.7;
+            /* 다른 이미지는 줄어듦 */
+        }
+
+        /* 수정된 transition-section 스타일 */
+        .transition-section {
+            display: flex;
+            position: relative;
+            height: auto;
+            min-height: 300vh;
+            /* 충분한 높이 확보 */
+        }
+
+        .fixed-left {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 50vw;
+            height: 100vh;
+            z-index: 1;
+            overflow: hidden;
+            /* 항상 고정 위치 유지 */
+        }
+
+        .fixed-left img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .scrolling-right-wrapper {
+            width: 50vw;
+            height: auto;
+            background: white;
+            position: relative;
+        }
+
+        .scrolling-right {
+            position: relative;
+            width: 100%;
+            height: auto;
+        }
+
+        .scrolling-right p {
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .scrolling-content {
+            max-width: 100%;
+            margin-top: 20px;
+            padding: 60px 20px;
+            box-sizing: border-box;
+            min-height: 250vh;
+            /* 중앙 정렬을 위한 추가 스타일 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+              gap: 120px; /* 카드 간 간격 */
+        }
+
+        .scrolling-content h3 {
+            font-family: 'BookkMyungjo-Bd';
+
+        }
+
+
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 40px;
+            letter-spacing: -1px;
+        }
+
+        .news-card {
+            margin-bottom: 300px;
+            padding-right: 40px;
+              display: flex;
+  flex-direction: column;
+  justify-content: center; /* 세로 중앙 정렬 */
+  align-items: center;      /* 가로 중앙 정렬 */
+  text-align: center;       /* 텍스트 자체 중앙 정렬 */
+        }
+
+        .news-card img {
+            width: 110%;
+            max-height: 450px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+
+        .news-card h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .news-card p {
+            font-family: 'SUIT-Regular';
+            font-size: 1rem;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .read-more-btn {
+            background-color: #B7232F;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            /* 둥근 네모 */
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .read-more-btn:hover {
+            background-color: #a91f29;
+        }
+
+        .fixed-left .overlay-img,
+        .fixed-right .overlay-img {
+            position: absolute;
+            width: 400px;
+            height: auto;
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            pointer-events: auto !important; // 중요: 클릭 가능하도록
+            cursor: pointer;
+        }
+
+        .fixed-right .overlay-img {
+            position: absolute;
+            width: 400px;
+            height: auto;
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            pointer-events: auto;
+            /* 이 줄을 추가하거나 기존의 pointer-events: none을 제거 */
+            cursor: pointer;
+            /* 마우스 커서가 포인터로 변하도록 */
+        }
+
+        /* visible 상태에서도 클릭 가능하도록 */
+        .fixed-right .overlay-img.visible,
+        .fixed-left .overlay-img.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto !important; // 중요: visible 상태에서도 클릭 가능
+        }
+
+
+
+        .fixed-right .overlay-img.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        * .fixed-left .overlay-img.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .overlay-0 {
+            top: 10%;
+            left: 15%;
+        }
+
+        .overlay-1 {
+            top: 35%;
+            left: 35%;
+        }
+
+        .overlay-2 {
+            top: 60%;
+            left: 15%;
+        }
+
+        .transition-section-1 {
+            margin-bottom: 150vh;
+            /* 충분한 공간 확보 */
+        }
+
+        .transition-section-2 {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+        }
+
+        .transition-section-2 .scrolling-left-wrapper {
+            width: 50vw;
+            max-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .transition-section-2 .scrolling-left {
+            padding: 80px 40px;
+        }
+
+        .transition-section-2 .fixed-right {
+            width: 50vw;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .transition-section-2 .fixed-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .transition-section-2 .overlay-img {
+            width: 300px;
+            height: auto;
+            max-width: 100%;
+        }
+
+        .transition-section-2 .overlay-0 {
+            top: 15%;
+            right: 10%;
+        }
+
+        .transition-section-2 .overlay-1 {
+            top: 50%;
+            left: 20%;
+        }
+
+        .transition-section-2 .overlay-2 {
+            bottom: 10%;
+            right: 15%;
+        }
+
+
+
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content {
+    width: 95vw;
+    height: 95vh;
+    max-width: 1600px;
+    background: white;
+    padding: 1rem;
+    box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+                .popup-close:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .popup-gallery-wrapper {
+              padding: 0 100px; /* 양쪽에 공간 확보 */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 1000px;
+            height: 80vh;
+        }
+
+        .popup-gallery {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .popup-gallery-track {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s ease;
+        }
+
+        .popup-gallery-track img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 16px;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .popup-description {
+  text-align: center;
+  font-family: 'SUIT-Regular';
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-top: 1rem;
+  white-space: pre-line; /* 줄바꿈 <br> 또는 \n 이 있을 경우 반영되게 */
+}
+
+       /* 돋보기 효과를 위한 컨테이너 */
+.zoom-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.zoom-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  cursor: crosshair;
+}
+
+.zoom-lens {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  background-repeat: no-repeat;
+  background-size: 400% 400%;
+  pointer-events: none;
+  display: none;
+  z-index: 1000;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(1px);
+}
+
+.zoom-lens::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  border: 2px solid rgba(183, 35, 47, 0.6);
+  border-radius: 50%;
+}
+        
+
+        .popup-gallery img {
+            width: 100%;
+            flex-shrink: 0;
+            object-fit: contain;
+            transition: transform 0.4s ease;
+        }
+
+        
+        .gallery-nav {
+             width: 50px;
+  height: 50px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  color: #333;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+        }
+
+        .gallery-nav:hover {
+  background-color: #B7232F;
+  color: white;
+  transform: scale(1.1);
+}
+
+.gallery-nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.gallery-nav.left {
+  position: absolute;
+  left: -80px; /* 왼쪽으로 더 떨어지게 */
+}
+
+.gallery-nav.right {
+  position: absolute;
+  right: -80px; /* 오른쪽으로 더 떨어지게 */
+}
+
+        .gallery-nav:disabled {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+
+
+        .popup-gallery-track img:hover {
+            transform: none !important;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="cursor"></div>
+
+    <!-- partial:index.partial.html -->
+    <section class="hero">
+        <div class="navbar">
+            <div class="logo"> </div>
+            <div class="menu">
+                <a href="../../sumak.html">수막새</a>
+                <a href="../../test.html">공예품</a>
+                <a href="#"></a>
+                <a href="#"></a>
+                <a href="#"> </a>
+            </div>
+        </div>
+        <div class="hero__top">
+            <img src="hanbokk.png" alt="HANBOK 로고" class="hanbok-logo">
+            <div class="hero__background"></div>
+        </div>
+        <div class="hero__bottom">
+            <img src="bg.jpg" />
+        </div>
+
+    </section>
+
+
+
+    <section id="extra-text"
+        style="position: relative; z-index: 10; min-height: 250vh; padding-top: 200px; padding-bottom: 300px; background: #000;">
+        <div class="extra-inner">
+            <div class="big_txt">
+                                <p class="b_txt">(*)</p>
+                <p class="b_txt">한복에 수놓인 자수는 단순한 장식이 아니라,</p>
+                <p class="b_txt">조상들의 바람과 철학이 담긴 상징의 언어입니다.</p>
+                <p class="b_txt">꽃 한 송이, 새 한 마리에도</p>
+                <p class="b_txt">복, 장수, 사랑 같은 깊은 의미가 숨어 있습니다.</p>
+            </div>
+            <div class="extra-right-box">
+                <div class="gallery-frame">
+                    <div class="gallery-track">
+                        <img src="img/1.png" alt="">
+                        <img src="img/2.png" alt="">
+                        <img src="img/3.png" alt="">
+                        <img src="img/4.png" alt="">
+                        <img src="img/6.png" alt="">
+                        <img src="img/1.png" alt="">
+                        <img src="img/2.png" alt="">
+                        <img src="img/3.png" alt="">
+                        <img src="img/4.png" alt="">
+                        <img src="img/8.png" alt="">
+                    </div>
+                </div>
+            </div>
+    </section>
+
+
+    <section class="about horizontal-scroll__section">
+        <div class="horizontal-scroll__wrapper">
+            <div class="horizontal-scroll__content">
+
+                <div class="panel">
+                    <div class="panel-content">
+                        <div class="text-block">
+                            <div class="first-line">
+                                <h1 class="large-text">HANBOK</h1>
+                                <div class="circle-text">
+                                    <p>(01)<br />길상 / 자연 문양</p>
+                                </div>
+                            </div>
+                            <h1 class="large-text second-line">한복의</h1>
+                        </div>
+                        <img src="img/22.png" alt="Hanbok Background" class="hanbok-img" />
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-content">
+                        <h1 class="large-text" style="margin-left: 6vw;" z-index="0;">자수</h1>
+                        <div class="circle-text" style="margin-left: 6vw;">
+                            <p>(02)<br />왕권 / 권위<br>상징 문양</p>
+                        </div>
+                        <img src="img/4.png" alt="Ceremonial Dress" class="art-image" />
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        </div>
+        </div>
+    </section>
+
+
+
+
+
+
+    <section class="extra-scroll-section">
+        <div class="extra-scroll-box-wrapper">
+        </div>
+    </section>
+
+
+
+    <section class="transition-section">
+        <div class="fixed-left" id="fixedLeft">
+            <img src="gil.jpg" alt="고정 이미지">
+        </div>
+        <div class="scrolling-right-wrapper">
+            <div class="scrolling-right">
+                <div class="scrolling-content">
+                    <div class="news-card" id="card1">
+                        <img src="img/d.png" alt="news1">
+                        <h3>당의</h3>
+                        <p>조선시대 여성들이 예복 또는 궁중 연회복으로 입었던 윗옷입니다.<br>
+                            몸에 맞게 재단된 곡선 라인과 넓은 소매가 특징이며,<br>
+                            화려한 문양 자수가 겉감에 수놓아져 신분과 품격을 나타냅니다.</p>
+                        <button class="read-more-btn" data-popup="popup1">더 알아보기➛</button>
+                    </div>
+
+                    <div class="news-card" id="card2">
+                        <img src="img/hwal.png" alt="news2">
+                        <h3>활옷</h3>
+                        <p>조선시대 왕비, 세자빈, 양반가 여성의 혼례복 및 대례복으로 사용된 겉옷입니다.<br>
+                            붉은 바탕에 넓은 소매(활)가 특징이며,<br>
+                            전면에 부귀와 길상을 상징하는 자수 문양이 정교하게 수놓아져 신분과 기원을 드러냅니다.</p>
+                        <button class="read-more-btn" data-popup="popup2">더 알아보기➛</button>
+                    </div>
+
+                    <div class="news-card" id="card3">
+                        <img src="img/ja.png" alt="news3">
+                        <h3>원삼</h3>
+                        <p>조선시대 왕비, 세자빈, 군부인 등 궁중 여성의 예복으로 사용된 겉옷입니다.<br>
+                            화려한 색감과 문양으로 신분을 드러내며,<br>
+                            어깨와 소매에는 길상적 의미를 지닌 자수 문양이 정교하게 새겨져 있습니다.</p>
+                        <button class="read-more-btn" data-popup="popup3">더 알아보기➛</button>
+                    </div>
+
+                    <div class="news-card" id="card4">
+                        <img src="img/dan.png" alt="news4">
+                        <h3>단령</h3>
+                        <p>조선시대 남성의 예복으로 사용된 의복으로, 둥근 깃(團領)이 특징이며<br>
+                            의례, 관직, 혼례 등에서 사용되었습니다.<br>
+                            앞뒤 흉배에 자수를 놓아 신분과 관직의 등급을 상징했습니다.</p>
+                        <button class="read-more-btn" data-popup="popup4">더 알아보기➛</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-content">
+            <button class="popup-close" id="popupClose">X</button>
+
+            <div class="popup-gallery-wrapper">
+                <button class="gallery-nav left" id="prevBtn" aria-label="Previous">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+                <div class="popup-gallery" id="popupGallery">
+                    <!-- 이미지가 여기에 들어갑니다 -->
+                     <div class="zoom-container">
+  <img class="zoom-image" src="img/example.jpg" alt="popup image">
+  <div class="zoom-lens"></div>
+</div>
+                </div>
+                <button class="gallery-nav right" id="nextBtn" aria-label="Next">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path d="M9 6L15 12L9 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+            </div>
+
+            <p class="popup-description" id="popupDescription">내용이 여기에 들어갑니다.</p>
+        </div>
+    </div>
+
+
+
+    <!-- partial -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/plugins/debug.addIndicators.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/plugins/animation.gsap.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.1.1/gsap.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+
+    <script src="./script.js"></script>
+    <script>
+
+        // Custom cursor
+        const cursor = document.querySelector('.cursor');
+
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX - 10 + 'px';
+            cursor.style.top = e.clientY - 10 + 'px';
+        });
+
+
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Hero 패럴랙스 효과
+        gsap.to(".hero__top", {
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            },
+            y: -200,
+            ease: "none"
+        });
+
+        // Hero 배경 이미지 패럴랙스 (더 느리게)
+        gsap.to(".hero__bottom img", {
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "bottom top",
+                scrub: true
+            },
+            y: -100,
+            ease: "none"
+        });
+
+        // Hero 텍스트 페이드아웃
+        gsap.to(".hero__top h1, .hero__top p", {
+            scrollTrigger: {
+                trigger: ".hero",
+                start: "top top",
+                end: "50% top",
+                scrub: true
+            },
+            opacity: 0,
+            y: -50,
+            ease: "none"
+        });
+
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const lines = gsap.utils.toArray('.b_txt');
+            const galleryTrack = document.querySelector('.gallery-track');
+            const extraText = document.querySelector('#extra-text');
+
+            const lineHeight = 100;
+            const textScroll = lines.length * lineHeight;      // 예: 500
+            const galleryScroll = 800;                         // 예: 더 길게
+            const totalScroll = galleryScroll;                 // pin 유지 거리
+
+            // 1. pin 전체 구간
+            ScrollTrigger.create({
+                trigger: extraText,
+                start: "top top",
+                end: `+=${totalScroll}`,
+                pin: true,
+                scrub: true,
+                anticipatePin: 1
+            });
+
+            // 텍스트 컬러 애니메이션 - 느리게
+            gsap.to(lines, {
+                color: "#fff",
+                ease: "none",               // 일정하게
+                duration: 1,                // 개별 b_txt 애니메이션 길이
+                stagger: {
+                    amount: 1.5,              // 전체 애니메이션을 더 길게 분배
+                    from: "start"
+                },
+                scrollTrigger: {
+                    trigger: extraText,
+                    start: "top top",
+                    end: `+=${textScroll + 200}`,  // 기존보다 길게
+                    scrub: true
+                }
+            });
+
+
+            // 3. gallery-track 이동 (같이 시작하지만 더 늦게 끝남)
+            gsap.to(galleryTrack, {
+                y: "-50%",
+                ease: "none",
+                scrollTrigger: {
+                    trigger: extraText,
+                    start: "top top",              // 텍스트와 동시에 시작
+                    end: `+=${galleryScroll}`,     // 텍스트보다 오래
+                    scrub: true
+                }
+            });
+        });
+
+        document.querySelectorAll('.art-image, .hanbok-img').forEach(img => {
+  img.addEventListener('click', () => {
+    const targetSection = document.querySelector('.transition-section');
+    if (targetSection) {
+      targetSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+
+
+        function initScrollAnimation() {
+            gsap.to(imageSeq, {
+                frame: frameCount - 1,
+                snap: "frame",
+                scrollTrigger: {
+                    trigger: ".extra-scroll-section",
+                    start: "top 20%",
+                    end: "bottom top",
+                    scrub: true
+                },
+                onUpdate: render
+            });
+        }
+
+
+        gsap.set(".extra-scroll-box-wrapper", {
+            position: "sticky",
+            top: "50%",
+            transform: "translateY(-50%)"
+        });
+
+        // 기존의 복잡한 ScrollTrigger 로직을 제거하고 간단하게 유지
+        // 왼쪽 이미지는 항상 sticky로 고정
+
+
+gsap.registerPlugin(ScrollTrigger);
+
+ScrollTrigger.create({
+  trigger: ".transition-section",
+  start: "top 70%", // 화면 70% 정도에 닿았을 때
+  onEnter: () => {
+    gsap.to(window, {
+      duration: 1,
+      scrollTo: ".transition-section",
+      ease: "power2.out"
+    });
+  },
+  once: true  // 한 번만 실행되도록
+});
+
+let lastTriggeredCard = null;
+
+gsap.registerPlugin(ScrollTrigger);
+
+// 카드 스크롤 개선 - 자연스러운 스크롤 허용
+let isAutoScrolling = false;
+let scrollEndTimer;
+let lastScrollY = window.pageYOffset;
+let scrollDirection = 0;
+
+// 각 카드에 대한 부드러운 하이라이트 효과만 적용
+gsap.utils.toArray(".news-card").forEach((card, index) => {
+  ScrollTrigger.create({
+    trigger: card,
+    start: "top 80%",
+    end: "bottom 20%",
+    onEnter: () => {
+      // 카드 진입 시 부드러운 하이라이트
+      gsap.fromTo(card, 
+        { opacity: 0.7, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
+      );
+    },
+    onLeave: () => {
+      // 카드 벗어날 때 페이드
+      gsap.to(card, { opacity: 0.8, duration: 0.3 });
+    },
+    onEnterBack: () => {
+      // 역방향 진입 시 하이라이트
+      gsap.to(card, { opacity: 1, duration: 0.5 });
+    }
+  });
+});
+
+// 스크롤 방향 감지
+window.addEventListener('scroll', () => {
+  const currentScrollY = window.pageYOffset;
+  scrollDirection = currentScrollY > lastScrollY ? 1 : -1;
+  lastScrollY = currentScrollY;
+  
+  // 스크롤 종료 감지 (부드러운 스냅을 위해)
+  if (scrollEndTimer) {
+    clearTimeout(scrollEndTimer);
+  }
+  
+  scrollEndTimer = setTimeout(() => {
+    if (!isAutoScrolling) {
+      handleScrollEnd();
+    }
+  }, 800); // 스크롤 완료 후 800ms 대기 (더 여유있게)
+}, { passive: true });
+
+// 스크롤 종료 후 부드러운 정렬
+function handleScrollEnd() {
+  const cards = document.querySelectorAll('.news-card');
+  let targetCard = null;
+  let minDistance = Infinity;
+  
+  cards.forEach((card) => {
+    const rect = card.getBoundingClientRect();
+    const cardCenter = rect.top + rect.height / 2;
+    const screenCenter = window.innerHeight / 2;
+    const distance = Math.abs(cardCenter - screenCenter);
+    
+    // 화면에 보이는 카드 중에서만 선택
+    if (rect.top < window.innerHeight && rect.bottom > 0) {
+      if (distance < minDistance) {
+        minDistance = distance;
+        targetCard = card;
+      }
+    }
+  });
+  
+  // 거리가 충분히 클 때만 자동 스크롤 (너무 민감하지 않게)
+  if (targetCard && minDistance > 80) {
+    snapToCard(targetCard);
+  }
+}
+
+// 부드러운 카드 스냅 함수
+function snapToCard(card) {
+  isAutoScrolling = true;
+  
+  const rect = card.getBoundingClientRect();
+  const targetScroll = window.pageYOffset + rect.top - window.innerHeight * 0.3;
+  
+  gsap.to(window, {
+    duration: 1.2,
+    scrollTo: {
+      y: targetScroll,
+      autoKill: false
+    },
+    ease: "power2.out",
+    onComplete: () => {
+      setTimeout(() => {
+        isAutoScrolling = false;
+      }, 500);
+    }
+  });
+  
+  // 타겟 카드 하이라이트
+  gsap.to(card, {
+    scale: 1.02,
+    duration: 0.4,
+    yoyo: true,
+    repeat: 1,
+    ease: "power2.inOut"
+  });
+}
+
+        // 팝업 관련 변수들 (맨 위에 추가)
+        const popupOverlay = document.getElementById('popupOverlay');
+        const popupGallery = document.getElementById('popupGallery');
+        const popupDescription = document.getElementById('popupDescription');
+        const popupClose = document.getElementById('popupClose');
+        let currentImageIndex = 0;
+        let totalImages = 0;
+
+        // 팝업 설명 데이터
+        const popupDescriptions = {
+            popup1: '모란과 복(福) 자 문양을 반복한 것으로 보입니다.<br>모란은 부귀, 영화를 뜻하고 복(福) 자에 담긴 의미처럼<br>입는 사람의 삶에 복을 기원하고 신분과 격을 나타냅니다.',
+            popup2: '활옷에 새겨진 봉황 자수는 왕비·귀족 여성의 고귀한 상징입니다.<br>전체적으로 혼례의 바람(복, 다산, 장수, 교양)을 총망라한 회화 자수입니다.',
+            popup3: '원삼에 새겨진 봉황, 구름 자수는 착용자의 신분뿐만 아니라<br>삶의 소망과 상징적 의미를 전하는 매개체였습니다.',
+            popup4: '단령에 새겨진 호랑이와 표범은 무관 관복에 사용되는 상징이며, 용맹과 충성을 뜻합니다.'
+        };
+
+        const imageMap = {
+            popup1: ['img/dang1.jpg', 'img/dang2.jpg', 'img/dang4.jpg'],
+            popup2: ['img/hhwal.jpg', 'img/hw.jpg', 'img/hwa.jpg'],
+            popup3: ['img/nok.jpg', 'img/hong.jpg'],
+            popup4: ['img/dan.jpg', 'img/dn.jpg']
+        };
+
+        // 팝업 열기 함수
+        function openPopup(popupId) {
+            console.log('Opening popup:', popupId);
+
+            const images = imageMap[popupId];
+            const desc = popupDescriptions[popupId] || "설명이 준비 중입니다.";
+
+            if (!images) {
+                console.error('No images found for popup:', popupId);
+                return;
+            }
+
+            // 갤러리 트랙 생성
+            popupGallery.innerHTML = '<div class="popup-gallery-track"></div>';
+            const track = popupGallery.querySelector('.popup-gallery-track');
+
+            // 이미지 추가
+            images.forEach(src => {
+                const img = document.createElement('img');
+                img.src = src;
+                track.appendChild(img);
+            });
+
+            // 인덱스 초기화
+            currentImageIndex = 0;
+            totalImages = images.length;
+
+            // 트랙 위치 초기화
+            updateGalleryPosition();
+            updateNavButtons();
+
+            popupDescription.innerHTML = desc;
+            popupOverlay.style.display = 'flex';
+        }
+
+        // 갤러리 위치 업데이트 함수
+        function updateGalleryPosition() {
+            const track = popupGallery.querySelector('.popup-gallery-track');
+            if (track) {
+                track.style.transform = `translateX(-${currentImageIndex * 100}%)`;
+            }
+        }
+
+
+
+        // 네비게이션 버튼 상태 업데이트
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            prevBtn.disabled = currentImageIndex === 0;
+            nextBtn.disabled = currentImageIndex === totalImages - 1;
+        }
+
+        // 이벤트 리스너들
+        document.addEventListener('DOMContentLoaded', function () {
+            // 팝업 닫기 버튼
+            if (popupClose) {
+                popupClose.addEventListener('click', () => {
+                    popupOverlay.style.display = 'none';
+                });
+            }
+
+            // 이전/다음 버튼
+            document.getElementById('prevBtn')?.addEventListener('click', () => {
+                if (currentImageIndex > 0) {
+                    currentImageIndex--;
+                    updateGalleryPosition();
+                    updateNavButtons();
+                }
+            });
+
+            document.getElementById('nextBtn')?.addEventListener('click', () => {
+                if (currentImageIndex < totalImages - 1) {
+                    currentImageIndex++;
+                    updateGalleryPosition();
+                    updateNavButtons();
+                }
+            });
+
+            // 오버레이 클릭시 팝업 닫기
+            if (popupOverlay) {
+                popupOverlay.addEventListener('click', (e) => {
+                    if (e.target === popupOverlay) {
+                        popupOverlay.style.display = 'none';
+                    }
+                });
+            }
+
+            // ESC 키로 팝업 닫기
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && popupOverlay && popupOverlay.style.display === 'flex') {
+                    popupOverlay.style.display = 'none';
+                }
+            });
+
+            // Read More 버튼 이벤트
+            document.querySelectorAll('.read-more-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = btn.dataset.popup;
+                    console.log('Read more clicked:', targetId);
+
+                    if (!imageMap[targetId]) {
+                        console.warn(`No image mapping found for: ${targetId}`);
+                        return;
+                    }
+
+                    const images = imageMap[targetId];
+                    const section = btn.closest('.transition-section') || btn.closest('.transition-section-2');
+                    const fixedBox = section?.querySelector('.fixed-left') || section?.querySelector('.fixed-right');
+
+                    if (!fixedBox) {
+                        console.error('Fixed box not found');
+                        return;
+                    }
+
+                    // 기존 이미지 제거
+                    fixedBox.querySelectorAll('.overlay-img').forEach(el => el.remove());
+
+                    // 새 이미지 삽입
+                    images.forEach((src, i) => {
+                        const img = document.createElement('img');
+                        img.src = src;
+                        img.classList.add('overlay-img', `overlay-${i}`);
+                        img.style.cursor = 'pointer';
+                        img.style.pointerEvents = 'auto';
+
+                        // 이미지 클릭 이벤트
+                        img.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            console.log('Overlay image clicked for:', targetId);
+                            openPopup(targetId);
+                        });
+
+                        fixedBox.appendChild(img);
+
+                        // 이미지가 로드된 후 visible 클래스 추가
+                        img.onload = () => {
+                            setTimeout(() => {
+                                img.classList.add('visible');
+                                console.log('Image visible:', img.src);
+                            }, i * 200);
+                        };
+                    });
+                });
+            });
+        });
+
+        // 나머지 기존 코드들 (커서, GSAP 애니메이션 등)은 그대로 유지
+
+
+
+    </script>
+</body>
+
+</html>

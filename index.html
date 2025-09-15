@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One-Page-Scroll</title>
+  <style>
+
+      @font-face {
+    font-family: 'BookkGothic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkGothic-Bd.woff2') format('woff2');
+    font-weight: 700; font-display: swap;
+  }
+
+* {
+    padding: 0;
+    margin: 0;
+    color : white;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+/* ====== Loading Overlay ====== */
+body.loading { overflow: hidden; }
+
+#loader{
+  position: fixed; inset: 0;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100000;
+  transition: opacity .6s ease, visibility .6s ease;
+}
+
+#loader.hidden{ opacity: 0; visibility: hidden; }
+
+#loader .line-svg,
+#loader .circle-svg{
+  position: absolute; top:0; left:0;
+  width: 100vw; height: 100vh;
+}
+
+#loader .h-line, #loader .v-line, #loader .circle{
+  stroke-dasharray: 3000;
+  stroke-dashoffset: 3000;
+  animation: draw 2.6s ease forwards;
+}
+
+@keyframes draw{
+  to{ stroke-dashoffset: 0; }
+}
+
+.pages{ opacity: 0; transition: opacity .6s ease; }
+.pages.ready{ opacity: 1; }
+
+
+.pages {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.page {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    bottom: -100%;
+    transition: bottom .7s;
+  
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.page:first-child {
+  bottom: 0;
+}
+
+.first {
+    background-color: #ffffff;
+    padding: 0; 
+    box-sizing: border-box;
+}
+
+/* --- 4분할 그리드 스타일 시작 --- */
+.grid-container {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    background-color: #171717; /* 그리드 라인 색상 */
+    gap: 2px;
+    padding: 50px; /* 전체 컨테이너 여백 */
+    box-sizing: border-box;
+}
+
+.grid-item {
+    background-color: #ffffff; /* 각 영역 배경색 */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.grid-item.top-left {
+    background-image: url('img/7.jpg');
+}
+
+.grid-item.top-right {
+    background-image: url('img/4.jpg');
+}
+
+.grid-item.bottom-left {
+    background-color: #2F5DC9;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 30px;
+}
+
+.grid-item.bottom-right {
+    background-image: url('img/8.jpg');
+}
+
+.grid-text {
+    font-family: 'BookkGothic', sans-serif;
+    font-weight: bold;
+    color: #000;
+}
+
+.grid-text.top-left-text {
+    font-size: 20px;
+    align-self: flex-start;
+}
+
+.grid-text.bottom-right-text {
+    font-size: 80px;
+    align-self: flex-end;
+}
+
+/* 설명 텍스트를 위한 스타일 추가 */
+.description-text {
+    font-family: 'BookkGothic';
+    font-size: 8px;
+    color: #383838;
+    line-height: 0.6;
+    margin-top: 15px;
+    font-weight: normal;
+}
+
+
+/* --- 4분할 그리드 스타일 끝 --- */
+
+
+.second {
+    background-color: #ffffff;
+}
+
+.third {
+    background-color: #ffffff;
+}
+
+.fourth {
+    background-color: #ffffff;
+}
+
+.fifth {
+    background-color: rgb(10, 10, 10);
+    overflow: hidden;
+}
+
+
+.pagination {
+    position: absolute;
+    left: 80px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.pagination.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.pagination>li {
+    list-style: none;
+    height: 10px;
+    width: 10px;
+    background: #B9B9B9;
+    border-radius: 50%;
+    margin-top: 10px;
+    transition: background .7s;
+    cursor: pointer;
+}
+
+.pagination>li.active {
+    background: #3f3f3f;
+}
+
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  right: 50px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  z-index: 9999;
+}
+
+.nav-arrow:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.nav-arrow svg {
+    width: 60px;
+    height: 60px;
+    stroke: #3f3f3f;
+    stroke-width: 2;
+    fill: none;
+}
+
+
+.title {
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+}
+
+
+@media (max-width: 768px) {
+    .grid-container {
+        padding: 20px; /* 모바일 여백 조정 */
+    }
+    .grid-text.bottom-right-text {
+        font-size: 50px; /* 모바일 텍스트 크기 조정 */
+    }
+    .description-text {
+        font-size: 12px;
+        margin-top: 10px;
+    }
+    .nav-arrow {
+        width: 40px;
+        height: 40px;
+        right: 20px;
+    }
+    .nav-arrow svg {
+        width: 30px;
+        height: 30px;
+    }
+    .pagination {
+        left: 20px;
+    }
+
+    .image-container,
+    .third-page-layout,
+    .right-column {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+    .image2, .image3, .image4, .image5 {
+        width: 80vw;
+        position: static;
+        animation: none;
+    }
+    .himage1, .himage2, .himage3 {
+        width: 90vw;
+        position: static;
+        margin-bottom: 20px;
+    }
+    .overlay-image {
+        width: 60vw;
+        position: static;
+        transform: none;
+        opacity: 1;
+    }
+}
+
+.center-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.stack-image {
+    max-width: 1600px;
+    width: 100%;
+    height: auto;
+    opacity: 0;
+    transform: translateY(-30px);
+    transition: opacity 0.7s, transform 0.7s;
+}
+
+.stack-image.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.image5 {
+    transition: opacity 1.5s ease, transform 1.5s ease;
+}
+
+.image-container {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.image-container2 {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin: 0 auto;
+  gap: 30px;
+  padding: 20px;
+}
+
+.third-page-layout {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.right-column {
+  height: 100%;
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+.image2, .image3, .image4, .image5, .himage1, .himage2, .himage3 {
+    pointer-events: none;
+}
+
+.image2 {
+  position: absolute;
+  width: 400px;
+  top: 0%;
+  left: 28%;
+  z-index: 2;
+  animation: float 6s ease-in-out infinite;
+}
+
+.image3 {
+  position: absolute;
+  width: 480px;
+  top: 48%;
+  right: 20%;
+  z-index: 2;
+  animation: float 7s ease-in-out infinite;
+}
+
+.image4 {
+  position: absolute;
+  width: 500px;
+  bottom: 3%;
+  left: 20%;
+  z-index: 2;
+  animation: float 8s ease-in-out infinite;
+}
+
+.image5 {
+  position: absolute;
+  width: 1200px;
+  bottom: 38%;
+  left: 8%;
+  z-index: 1;
+}
+
+.himage1 {
+  position: absolute;
+  width: 1200px;
+  top: 10%;
+}
+
+.himage2 {
+  position: absolute;
+  width: 800px;
+  top: 25%;
+  left: 8%;
+}
+
+.himage3 {
+  position: absolute;
+  width: 750px;
+  top: 45%;
+  right: 0%;
+}
+
+/* ============================================= */
+/* ===== 4K 및 고해상도 데스크톱을 위한 미디어 쿼리 ===== */
+/* ============================================= */
+@media (min-width: 1921px) {
+    /* --- 1페이지: 그리드 레이아웃 조정 --- */
+    .grid-container {
+        padding: 100px; /* 전체 여백 확장 */
+        gap: 4px;       /* 그리드 라인 두께 조절 */
+    }
+
+    .grid-item.bottom-left {
+        padding: 60px; /* 내부 여백 확장 */
+    }
+
+    .grid-text.top-left-text {
+        font-size: 32px; /* '문양록;' 텍스트 크기 증가 */
+    }
+
+    .grid-text.bottom-right-text {
+        font-size: 120px; /* '文樣錄' 텍스트 크기 증가 */
+    }
+
+    .description-text {
+        font-size: 16px; /* 설명 텍스트 크기 증가 */
+        line-height: 1.5; /* 줄 간격 조절 */
+        margin-top: 20px;
+    }
+
+    /* --- 2페이지: 스택 이미지 컨테이너 확장 --- */
+    .image-container {
+        max-width: 1600px; /* 콘텐츠 최대 너비 확장 (기존 1000px) */
+    }
+
+    /* --- 3페이지: 플로팅 이미지 크기 및 위치 조정 --- */
+    .image2 {
+        width: 600px;
+        left: 25%;
+    }
+    .image3 {
+        width: 720px;
+        right: 15%;
+    }
+    .image4 {
+        width: 750px;
+        left: 18%;
+    }
+    .image5 {
+        width: 1800px; /* 타이틀 이미지 크기 대폭 증가 */
+        bottom: 35%;
+        left: 5%;
+    }
+
+    /* --- 4페이지: 한복 이미지 크기 조정 --- */
+    .himage1 {
+        width: 1800px;
+    }
+    .himage2 {
+        width: 1200px;
+    }
+    .himage3 {
+        width: 1100px;
+    }
+
+    /* --- UI 요소: 페이지네이션 및 화살표 --- */
+    .pagination {
+        left: 120px; /* 왼쪽 여백 증가 */
+    }
+    .pagination > li {
+        height: 15px; /* 아이콘 크기 증가 */
+        width: 15px;
+        margin-top: 15px;
+    }
+    .nav-arrow {
+        width: 70px; /* 화살표 크기 증가 */
+        height: 70px;
+        right: 80px; /* 오른쪽 여백 증가 */
+    }
+    .nav-arrow svg {
+        width: 45px;
+        height: 45px;
+    }
+}
+
+
+  </style>
+</head>
+
+<body class="loading">
+  <div id="loader" aria-hidden="true">
+    <svg class="line-svg" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+      <line class="h-line" x1="0" y1="540" x2="1920" y2="540" stroke="black" stroke-width="1"/>
+      <line class="v-line" x1="960" y1="0" x2="960" y2="1080" stroke="black" stroke-width="1"/>
+    </svg>
+    <svg class="circle-svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid meet">
+      <circle class="circle" cx="960" cy="540" r="300" stroke="black" stroke-width="1" fill="none"/>
+    </svg>
+  </div>
+
+
+    <div class="pages">
+        <div class="first page">
+            <div class="grid-container">
+                <div class="grid-item top-left"></div>
+                <div class="grid-item top-right"></div>
+                <div class="grid-item bottom-left">
+                    <div class="top-content">
+                        <span class="grid-text top-left-text">문양록;</span>
+                        <p class="description-text">우리 조상들이 남긴 문양과 자수에는 단순한 장식을 넘어 복, 장수, 사랑과 같은 깊은 바람이 담겨 있습니다.</p>
+                        <p class="description-text">이 웹페이지는 그런 상징의 의미를 풀어내고, 유물 속 이야기를 전합니다.</p>
+                    </div>
+                    <span class="grid-text bottom-right-text">文樣錄</span>
+                </div>
+                <div class="grid-item bottom-right"></div>
+            </div>
+        </div>
+        <div class="second page">
+          <div class="nav-arrow" data-href="sumak.html">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </div>
+            <div class="image-container">
+                <img src="img/sumak/Group15.png" alt="이미지 1" class="stack-image">
+                <img src="img/sumak/Group16.png" alt="이미지 2" class="stack-image">
+                <img src="img/sumak/Group17.png" alt="이미지 3" class="stack-image">
+                <img src="img/sumak/Group18.png" alt="이미지 4" class="stack-image">
+            </div>
+        </div>
+        <div class="third page">
+          <div class="nav-arrow" data-href="ceramics.html">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </div>
+          <div class="third-page-layout">
+            <div class="right-column">
+              <img src="img/gong/1.png" alt="이미지 1" class="stack-image image2">
+              <img src="img/gong/44.png" alt="이미지 2" class="stack-image image3">
+              <img src="img/gong/2.png" alt="이미지 3" class="stack-image image4">
+              <img src="img/gong/title2.png" alt="CRAFTS 텍스트" class="stack-image image5">
+            </div>
+          </div>
+        </div>
+        <div class="fourth page">
+            <div class="nav-arrow" data-href="hanbok.html">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M9 18l6-6-6-6"/>
+                </svg>
+            </div>
+            <img src="img/han/hanbokk.png" alt="이미지 5" class="himage1">
+            <img src="img/han/hhh.png" alt="이미지 6" class="himage2">
+            <img src="img/han/hh.png" alt="이미지 7" class="himage3">
+        </div>
+    </div>
+    
+    <ul class="pagination"></ul>
+
+<script>
+  (function(){
+    const loader = document.getElementById('loader');
+    const pages  = document.querySelector('.pages');
+    
+    function endLoading(){
+      if(!loader || loader.classList.contains('hidden')) return;
+      loader.classList.add('hidden');
+      document.body.classList.remove('loading');
+      if(pages) pages.classList.add('ready');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const circle = document.querySelector('#loader .circle');
+      if(circle){
+        circle.addEventListener('animationend', endLoading, { once: true });
+      }
+      setTimeout(endLoading, 3200);
+    });
+  })();
+
+  /* 랜덤 이미지 스크립트는 이제 사용하지 않습니다. */
+
+window.onload = () => {
+  function animateStackImages(pageIndex) {
+    const page = document.querySelectorAll('.page')[pageIndex];
+    if (!page) return;
+    const images = page.querySelectorAll('.stack-image');
+    
+    document.querySelectorAll('.stack-image').forEach(img => {
+      img.classList.remove('visible');
+    });
+    
+    if (pageIndex === 2) {
+      const title = page.querySelector('.image5');
+      const img1 = page.querySelector('.image2');
+      const img2 = page.querySelector('.image3');
+      const img3 = page.querySelector('.image4');
+
+      setTimeout(() => title && title.classList.add('visible'), 0);
+      setTimeout(() => img1 && img1.classList.add('visible'), 600);
+      setTimeout(() => img2 && img2.classList.add('visible'), 1200);
+      setTimeout(() => img3 && img3.classList.add('visible'), 1800);
+    } else if (pageIndex !== 0) {
+      images.forEach((img, index) => {
+        setTimeout(() => {
+          img.classList.add('visible');
+        }, index * 300);
+      });
+    }
+  }
+
+  const Slider = function(pages, pagination) {
+    let slides = [],
+        btns = [],
+        count = 0,
+        current = 0,
+        touchstart = 0,
+        animation_state = false;
+
+    const init = () => {
+      slides = pages.children;
+      count = slides.length;
+      for(let i = 0; i < count; i++) {
+        slides[i].style.bottom = -(i * 100) + '%';
+        let btn = document.createElement('li');
+        btn.dataset.slide = i;
+        btn.addEventListener('click', btnClick)
+        btns.push(btn);
+        pagination.appendChild(btn);
+      }
+      btns[0].classList.add('active');
+      pagination.classList.add('hidden'); // 처음에 페이지네이션 숨기기
+      animateStackImages(0);
+    }
+
+    const gotoNum = (index) => {
+      if((index != current) && !animation_state) {
+        animation_state = true;
+        setTimeout(() => animation_state = false, 700);
+        
+        // 페이지네이션 보이기/숨기기 로직
+        if (index > 0) {
+            pagination.classList.remove('hidden');
+        } else {
+            pagination.classList.add('hidden');
+        }
+
+        btns[current].classList.remove('active');
+        current = index;
+        btns[current].classList.add('active');
+        for(let i = 0; i < count; i++) {
+          slides[i].style.bottom = (current - i) * 100 + '%';
+        }
+        setTimeout(() => animateStackImages(current), 700);
+      }
+    }
+
+    const gotoNext = () => {
+        if(current < count - 1) { // 마지막 페이지가 아닐 때만 다음 페이지로 이동
+            gotoNum(current + 1);
+        }
+        // 마지막 페이지에서는 스크롤해도 아무 동작 안 함
+    }
+    const gotoPrev = () => current > 0 ? gotoNum(current - 1) : false;
+    const btnClick = (e) => gotoNum(parseInt(e.target.dataset.slide));
+    
+    pages.addEventListener('touchstart', (e) => touchstart = e.touches[0].screenY, { passive: true });
+    pages.addEventListener('touchend', (e) => {
+      if (touchstart < e.changedTouches[0].screenY) {
+        gotoPrev();
+      } else {
+        gotoNext();
+      }
+    });
+    pages.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        e.deltaY < 0 ? gotoPrev() : gotoNext();
+    }, { passive: false });
+
+    init();
+    
+    return {
+        gotoNext,
+        gotoPrev,
+        gotoNum
+    }
+  }
+
+  let pages = document.querySelector('.pages');
+  let pagination = document.querySelector('.pagination');
+  let slider = new Slider(pages, pagination);
+
+  const navArrows = document.querySelectorAll('.nav-arrow');
+  navArrows.forEach(arrow => {
+    arrow.addEventListener('click', function() {
+        const href = this.dataset.href;
+        if (href) {
+            window.location.href = href;
+        } else {
+            slider.gotoNext();
+        }
+    });
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공예품</title>
+  <style>
+    @font-face {
+      font-family: 'SUIT-Regular';
+      src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'SUIT-Regular';
+    }
+
+    html,
+    body {
+      overflow: hidden;
+      /* 스크롤바 완전 제거 */
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      background-color: #f8f8f8;
+      color: #222;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      z-index: 1000;
+      color: #999;
+      font-size: 12px;
+    }
+
+    .container {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .content {
+      width: 80%;
+      max-width: 1200px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .left-content {
+      width: 28%;
+      padding-right: 5px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      position: relative;
+      margin-top: -350px;
+      margin-left: -80px;
+    }
+
+    .center-content {
+      width: 44%;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+
+    .right-content {
+      width: 28%;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .book-image {
+      width: 100%;
+      height: auto;
+      max-height: 70vh;
+      object-fit: contain;
+      transition: opacity 0.3s ease;
+    }
+
+    /* 호버 이미지 스타일 */
+    .image-container {
+      position: relative;
+      width: 100%;
+      height: auto;
+    }
+
+    .hover-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+      max-height: 70vh;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .image-container:hover .book-image {
+      opacity: 0;
+    }
+
+    .image-container:hover .hover-image {
+      opacity: 1;
+    }
+
+    .title-korean {
+      font-size: 60px;
+      font-weight: 900;
+      line-height: 1.2;
+      word-break: keep-all;
+      margin-bottom: 40px;
+    }
+
+    #lefttitle {
+      font-size: 80px;
+    }
+
+    #rightTitle {
+      font-size: 40px;
+    }
+
+    .title-explanation {
+      font-size: 64px;
+      font-weight: 900;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      margin-bottom: 30px;
+      font-weight: 500;
+    }
+
+    .details {
+      font-size: 14px;
+      line-height: 1.8;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .divider-line {
+      width: 100%;
+      height: 1px;
+      background-color: #ddd;
+      margin: 30px 0;
+    }
+
+    .horizontal-line {
+      width: 100%;
+      height: 1px;
+      background-color: #222;
+    }
+
+    .section {
+      opacity: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+    }
+
+    .section.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .navigation {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 1000;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #ccc;
+      margin: 10px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .nav-dot.active {
+      background-color: #222;
+      transform: scale(1.5);
+    }
+
+    .footer-button {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      align-self: flex-start;
+    }
+
+    .footer-button:hover {
+      background-color: #f0f0f0;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        flex-direction: column;
+        width: 90%;
+      }
+
+      .left-content,
+      .center-content,
+      .right-content {
+        width: 100%;
+        padding: 0;
+        margin-bottom: 20px;
+      }
+
+      .title-korean,
+      .title-explanation {
+        font-size: 22px;
+      }
+
+      .left-content {
+        margin-top: 0;
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="logo">백자</div>
+    <div class="page-number">01/06</div>
+  </div>
+
+  <div class="navigation">
+    <div class="nav-dot active" data-index="0"></div>
+    <div class="nav-dot" data-index="1"></div>
+    <div class="nav-dot" data-index="2"></div>
+    <div class="nav-dot" data-index="3"></div>
+    <div class="nav-dot" data-index="4"></div>
+    <div class="nav-dot" data-index="5"></div>
+  </div>
+
+  <div class="container">
+    <div class="content">
+      <div class="left-content">
+        <h1 class="title-korean" id="left-title">동물문양</h1>
+      </div>
+
+      <div class="center-content">
+        <div class="section active" id="section1">
+          <div class="image-container">
+            <img src="자료/공예품/백자/1.png" alt="책 이미지" class="book-image">
+            <img src="자료/공예품/백자/2.png" alt="호버 이미지" class="hover-image">
+          </div>
+        </div>
+        <div class="section" id="section2">
+          <div class="image-container">
+            <img src="자료/공예품/cup.png" alt="책 이미지 2" class="book-image">
+            <img src="자료/공예품/백자/4.png" alt="호버 이미지 2" class="hover-image">
+          </div>
+        </div>
+        <div class="section" id="section3">
+          <div class="image-container">
+            <img src="자료/공예품/ccc.png" alt="책 이미지 3" class="book-image">
+            <img src="자료/공예품/cc.png" alt="호버 이미지 3" class="hover-image">
+          </div>
+        </div>
+        <div class="section" id="section4">
+          <div class="image-container">
+            <img src="자료/공예품/p.png" alt="책 이미지 4" class="book-image">
+            <img src="자료/공예품/백자/6.png" alt="호버 이미지 4" class="hover-image">
+          </div>
+        </div>
+        <div class="section" id="section5">
+          <div class="image-container">
+            <img src="자료/공예품/a1.png" alt="책 이미지 4" class="book-image">
+            <img src="자료/공예품/a2.png" alt="호버 이미지 4" class="hover-image">
+          </div>
+        </div>
+        <div class="section" id="section6">
+          <div class="image-container">
+            <img src="자료/공예품/7.png" alt="책 이미지 4" class="book-image">
+            <img src="자료/공예품/6.png" alt="호버 이미지 4" class="hover-image">
+          </div>
+        </div>
+      </div>
+
+      <div class="right-content">
+        <h1 class="title-explanation" id="right-title">청화백자</h1>
+        <p class="subtitle" id="subtitle">Welcome to Talk Concert</p>
+        <div class="details" id="details">
+          고고함과<br>
+          장수를 상징<br><br>
+          2024.02.19
+        </div>
+        <button class="footer-button" id="section-button">자세히 보기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const sections = document.querySelectorAll('.section');
+      const navDots = document.querySelectorAll('.nav-dot');
+      const pageNumber = document.querySelector('.page-number');
+      const leftTitle = document.getElementById('left-title');
+      const rightTitle = document.getElementById('right-title');
+      const subtitle = document.getElementById('subtitle');
+      const details = document.getElementById('details');
+      const sectionButton = document.getElementById('section-button');
+
+      // Content for each section
+      const content = [
+        {
+          leftTitle: "동물문양",
+          rightTitle: "백자 주전자",
+          subtitle: "이 주전자는 경덕진요(景德鎭窯)에서 제작한 것으로<br>봉황의 머리가 입 둘레에 장식되어 있으며, 머리 가운데 구멍이 뚫려져 있다.",
+          details: "백자 청화 운룡문 접시<br>	白磁注子<br><br>소장품번호	덕수2995",
+          buttonText: "자세히 보기",
+          buttonLink: "animal.html"
+        },
+        {
+          leftTitle: "식물문양",
+          rightTitle: "청자",
+          subtitle: "연꽃이 새겨진 청자,불교적 의미가 강하며,불순한 세상에서 피어나는 깨끗한 마음을 상징",
+          details: "청자 상감 연꽃 넝쿨 무늬 합<br>靑磁 象嵌 蓮唐草文 盒<br><br>소장품번호 본관2002",
+          buttonText: "자세히 보기",
+          buttonLink: "plant.html"
+        },
+        {
+          leftTitle: "기하학적문양",
+          rightTitle: "백자",
+          subtitle: "태극 문양이 새겨진 백자,검은 부분이 음(陰), 밝은 부분이 양(陽)을 의미",
+          details: "백자 청화 운룡문 접시<br>白磁 靑畵 雲龍文 角匙<br><br>소장품번호 수정138",
+          buttonText: "자세히 보기",
+          buttonLink: "geometric.html"
+        },
+        {
+          leftTitle: "문자가새겨진",
+          rightTitle: "청화 백자",
+          subtitle: "'복'자가 쓰인 백자 청화 접시",
+          details: "대진 명접시<br>	白磁靑畵「福」銘楪匙<br><br>소장품번호 증6942",
+          buttonText: "자세히 보기",
+          buttonLink: "letter.html"
+        },
+        {
+          leftTitle: "문자가새겨진",
+          rightTitle: "청화 백자",
+          subtitle: "'복'자가 쓰인 백자 청화 접시",
+          details: "대진 명접시<br>	白磁靑畵「福」銘楪匙<br><br>소장품번호 증6942",
+          buttonText: "자세히 보기",
+          buttonLink: "letter.html"
+        },
+        {
+          leftTitle: "문자가새겨진",
+          rightTitle: "청화 백자",
+          subtitle: "'복'자가 쓰인 백자 청화 접시",
+          details: "대진 명접시<br>	白磁靑畵「福」銘楪匙<br><br>소장품번호 증6942",
+          buttonText: "자세히 보기",
+          buttonLink: "letter.html"
+        },
+      ];
+
+      let currentIndex = 0;
+      let isScrolling = false;
+
+      // Update the active section based on the index
+      function updateActiveSection(index) {
+        sections.forEach(section => section.classList.remove('active'));
+        navDots.forEach(dot => dot.classList.remove('active'));
+
+        sections[index].classList.add('active');
+        navDots[index].classList.add('active');
+
+        // Update content
+        leftTitle.textContent = content[index].leftTitle;
+        rightTitle.textContent = content[index].rightTitle;
+        subtitle.textContent = content[index].subtitle;
+        details.innerHTML = content[index].details;
+
+        // Update button text and link
+        sectionButton.textContent = content[index].buttonText;
+        sectionButton.onclick = function () {
+          window.location.href = content[index].buttonLink;
+        };
+
+        // Update page number
+        pageNumber.textContent = `0${index + 1}/0${sections.length}`;
+
+        currentIndex = index;
+      }
+
+      // Handle scroll events with debounce
+      let scrollTimeout;
+      window.addEventListener('wheel', function (e) {
+        if (isScrolling) return;
+
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+          if (e.deltaY > 0 && currentIndex < sections.length - 1) {
+            // Scroll down
+            updateActiveSection(currentIndex + 1);
+          } else if (e.deltaY < 0 && currentIndex > 0) {
+            // Scroll up
+            updateActiveSection(currentIndex - 1);
+          }
+
+          // Set a cooldown period
+          isScrolling = true;
+          setTimeout(() => { isScrolling = false; }, 800);
+        }, 50);
+      });
+
+      // Handle click on navigation dots
+      navDots.forEach(dot => {
+        dot.addEventListener('click', function () {
+          const index = parseInt(this.getAttribute('data-index'));
+          updateActiveSection(index);
+        });
+      });
+
+      // Handle touch events for mobile
+      let touchStartY = 0;
+
+      window.addEventListener('touchstart', function (e) {
+        touchStartY = e.touches[0].clientY;
+      });
+
+      window.addEventListener('touchend', function (e) {
+        if (isScrolling) return;
+
+        const touchEndY = e.changedTouches[0].clientY;
+        const deltaY = touchEndY - touchStartY;
+
+        if (deltaY < -50 && currentIndex < sections.length - 1) {
+          // Swipe up
+          updateActiveSection(currentIndex + 1);
+        } else if (deltaY > 50 && currentIndex > 0) {
+          // Swipe down
+          updateActiveSection(currentIndex - 1);
+        }
+
+        // Set a cooldown period
+        isScrolling = true;
+        setTimeout(() => { isScrolling = false; }, 800);
+      });
+
+      // Handle keyboard navigation
+      window.addEventListener('keydown', function (e) {
+        if (isScrolling) return;
+
+        if ((e.key === 'ArrowDown' || e.key === 'PageDown') && currentIndex < sections.length - 1) {
+          updateActiveSection(currentIndex + 1);
+        } else if ((e.key === 'ArrowUp' || e.key === 'PageUp') && currentIndex > 0) {
+          updateActiveSection(currentIndex - 1);
+        }
+
+        // Set a cooldown period
+        isScrolling = true;
+        setTimeout(() => { isScrolling = false; }, 800);
+      });
+
+      // Initial setup
+      updateActiveSection(0);
+    });
+  </script>
+</body>
+
+</html>
