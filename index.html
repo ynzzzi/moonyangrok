@@ -278,6 +278,37 @@ body.loading { overflow: hidden; }
         align-items: center;
         padding: 20px;
     }
+
+    .right-column {
+    position: relative;
+    width: 100%;
+    max-width: 1920px; /* 레이아웃 최대 너비 설정 */
+    margin: 0 auto;    /* 컨테이너 중앙 정렬 */
+    height: 100%;
+}
+
+.image2 { /* 상단 좌측 도자기 */
+    width: 550px;
+    top: 10%;
+    left: 15%;
+}
+.image3 { /* 중간 우측 도자기 */
+    width: 700px;
+    top: 45%;
+    right: 10%;
+}
+.image4 { /* 하단 좌측 도자기 */
+    width: 700px;
+    bottom: 12%;
+    left: 12%;
+}
+.image5 { /* CRAFTS 타이틀 이미지 */
+    width: 100%;
+    max-width: 1800px;
+    left: 50%;
+    transform: translateX(-50%); /* 정확한 중앙 정렬 */
+    bottom: 30%;
+}
     .image2, .image3, .image4, .image5 {
         width: 80vw;
         position: static;
@@ -660,7 +691,7 @@ window.onload = () => {
     const gotoNum = (index) => {
       if((index != current) && !animation_state) {
         animation_state = true;
-        setTimeout(() => animation_state = false, 700);
+        setTimeout(() => animation_state = false, 1200);
         
         // 페이지네이션 보이기/숨기기 로직
         if (index > 0) {

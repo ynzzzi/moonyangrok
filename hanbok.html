@@ -22,7 +22,7 @@
 
     /* 갤러리 */
     section#gallery{position:relative}
-    .gallery-container{position:relative;width:100%;height:80vh;margin-top:50px;overflow:hidden}
+    .gallery-container{position:relative;width:100%;height:100vh;margin-top:50px;overflow:hidden}
     .background-image{position:absolute;width:auto;height:auto;z-index:0;pointer-events:none}
     .gallery-item{position:absolute;border-radius:2px;box-shadow:0 4px 8px rgba(0,0,0,.1);transition:all .3s ease;background:#fff;z-index:1;cursor:pointer}
     .gallery-item:hover{transform:scale(1.03);z-index:10;box-shadow:0 8px 16px rgba(0,0,0,.2)}
@@ -198,8 +198,8 @@
       min-height: 70vh;
     }
     .sp-hero {
-      position:relative; border-radius:12px; overflow:hidden; border:1px solid #ddd;
-      box-shadow:0 30px 60px -20px rgba(0,0,0,.1); aspect-ratio: 3 / 4;
+      position:relative; overflow:hidden; 
+      aspect-ratio: 3 / 4;
     }
     .sp-hero img{width:100%; height:100%; object-fit:cover; transition:transform .5s ease, opacity .3s ease;}
     .sp-hero:hover img{transform:scale(1.02)}
@@ -213,7 +213,7 @@
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
-      margin-top: 32px;
+      margin-top: 24px;
     }
     .sp-mini-gallery img {
       width: 100%;
@@ -253,7 +253,7 @@
     }
     .sp-secondary-image img {
         width: 100%;
-        border-radius: 8px;
+        border-radius: 0;
     }
 
     .sp-fullbleed{
@@ -277,6 +277,24 @@
       height: 180px;
       background-repeat: no-repeat;
       pointer-events: none;
+    }
+    /* 돋보기 안내 문구 스타일 추가 */
+    .magnifier-hint {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-family: 'Suit', sans-serif;
+        z-index: 10;
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
     #pattern-buttons-container {
@@ -501,7 +519,7 @@
 /* ❷ 본문: 아래에서 위로 떠오른다(괄호 이후 약간 딜레이) */
 .stack-hint.reveal .hint-text {
   opacity: 0;
-  animation: hintRise 0.65s cubic-bezier(.2,.7,.2,1) 0.35s forwards;
+  animation: hintRise 0.65s cubic-bezier(.2,.7,.2,1) 0.55s forwards;
 }
 
 /* 신규 키프레임: 괄호 벌어짐 */
@@ -549,6 +567,9 @@
 @media (min-width: 1600px){
   .stack{ width: min(52vw, 1100px); }
   .marquee-row{ font-size: clamp(12vw, 18vw, 18vw); }
+    .site-header {
+    top: 20px; /* 헤더를 위에서 20px만큼 내립니다 */
+  }
 }
 
 /* 4) Split Portfolio 영역 여백/그리드 미세 조정 */
@@ -631,16 +652,16 @@
     </section>
 
     <section class="intro-cta" id="intro-cta">
-      <div class="cta-wrap">
-        <div class="cta-row">
-          <a href="#marquee" aria-label="Go to marquee">GALLERY</a>
-          <svg class="hover-icon spin" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,5 58,34 90,10 66,42 95,50 66,58 90,90 58,66 50,95 42,66 10,90 34,58 5,50 34,42 10,10 42,34" fill="#2F5DC9"/></svg>
-        </div>
-        <div class="cta-row">
-          <a href="#split-portfolio" aria-label="Go to split portfolio">EXPLORE</a>
-          <svg class="hover-icon spin" viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,5 58,34 90,10 66,42 95,50 66,58 90,90 58,66 50,95 42,66 10,90 34,58 5,50 34,42 10,10 42,34" fill="#2F5DC9"/></svg>
-        </div>
-      </div>
+<div class="cta-wrap">
+  <div class="cta-row">
+    <a href="#marquee" aria-label="Go to marquee">GALLERY</a>
+    <img src="img/han/icon.png" class="hover-icon spin" alt="Decorative Icon" />
+  </div>
+  <div class="cta-row">
+    <a href="#split-portfolio" aria-label="Go to split portfolio">EXPLORE</a>
+    <img src="img/han/icon.png" class="hover-icon spin" alt="Decorative Icon" />
+  </div>
+</div>
       <div class="blurb-wrap">
         <div class="mask-block" id="blurbMask">
           <p class="mask-text">(*)</p>
@@ -716,6 +737,7 @@
             </section>
 
             <section class="sp-fullbleed" id="sp-fullbleed">
+              <p class="magnifier-hint" id="magnifier-hint">한복의 자수를 가까이서 볼 수 있습니다.</p>
               <img id="spf-full" src="" alt="풀사이즈 이미지">
               <div id="magnifier-lens" class="magnifier-lens"></div>
               <div id="pattern-buttons-container"></div>
@@ -792,10 +814,10 @@
             const deg = (el.dataset.rot || '0') + 'deg';
             setTimeout(() => el.style.setProperty('--rot', deg), i * 150);
           });
-          if (hint) setTimeout(() => hint.classList.add('reveal'), 400);
+          if (hint) setTimeout(() => hint.classList.add('reveal'), 900);
           io.unobserve(en.target);
         });
-      }, { threshold: .35 });
+      }, { threshold: .60 });
       io.observe(section);
       const PHOTOS = ['img/han/4.jpg', 'img/han/5.jpg', 'img/han/2.jpg'];
       let idx = 0;
@@ -845,14 +867,14 @@
       const projects = [
         { id:0,
           title:"당의(唐衣)", category:"궁중·사대부 여성의 예복",
-          description:"당의는 저고리에서 길이가 늘어나 치마 위에 겹쳐 입는 겉옷으로, 앞길이보다 뒤길이가 약간 길고 둥근 도련·흰 동정(깃)이 특징입니다. 왕실에선 소례와 조회 같은 격식 있는 자리에, 민간에선 예복이나 혼례 때 착용했습니다.",
-          featureBody:"당의는 동정·깃·고름·곁마기 등의 구성요소가 간결하게 균형을 이루며, 직선 재단임에도 착용자의 움직임을 따라 유려한 곡선이 살아납니다. 평상복보다는 ‘격식 있는 날의 단정함’을 표현하는 예복 성격이 강합니다.",
+          description:"당의는 저고리에서 길이가 늘어나 치마 위에 겹쳐 입는 겉옷으로, 앞길이보다 뒤길이가 약간 길고 둥근 도련·흰 동정(깃)이 특징입니다. 왕실에선 소례와 조회 같은 격식 있는 자리에, 민간에선 예복이나 혼례 때 착용했다.",
+          featureBody:"당의에 보이는 주요 문양은 주로 금박(金箔) 기법으로 새겨져 있으며, '수'와 '복' 문자를 옷에 새기는 것은 착용자에게 장수와 행복이 깃들기를 바라는 가장 직접적이고 강력한 기원이었다.",
           image:"img/han/h2.jpg", thumb:"img/han/h2.jpg", hoverThumb:"img/han/y.jpg",
           mini_images: ["img/han/1.png", "img/han/3.png"],
           secondary_feature: {
-            title: "보(補)의 미학",
-            text: "당의의 가슴, 등, 어깨에는 '보(補)'라 불리는 사각형의 장식판을 붙여 착용자의 신분과 등급을 나타냈습니다. 보는 주로 용, 봉황, 꽃 등 상서로운 문양을 정교하게 수놓아 만들었으며, 이는 단순한 장식을 넘어 왕실의 권위와 질서를 시각적으로 표현하는 중요한 역할을 했습니다.",
-            image: "img/han/bo.jpg"
+            title: "왕실의 권위와 번영",
+            text: "당의에 나타난 문양들은 단순히 옷을 아름답게 꾸미는 것을 넘어, 착용자인 왕실 여성의 건강과 장수(壽), 행복과 길운(福), 그리고 부귀영화(모란 등)를 기원하는 상징물들의 집합체입니다. 이러한 길상 문양을 최고급 재료인 금으로 화려하게 새겨 넣어 왕실의 권위와 번영을 드러내고자 했던 것이다.",
+            image: "img/han/bg.jpg"
           },
           detail_image: "img/han/d.png",
           patterns: [
@@ -1026,7 +1048,8 @@
       const container = document.getElementById('sp-fullbleed');
       const img = document.getElementById('spf-full');
       const lens = document.getElementById('magnifier-lens');
-      if(!container || !img || !lens) return;
+      const hint = document.getElementById('magnifier-hint');
+      if(!container || !img || !lens || !hint) return;
       const zoomLevel = 2.5;
       function moveMagnifier(e) {
         const rect = img.getBoundingClientRect();
@@ -1045,6 +1068,8 @@
         lens.style.backgroundPosition = `${bgPosX}% ${bgPosY}%`;
       }
       container.addEventListener('mouseenter', () => {
+        hint.style.opacity = '1';
+        hint.style.visibility = 'visible';
         const onImgLoad = () => {
             lens.style.backgroundImage = `url('${img.src}')`;
             lens.style.backgroundSize = `${img.width * zoomLevel}px ${img.height * zoomLevel}px`;
@@ -1052,7 +1077,11 @@
         };
         if (img.complete) { onImgLoad(); } else { img.addEventListener('load', onImgLoad, {once: true}); }
       });
-      container.addEventListener('mouseleave', () => { lens.style.display = 'none'; });
+      container.addEventListener('mouseleave', () => {
+        lens.style.display = 'none';
+        hint.style.opacity = '0';
+        hint.style.visibility = 'hidden';
+      });
       container.addEventListener('mousemove', moveMagnifier);
     })();
 

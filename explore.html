@@ -1069,7 +1069,8 @@
   const init = ()=>{
     tagCategories();
     layoutStaggered();
-    scale = targetScale = Z_MIN;
+   const initialScale = window.innerWidth > 1920 ? 1.0 : Z_MIN; // 화면 너비에 따라 초기 줌 레벨 결정
+    scale = targetScale = initialScale; // 결정된 값으로 스케일 설정
     topCenter(true);
     targetPos.x = pos.x; targetPos.y = pos.y;
     requestAnimationFrame(tick);
