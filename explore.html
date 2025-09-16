@@ -564,7 +564,9 @@
   const chips        = filterBar.querySelectorAll('.chip');
   if(!viewport || !canvas) return;
 
-  const pxVar = name => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name).trim())||0;
+  // ===== 💡 수정된 부분 1: pxVar 함수 =====
+  // CSS 변수 읽기에 실패할 경우(NaN)를 대비해 fallback 값을 받도록 수정
+  const pxVar = (name, fallback) => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name).trim()) || fallback;
   const Z_MIN=.6, Z_MAX=2, Z_STEP=.15;
 
   let pos={x:0,y:0}, targetPos={x:0,y:0};
@@ -610,7 +612,16 @@
   }
 
   function layoutStaggered(){
-    const SIZE = pxVar('--cell-size'), GAP=pxVar('--cell-gap'), PAD=pxVar('--cell-pad'), PITCH=SIZE+GAP;
+    // ===== 💡 수정된 부분 2: layoutStaggered 함수 =====
+    // pxVar 함수에 기본값(320, 140, 140)을 전달
+    const SIZE = pxVar('--cell-size', 320), GAP=pxVar('--cell-gap', 140), PAD=pxVar('--cell-pad', 140), PITCH=SIZE+GAP;
+    
+    // PITCH가 0이면(CSS 로드 실패) 레이아웃을 중단하여 (0,0)에 쌓이는 것을 방지
+    if (PITCH === 0) {
+      console.warn("Grid layout failed: CSS variables not loaded?");
+      return; 
+    }
+
     const items = Array.from(canvas.querySelectorAll('.pan-item:not(.is-hidden)'));
     const idealCols = Math.max(6, Math.floor((viewport.clientWidth * 1.6) / PITCH));
     const COLS = Math.min(12, idealCols);
@@ -1092,7 +1103,10 @@
   const init = ()=>{
     tagCategories();
     layoutStaggered();
-   const initialScale = window.innerWidth > 1920 ? 1.0 : Z_MIN; // 화면 너비에 따라 초기 줌 레벨 결정
+
+    // ===== 💡 수정된 부분 3: init 함수 (초기 줌 레벨) =====
+    // 화면 크기와 관계없이 항상 최소 줌(Z_MIN)으로 시작하도록 수정
+    const initialScale = Z_MIN; // 화면 너비에 따라 초기 줌 레벨 결정
     scale = targetScale = initialScale; // 결정된 값으로 스케일 설정
     topCenter(true);
     targetPos.x = pos.x; targetPos.y = pos.y;
