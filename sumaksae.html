@@ -270,6 +270,18 @@
       display: grid; grid-template-columns: 1fr 1fr; align-items: center;
       padding: 8px var(--gutter); pointer-events: none;
     }
+
+    /* 헤더(홈/메뉴 아이콘)를 화면 상단에서 ↓로 조금 내리기 */
+.site-header{
+  top: 18px !important;   /* ← 내려가는 양: 12~28px 사이로 취향 조절 */
+  left: 0; 
+  right: 0;
+}
+
+/* 아이콘을 조금 더 여유 있게 보이고 싶으면 버튼 자체도 살짝 내리기(옵션) */
+.site-header .icon-btn{
+  transform: translateY(2px); /* 0~6px 사이로 조절 */
+}
     .header-left{ justify-self: start; }
     .header-right{ justify-self: end; }
     .icon-btn{
@@ -331,6 +343,52 @@
       font-size:clamp(16px,4vh,36px); line-height:1.2; padding:1vh 1vw 0; }
     .fm-marquee__img{ width:200px; height:7vh; min-height:42px; margin:2em 2vw; padding:1em 0; border-radius:50px; background-size:cover; background-position:50% 50%; }
     @keyframes fm-marquee{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+    /* ============================================= */
+/* ===== 4K 및 고해상도 데스크톱을 위한 미디어 쿼리 ===== */
+/* ============================================= */
+@media (min-width: 1921px) {
+
+    /* === 문제 1: 좌우 여백 줄이기 (콘텐츠 최대 너비 확장) === 
+      기존 1800px 였던 것들을 2200px로 늘려서 여백을 줄입니다.
+      숫자는 원하시는 만큼 더 늘리거나 줄이셔도 됩니다.
+    */
+    .about-image-container,
+    .about-image-container2 img,
+    .tile-grid {
+        max-width: 2200px; /* 기존 1800px에서 확장 */
+    }
+
+    /* 텍스트 영역도 조금 더 넓게 */
+    .un-overlay-text {
+        max-width: 700px; /* 기존 600px에서 확장 */
+        font-size: 1.15rem;
+    }
+
+    .overlay-text {
+        max-width: 1100px; /* 기존 950px에서 확장 */
+        font-size: 1.2rem;
+    }
+
+    /* (이하 1921px 미디어 쿼리 내의 다른 스타일들...) */
+    .tile-grid {
+        max-width: 2200px; /* 기존 1800px에서 확장 */
+        height: 900px;
+    }
+    .tile-item:nth-child(1) { width: 285px; top: 0%; left: 32%; }
+    .tile-item:nth-child(2) { width: 345px; top: 36%; left: 19%; }
+    .tile-item:nth-child(3) { width: 675px; top: 4%; left: 43%; }
+    .tile-item:nth-child(4) { width: 255px; top: 68%; left: 35%; }
+    .tile-item:nth-child(5) { width: 285px; top: 53%; left: 64%; }
+    .tile-item:nth-child(6) { width: 240px; top: -12%; left: 5%; }
+
+
+
+    img + .artifact-info {
+        margin-top: 60px; /* 이 값을 80px 등으로 늘려보세요 */
+    }
+
+}
   </style>
 </head>
 <body>

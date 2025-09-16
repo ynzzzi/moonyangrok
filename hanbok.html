@@ -32,6 +32,24 @@
     .item4{width:250px;height:250px;top:200px;left:700px;z-index:2}
     .item5{width:450px;height:300px;top:250px;left:200px;z-index:1}
     .item6{width:350px;height:380px;top:40px;left:50px;z-index:4}
+/* Hero(#gallery)를 컨테이너 밖으로 풀-블리드(가로 100vw) */
+section#gallery{
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 0;                 /* .container의 padding 20px 무시 */
+  border: 0;
+}
+
+/* 높이 100% (모든 데스크탑에서 안정적으로) + 상단 여백 제거 */
+section#gallery .gallery-container{
+  height: 100svh;             /* 100vh 대신 100svh로 안전 */
+  margin-top: 0;              /* 기존 50px 제거 */
+  overflow: hidden;
+}
+
+/* 필요 시(큰 화면에서 살짝 비침 방지): 헤더가 겹쳐도 깔끔 */
+.site-header{ pointer-events:none }  /* 이미 있음: 확인만 */
 
     /* intro-cta */
     section.intro-cta{

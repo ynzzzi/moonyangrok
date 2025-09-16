@@ -56,6 +56,19 @@
       display: grid; grid-template-columns: 1fr 1fr; align-items: center;
       padding: 8px var(--gutter); pointer-events: none;
     }
+
+    /* 헤더(홈/메뉴 아이콘)를 화면 상단에서 ↓로 조금 내리기 */
+.site-header{
+  top: 18px !important;   /* ← 내려가는 양: 12~28px 사이로 취향 조절 */
+  left: 0; 
+  right: 0;
+}
+
+/* 아이콘을 조금 더 여유 있게 보이고 싶으면 버튼 자체도 살짝 내리기(옵션) */
+.site-header .icon-btn{
+  transform: translateY(2px); /* 0~6px 사이로 조절 */
+}
+
     .header-left{ justify-self: start; }
     .header-right{ justify-self: end; }
     .icon-btn{
