@@ -210,7 +210,7 @@ font-family:'BookkGothic';
   .panel-image {
     width: 100%;
     height: auto;
-    max-height: 80vh;
+    max-height: 60vh;
     object-fit: contain;
   }
 
@@ -232,8 +232,8 @@ font-family:'BookkGothic';
     width: 100%;
   }
 
-  .panel-number { font-size: clamp(16px, 1.1vw, 22px); font-weight: 700; color: #94a3b8; transition: transform .45s ease; }
-  .panel-title  { font-size: clamp(28px, 2.5vw, 42px); font-weight: 700; margin: 0; color:#111; transition: transform .45s ease; }
+  .panel-number {     font-family: 'BookkGothic';font-size: clamp(16px, 1.1vw, 22px); font-weight: 700; color: #94a3b8; transition: transform .45s ease; }
+  .panel-title  {     font-family: 'BookkGothic';font-size: clamp(28px, 2.5vw, 42px); font-weight: 700; margin: 0; color:#111; transition: transform .45s ease; }
   .panel.is-open .panel-number,
   .panel.is-open .panel-title { transform: translateY(8px); }
   
@@ -263,7 +263,7 @@ font-family:'BookkGothic';
   .panel:not(.is-active) .panel-header-collapsed {
     display: flex;
     writing-mode: vertical-rl;
-    transform: rotate(180deg);
+
     align-items: center;
     justify-content: center;
     height: 100%;
@@ -315,6 +315,25 @@ font-family:'BookkGothic';
         transition-delay: .6s;
       }
   }
+
+  /* ↓ 패널이 열렸을 때(가로 패널 내부 헤더) 숫자/타이틀을 조금 더 아래로 */
+.panel.is-open .panel-number,
+.panel.is-open .panel-title {
+  transform: translateY(16px); /* 기존 8px → 16px로 살짝 하향 */
+}
+
+/* ↓ 헤더 줄 자체에 여백 살짝 더 줘서 전체적으로 아래로 보이게 */
+.panel-header {
+  padding-bottom: 22px; /* +6px */
+  margin-bottom: 44px;  /* +4px */
+}
+
+/* ↓ 접혀있을 때(세로 글자 열)도 아주 조금 하향 */
+.panel:not(.is-active) .panel-header-collapsed .panel-number,
+.panel:not(.is-active) .panel-header-collapsed .panel-title {
+  transform: translateY(6px);
+}
+
 
 
   /* ===== Gallery after ===== */
@@ -397,7 +416,7 @@ font-family:'BookkGothic';
       </div>
     </div>
     <div class="hero-title-wrap">
-      <h1 class="hero-title" id="heroTitle">CRAFT&nbsp;&nbsp;&nbsp;WORK*</h1>
+      <h1 class="hero-title" id="heroTitle">KOREAN&nbsp;&nbsp;&nbsp;CRAFTS*</h1>
     </div>
     <p class="hero-desc">
       우리나라의 전통공예품은 실용성과 예술성을 조화롭게 갖춘 생활 속의 예술입니다.<br />
@@ -424,7 +443,7 @@ font-family:'BookkGothic';
       <article class="panel" id="hs-baekja">
         <div class="panel-header-collapsed">
            <span class="panel-number">01</span>
-           <h3 class="panel-title">Baekja</h3>
+           <h3 class="panel-title">백자</h3>
         </div>
         <div class="panel-content">
           <div class="panel-image-wrapper">
@@ -433,7 +452,7 @@ font-family:'BookkGothic';
           <div class="panel-text-wrapper">
             <div class="panel-header">
               <span class="panel-number">01</span>
-              <h3 class="panel-title">Baekja · White Porcelain</h3>
+              <h3 class="panel-title">백자 · White Porcelain</h3>
             </div>
             <div class="panel-footer">
               <p class="panel-meta">CERAMICS / JOSEON DYNASTY</p>
@@ -447,7 +466,7 @@ font-family:'BookkGothic';
       <article class="panel" id="hs-cheongja">
         <div class="panel-header-collapsed">
            <span class="panel-number">02</span>
-           <h3 class="panel-title">Cheongja</h3>
+           <h3 class="panel-title">청자</h3>
         </div>
         <div class="panel-content">
           <div class="panel-image-wrapper">
@@ -456,7 +475,7 @@ font-family:'BookkGothic';
           <div class="panel-text-wrapper">
             <div class="panel-header">
               <span class="panel-number">02</span>
-              <h3 class="panel-title">Cheongja · Celadon</h3>
+              <h3 class="panel-title">청자 · Celadon</h3>
             </div>
             <div class="panel-footer">
               <p class="panel-meta">CERAMICS / GORYEO DYNASTY</p>
@@ -470,7 +489,7 @@ font-family:'BookkGothic';
       <article class="panel" id="hs-najeon">
          <div class="panel-header-collapsed">
            <span class="panel-number">03</span>
-           <h3 class="panel-title">Najeon Chilgi</h3>
+           <h3 class="panel-title">나전칠기</h3>
         </div>
         <div class="panel-content">
           <div class="panel-image-wrapper">
@@ -479,7 +498,7 @@ font-family:'BookkGothic';
           <div class="panel-text-wrapper">
             <div class="panel-header">
               <span class="panel-number">03</span>
-              <h3 class="panel-title">Najeon Chilgi</h3>
+              <h3 class="panel-title">나전칠기</h3>
             </div>
             <div class="panel-footer">
               <p class="panel-meta">LACQUERWARE / TRADITIONAL</p>

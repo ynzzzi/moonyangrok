@@ -6,6 +6,7 @@
   <title>무늬기와 수막새 레이아웃</title>
 
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -22,7 +23,7 @@
 
     /* ==== 스크롤바/기본 ==== */
     html{ min-height: 100%; height: auto; scroll-behavior:auto; }
-    html, body { height: 100%; margin: 0; padding: 0; }
+    html, body {margin: 0; padding: 0; }
     body {min-height: 100%;  font-family:'SUIT-Regular'; overflow-x:hidden; color:#FCFCFc; }
     img{ max-width:100%; height:auto; display:block; }
 
@@ -142,11 +143,28 @@ font-family:'BookkGothic';
       background-size:cover; background-position:center; background-repeat:no-repeat;
       position:relative; overflow:hidden; height:100vh; width:100%;
       display:flex; justify-content:center; align-items:center;
+      /* 💡 z-index 추가 */
+      z-index: 2; 
+      /* clip-path 애니메이션을 위해 추가 */
+      clip-path: circle(200% at 50% 50%);
+        will-change: transform, clip-path;
+  -webkit-clip-path: circle(200% at 50% 50%); /* Safari 대비 */
+  clip-path: circle(200% at 50% 50%);
     }
-    #main::after{
-      content:""; position:absolute; inset:0; background:#000; z-index:5; pointer-events:none;
-      opacity:1; animation:fadeOutScreen 1.6s ease .2s forwards;
-    }
+#main::after{
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -1px;                 /* 경계선 미세 숨김 */
+  width: 140%;                  /* 살짝 더 넓게 해서 가장자리까지 곡선 느낌 살림 */
+  height: var(--arc-h, 0vh);    /* 처음엔 0 → 나중에 40~50vh 정도로 */
+  background: #fff;             /* 다음 섹션 배경색과 동일하게 */
+  border-top-left-radius: 50% 100%;
+  border-top-right-radius: 50% 100%;
+  pointer-events: none;
+  will-change: height;
+}
     @keyframes fadeOutScreen{ to{ opacity:0; } }
     @media (prefers-reduced-motion: reduce){ #main::after{ animation:none; opacity:0; } }
 
@@ -159,14 +177,20 @@ font-family:'BookkGothic';
 
     .section{ width:100%; min-height:100vh; display:flex; justify-content:center; align-items:center; }
     .page{ width:100%; min-height:100vh; position:relative; background-color:#ffffff; display:flex; justify-content:center; align-items:center; }
+    /* 💡 #about 섹션이 #main 뒤로 가도록 z-index 설정 */
+    #about.page {
+      position: relative;
+      z-index: 1;
+    }
+
 
     .about-image-container{ display:flex; justify-content:center; align-items:center; width:60%; padding:60px 0; }
     .un-section{ position:relative; width:100vw; display:flex; justify-content:center; align-items:center; }
     .un-section img{ width:100vw; height:auto; }
     .un-overlay-text{ position:absolute; left:15%; top:23%; transform:translateY(-50%); color:#121212; max-width:400px; }
-    .about-image-container2{ display:flex; justify-content:center; align-items:center; width:100%; padding:60px 0; z-index:2; margin-top:-500px; margin-bottom:-200px; }
+    .about-image-container2{ display:flex; justify-content:center; align-items:center; width:100%; padding:120px 0 80px; z-index:2; margin:0; }
     .about-image-container2 img{ width:70vw; max-width:1200px; height:auto; }
-    .about-image-container3{ display:flex; justify-content:center; align-items:center; width:100%; z-index:0; padding:60px 0; position:relative; margin-bottom:-300px; }
+    .about-image-container3{ display:flex; justify-content:center; align-items:center; width:100%; z-index:0;  padding:120px 0; position:relative;  margin:0;}
     .about-image-container3 img{ width:100vw; height:auto; }
     .about-image-container4 {
     display: flex;
@@ -210,7 +234,8 @@ font-family:'BookkGothic';
       .tile-item:nth-child(5){ top:72%; left:15%; }
     }
 
-    .fade-in{ opacity:0; transform:translateY(30px); transition:opacity 1s ease, transform 1s ease; }
+    .fade-in{ opacity:0; transform:translateY(16px);   transition: opacity .7s ease, transform .7s ease;
+  will-change: transform, opacity; }
     .fade-in.appear{ opacity:1; transform:translateY(0); }
     .stagger{ transition-delay:calc(var(--order) * 200ms); }
 
@@ -270,7 +295,6 @@ font-family:'BookkGothic';
   </style>
 </head>
 <body>
-  <!-- ★ 커서: 텍스트 포함 구조로 교체 -->
   <div id="custom-cursor" class="cursor" aria-hidden="true"><span>scroll</span></div>
 
   <header class="site-header" role="banner">
@@ -295,15 +319,12 @@ font-family:'BookkGothic';
   </div>
 
   <div class="container">
-    <!-- 히어로 -->
     <div id="main" class="section page">
       <div class="scroll-indicator">
         <p>스크롤을 내려보세요</p>
         <span class="arrow">&#8595;</span>
       </div>
     </div>
-
-    <br><br><br><br><br><br><br><br><br><br>
 
     <div class="section page" id="about">
       <div class="about-image-container fade-in">
@@ -578,6 +599,55 @@ font-family:'BookkGothic';
         updateCursorMode();
       });
     })();
+  </script>
+
+  <script>
+(function(){
+  function init(){
+    if (!window.gsap || !window.ScrollTrigger) return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Lenis 쓰면 동기화
+    if (window.__lenis) window.__lenis.on('scroll', ScrollTrigger.update);
+
+    // 히어로 위, 다음 섹션 아래
+    gsap.set("#main",  { zIndex: 2 });
+    gsap.set("#about", { zIndex: 1, position: "relative" });
+
+    // ✅ 하단만 둥근 컷 + 패럴렉스
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: "#main",
+        start: "top top",
+        end:   "+=110%",   // 스크롤 여유
+        scrub: 1.1,
+        pin: true,
+        pinSpacing: true,
+        anticipatePin: 1
+      }
+    });
+
+    // (옵션) 살짝 위로 패럴렉스
+    tl.to("#main", { yPercent: -12, ease: "none" }, 0);
+
+    // 하단 곡선 오버레이 키우기: 0 → 46vh 정도
+    tl.to("#main", { "--arc-h": "46vh", ease: "power1.out" }, 0.35);
+
+    // 스크롤 인디케이터가 있다면淡페이드
+    gsap.to(".scroll-indicator", {
+      opacity: 0,
+      scrollTrigger: {
+        trigger: "#main",
+        start: "top+=10% top",
+        end:   "center center",
+        scrub: true
+      }
+    });
+  }
+
+  if (document.readyState === "complete") init();
+  else window.addEventListener("load", init);
+})();
   </script>
 </body>
 </html>

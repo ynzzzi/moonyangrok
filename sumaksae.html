@@ -3,12 +3,38 @@
 <head>
   <meta charset="UTF-8">
   <title>Korean Traditional Artifacts Gallery</title>
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
   <style>
+    /* ===== Fonts ===== */
     @font-face {
       font-family: 'SUIT-Regular';
       src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-Regular.woff2') format('woff2');
       font-weight: normal;
       font-style: normal;
+    }
+    /* 메뉴용 폰트 추가 */
+    @font-face {
+      font-family: 'BookkGothic';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkGothic-Bd.woff2') format('woff2');
+      font-weight: 700; font-display: swap;
+    }
+
+    /* 메뉴용 CSS 변수 추가 */
+    :root{
+      --ink:#0a0a0a;
+      --muted:#6b7280;
+      --gutter: clamp(16px, 4vw, 48px);
+      --z-header: 100;
+      --z-overlay: 90;
+      --fm-bg:#060010; 
+      --fm-fg:#fff; 
+      --fm-divider:rgba(255,255,255,.3);
+      --fm-font:'BookkGothic';
     }
 
     * {
@@ -22,15 +48,8 @@
       background-color: #f8f8f8;
     }
 
-    .home-icon {
-      position: absolute;
-      top: 30px;
-      right: 30px;
-      z-index: 5;
-      width: 30px;
-      cursor: pointer;
-    }
-
+    /* 기존 home-icon 스타일은 삭제 (새 헤더가 대체) */
+    
     .slider {
       position: relative;
       height: 100vh;
@@ -244,24 +263,102 @@
     .section-container.active {
       display: block;
     }
+
+    /* ===== Header / Menu CSS (ceramics.html에서 복사) ===== */
+    .site-header{
+      position: fixed; inset: 0 0 auto 0; height: 64px; z-index: var(--z-header);
+      display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+      padding: 8px var(--gutter); pointer-events: none;
+    }
+    .header-left{ justify-self: start; }
+    .header-right{ justify-self: end; }
+    .icon-btn{
+      pointer-events: auto; appearance: none; border: 0; background: transparent; cursor: pointer;
+      width: 44px; height: 44px; display: inline-grid; place-items: center;
+      border-radius: 999px; transition: background .2s ease;
+    }
+    .icon-btn:hover{ background: rgba(0,0,0,.06); }
+    .icon-btn:focus-visible{ outline: 2px solid #111; outline-offset: 2px; }
+    .home-svg{ width: 22px; height: 22px; fill:none; stroke:#111; stroke-width:2; }
+    .menu-btn .burger{ display:grid; gap:4px; }
+    .menu-btn .burger span{ width:20px; height:2px; background:#111; display:block; transition: transform .25s, opacity .25s; }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(2){ opacity:0; }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(1){ transform: translateY(6px) rotate(45deg); }
+    .menu-btn[aria-expanded="true"] .burger span:nth-child(3){ transform: translateY(-6px) rotate(-45deg); }
+    .hm-overlay{ position: fixed; inset:0; background: rgba(0,0,0,.35); display:none; z-index: var(--z-overlay); }
+    .hm-overlay.open{ display:grid; place-items: stretch; }
+    .hm-panel{
+      margin-left:auto; width:min(500px, 90vw); height:100%;
+      background:#060010; color:#fff; position:relative;
+      transform: translateX(100%); transition: transform .45s cubic-bezier(.19,1,.22,1);
+      box-shadow: -12px 0 24px rgba(0,0,0,.25);
+    }
+    .hm-overlay.open .hm-panel{ transform: translateX(0); }
+    #react-menu-root{ height:100%; }
+    .fm-menu-wrap{ width:100%; height:100%; overflow:hidden; background:#060010; }
+    .fm-menu{ display:flex; flex-direction:column; height:100%; margin:0; padding:0;    grid-template-rows: repeat(4, 1fr);   justify-content: space-evenly; }
+    .fm-menu__item{  position: relative;
+    overflow: hidden;
+    text-align: center;
+    box-shadow: 0 -1px var(--fm-divider);
+    display: grid;
+    place-items: center; /* 수직/수평 중앙 */
+    height: 100%;
+    min-height: unset;   /* 높이 강제값 해제(큰 화면에서 상단 치우침 방지) */}
+  .menu-items { height: 100%; }
+    .fm-menu__item-link{
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    font-weight: 600;
+    color: var(--fm-fg);
+    font-size: clamp(18px, 4vh, 42px);
+    outline: none;
+  font-family:'BookkGothic';
+        font-weight:600; color:#fff;
+    }
+    .fm-menu__item-link:focus-visible{ outline:2px solid #fff; outline-offset: -4px; }
+    .fm-marquee{ position:absolute; inset:0; overflow:hidden; pointer-events:none; background:#fff;
+      transform: translate3d(0,101%,0); transition: transform .6s cubic-bezier(.19,1,.22,1); }
+    .fm-marquee__inner-wrap{ height:100%; width:200%; display:flex; transform:translateX(0); }
+    .fm-marquee__inner{ display:flex; align-items:center; height:100%; width:200%; will-change:transform; animation: fm-marquee 15s linear infinite; }
+    .fm-marquee span{ color:#060010; white-space:nowrap; text-transform:uppercase; font-weight:400;
+      font-size:clamp(16px,4vh,36px); line-height:1.2; padding:1vh 1vw 0; }
+    .fm-marquee__img{ width:200px; height:7vh; min-height:42px; margin:2em 2vw; padding:1em 0; border-radius:50px; background-size:cover; background-position:50% 50%; }
+    @keyframes fm-marquee{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
   </style>
 </head>
 <body>
-    <!-- 홈 아이콘 -->
-    <a href="index.html" class="home-icon" style="z-index: 9999;">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#6d6d6d" stroke-width="2"
-        stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-      </svg>
-    </a>
-  <div class="slider">
+    <header class="site-header" role="banner">
+      <div class="header-left">
+        <a class="icon-btn" href="index.html" aria-label="Home">
+          <svg class="home-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />
+          </svg>
+        </a>
+      </div>
+      <div class="header-right">
+        <button id="menuBtn" class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="menuPanel" aria-label="Open menu">
+          <span class="burger"><span></span><span></span><span></span></span>
+        </button>
+      </div>
+    </header>
+    <div id="menuOverlay" class="hm-overlay" aria-hidden="true">
+      <aside id="menuPanel" class="hm-panel" role="dialog" aria-modal="true" aria-label="Navigation menu">
+        <div class="menu-items"><div id="react-menu-root"></div></div>
+      </aside>
+    </div>
+    <div class="slider">
     <div class="inner-container">
       <div class="slider__wrraper flex-column">
         <button class="slider__btn-buy">동물문양</button>
         
         <div class="flex-column slider__content">
-          <!-- 용 문양 섹션 -->
           <div class="section-container active" id="section1">
             <div class="main-image">
               <img src="img/sumak/yong/1.png" alt="Dragon Artifact 1" class="visible" id="dragon-image1">
@@ -286,7 +383,6 @@
             </div>
           </div>
           
-          <!-- 꽃 문양 섹션 -->
           <div class="section-container" id="section2">
             <div class="main-image">
               <img src="img/sumak/yeon/11.png" alt="Flower Artifact 1" class="visible" id="flower-image1">
@@ -311,7 +407,6 @@
             </div>
           </div>
           
-          <!-- 소용돌이 문양 섹션 -->
           <div class="section-container" id="section3">
             <div class="main-image">
               <img src="img/sumak/tae/2.png" alt="Spiral Artifact 1" class="visible" id="spiral-image1">
@@ -332,7 +427,6 @@
             </div>
           </div>
           
-          <!-- 문자 문양 섹션 -->
           <div class="section-container" id="section4">
             <div class="main-image">
               <img src="img/sumak/moon/bok.png" alt="Character Artifact 1" class="visible" id="character-image1">
@@ -576,5 +670,82 @@
 
     
   </script>
+
+  <script type="text/babel" data-presets="env,react">
+    const { useEffect, useRef } = React;
+
+    /* ===== React Flowing Menu (explore와 동일 구조/가드) ===== */
+    function FlowingMenu({ items = [] }) {
+      useEffect(() => { items.forEach(item => { if (item.image) { const img = new Image(); img.src = item.image; } }); }, [items]);
+      return (<div className="fm-menu-wrap"><nav className="fm-menu" aria-label="Hamburger items">{items.map((it, i) => <MenuItem key={i} {...it} />)}</nav></div>);
+    }
+    function MenuItem({ link = '#', text, image }) {
+      const itemRef = useRef(null); const marqueeRef = useRef(null); const marqueeInnerRef = useRef(null);
+      const animationDefaults = { duration: 0.6, ease: 'expo.out' };
+      const dist = (x,y,x2,y2)=>{ const dx=x-x2, dy=y-y2; return dx*dx+dy*dy; };
+      const closestEdge = (mx,my,w,h)=> dist(mx,my,w/2,0) < dist(mx,my,w/2,h) ? 'top':'bottom';
+      const enter = (ev)=>{
+        if (typeof gsap === 'undefined') return;
+        if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return; const rect = itemRef.current.getBoundingClientRect();
+        const x=(ev.clientX??0)-rect.left, y=(ev.clientY??0)-rect.top; const edge=closestEdge(x,y,rect.width,rect.height);
+        gsap.timeline({ defaults: animationDefaults }).set(marqueeRef.current,{ y:edge==='top' ? '-101%':'101%' },0).set(marqueeInnerRef.current,{ y:edge==='top' ? '101%':'-101%' },0).to([marqueeRef.current,marqueeInnerRef.current],{ y:'0%' },0);
+      };
+      const leave = (ev)=>{
+        if (typeof gsap === 'undefined') return;
+        if (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return; const rect=itemRef.current.getBoundingClientRect();
+        const x=(ev.clientX??0)-rect.left, y=(ev.clientY??0)-rect.top; const edge=closestEdge(x,y,rect.width,rect.height);
+        gsap.timeline({ defaults: animationDefaults }).to(marqueeRef.current,{ y:edge==='top' ? '-101%':'101%' },0).to(marqueeInnerRef.current,{ y:edge==='top' ? '101%':'-101%' },0);
+      };
+      const onClick = () => { if (link && link.startsWith('#')) { if (window.toggleMenu) window.toggleMenu(false); } };
+      const repeated = Array.from({ length:4 }).map((_,i)=>( <React.Fragment key={i}><span>{text}</span><div className="fm-marquee__img" style={{ backgroundImage:`url(${image})` }} /></React.Fragment> ));
+      return (<div className="fm-menu__item" ref={itemRef}>
+          <a className="fm-menu__item-link" href={link} onPointerEnter={enter} onPointerLeave={leave} onFocus={enter} onBlur={leave} onClick={onClick}>{text}</a>
+          <div className="fm-marquee" ref={marqueeRef} aria-hidden="true"><div className="fm-marquee__inner-wrap" ref={marqueeInnerRef}><div className="fm-marquee__inner">{repeated}</div></div></div>
+        </div>);
+    }
+
+    /* ===== Mount React bits ===== */
+    (async () => {
+      // FlowingMenu mount
+      const menuRoot = document.getElementById('react-menu-root');
+      if (menuRoot && !menuRoot.__mounted) {
+        menuRoot.__mounted = true;
+        const menuItems = [
+          { link: 'index.html',    text: '홈',   image: 'img/8.jpg' },
+          { link: 'sumak.html',     text: '수막새', image: 'img/6.jpg' },
+          { link: 'ceramics.html', text: '공예품', image: 'img/gong/do.png' },
+          { link: 'hanbok.html',   text: '한복', image: 'img/han/bg.jpg' },
+        ];
+        if (ReactDOM.createRoot) {
+          ReactDOM.createRoot(menuRoot).render(<FlowingMenu items={menuItems} />);
+        } else {
+          ReactDOM.render(React.createElement(FlowingMenu, { items: menuItems }), menuRoot);
+        }
+      }
+    })();
+  </script>
+
+  <script>
+    /* ===== Menu open/close ===== */
+    (() => {
+      const btn = document.getElementById('menuBtn');
+      const overlay = document.getElementById('menuOverlay');
+      const panel = document.getElementById('menuPanel');
+      if(!btn || !overlay || !panel) return;
+      function setOpen(open){
+        btn.setAttribute('aria-expanded', String(open));
+        overlay.classList.toggle('open', open);
+        overlay.setAttribute('aria-hidden', String(!open));
+        if (window.__lenis){ open ? window.__lenis.stop() : window.__lenis.start(); }
+        else { document.body.style.overflow = open ? 'hidden' : ''; } // Lenis 없는 환경 fallback
+      }
+      btn.addEventListener('click', () => setOpen(btn.getAttribute('aria-expanded') !== 'true'));
+      overlay.addEventListener('click', () => setOpen(false));
+      panel?.addEventListener('click', (e) => e.stopPropagation());
+      window.addEventListener('keydown', (e) => { if(e.key === 'Escape') setOpen(false); });
+      window.toggleMenu = function(next){ if (typeof next === 'boolean') setOpen(next); else setOpen(btn.getAttribute('aria-expanded') !== 'true'); };
+    })();
+  </script>
+
 </body>
 </html>

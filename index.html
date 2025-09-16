@@ -101,6 +101,7 @@ body.loading { overflow: hidden; }
     gap: 2px;
     padding: 50px; /* 전체 컨테이너 여백 */
     box-sizing: border-box;
+    z-index: 1000;
 }
 
 .grid-item {
@@ -271,21 +272,10 @@ body.loading { overflow: hidden; }
         left: 20px;
     }
 
-    .image-container,
-    .third-page-layout,
-    .right-column {
-        flex-direction: column;
-        align-items: center;
-        padding: 20px;
-    }
-
-    .right-column {
-    position: relative;
-    width: 100%;
-    max-width: 1920px; /* 레이아웃 최대 너비 설정 */
-    margin: 0 auto;    /* 컨테이너 중앙 정렬 */
-    height: 100%;
-}
+.third.page { position: relative; overflow: hidden; }
+.third.page .full-bleed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+/* (옵션) 화살표가 항상 이미지 위에 뜨도록 */
+.third.page .nav-arrow { z-index: 10000; }
 
 .image2 { /* 상단 좌측 도자기 */
     width: 550px;
@@ -314,11 +304,18 @@ body.loading { overflow: hidden; }
         position: static;
         animation: none;
     }
-    .himage1, .himage2, .himage3 {
+
+    /* ▼▼▼ CSS 수정 ▼▼▼ */
+    .himage1, .himage2 {
         width: 90vw;
         position: static;
         margin-bottom: 20px;
     }
+    .himage3 {
+        display: none; /* 모바일에서도 숨김 */
+    }
+    /* ▲▲▲ CSS 수정 ▲▲▲ */
+
     .overlay-image {
         width: 60vw;
         position: static;
@@ -435,25 +432,32 @@ body.loading { overflow: hidden; }
   z-index: 1;
 }
 
+/* ▼▼▼ CSS 수정 ▼▼▼ */
+/* 기존 himage1, himage2, himage3의 position: absolute 규칙을 삭제하고 아래로 대체합니다. */
+
+.himage1, .himage2 {
+    /* position: absolute; (제거됨) */
+    height: auto; /* 비율 유지 */
+    pointer-events: none; /* 기존 속성 유지 */
+    z-index: 1; /* 화살표 아래에 있도록 */
+}
+
 .himage1 {
-  position: absolute;
-  width: 1200px;
-  top: 10%;
+    width: 70vw; /* 반응형 너비 */
+    max-width: 1600px; /* 24인치 Mac 등 고해상도 최대 너비 */
+    margin-bottom: 2vw; /* 이미지 사이 간격 */
 }
 
 .himage2 {
-  position: absolute;
-  width: 800px;
-  top: 25%;
-  left: 8%;
+    width: 55vw; /* 반응형 너비 */
+    max-width: 1100px; /* 24인치 Mac 등 고해상도 최대 너비 */
 }
 
 .himage3 {
-  position: absolute;
-  width: 750px;
-  top: 45%;
-  right: 0%;
+    display: none; /* himage3 완전히 숨기기 */
 }
+/* ▲▲▲ CSS 수정 ▲▲▲ */
+
 
 /* ============================================= */
 /* ===== 4K 및 고해상도 데스크톱을 위한 미디어 쿼리 ===== */
@@ -508,15 +512,10 @@ body.loading { overflow: hidden; }
     }
 
     /* --- 4페이지: 한복 이미지 크기 조정 --- */
-    .himage1 {
-        width: 1800px;
-    }
-    .himage2 {
-        width: 1200px;
-    }
-    .himage3 {
-        width: 1100px;
-    }
+    /* ▼▼▼ CSS 수정 ▼▼▼ */
+    /* 기존 himage 규칙 삭제됨 (위에서 max-width로 처리) */
+    /* ▲▲▲ CSS 수정 ▲▲▲ */
+
 
     /* --- UI 요소: 페이지네이션 및 화살표 --- */
     .pagination {
@@ -537,8 +536,52 @@ body.loading { overflow: hidden; }
         height: 45px;
     }
 }
+/* 2번째 섹션 이미지를 섹션 안에만 딱 채우기 (전역 적용) */
+.second.page { position: relative; overflow: hidden; }
+.second.page .full-bleed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display:block; z-index: 0; }
+/* 화살표는 항상 이미지 위로 */
+.second.page .nav-arrow { z-index: 10000; }
 
 
+
+/* 겹치기: himage1 아래, himage2 위 */
+.fourth.page .himage1,
+.fourth.page .himage2{
+  position: relative;           /* z-index가 먹도록 */
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: auto;
+  pointer-events: none;
+}
+
+.fourth.page .himage1{
+  z-index: 1;                   /* 뒤(아래) */
+  width: clamp(320px, 52vw, 1200px);
+}
+
+.fourth.page .himage2{
+  z-index: 2;                   /* 앞(위) */
+  width: clamp(340px, 56vw, 1280px);
+  margin-top: -14vw;             /* ⬅ 살짝 겹치기(값으로 겹침 정도 조절) */
+}
+
+/* 모바일에서도 겹침 유지 (원하면 값 줄여도 OK) */
+@media (max-width: 768px){
+  .fourth.page .himage1{ width: 86vw; }
+  .fourth.page .himage2{ width: 82vw; margin-top: -14vw; }
+}
+
+
+
+
+/* 모바일에선 겹침 강도가 세니 값 보정 */
+@media (max-width: 768px){
+  .fourth.page .himage1{ margin-top: 6vw; }
+  .fourth.page .himage2{ margin-top: calc(-8vw + 6vw); }    /* = -2vw */
+}
+.fourth.page .himage1 { margin-top: 24vw; z-index: 1; }   /* 윗쪽(먼저 배치) */
+.fourth.page .himage2 { margin-top: -5vw; z-index: 2; }   /* 아래서 위로 3vw 겹침 */
   </style>
 </head>
 
@@ -570,6 +613,16 @@ body.loading { overflow: hidden; }
                 <div class="grid-item bottom-right"></div>
             </div>
         </div>
+
+        <div class="third page">
+          <div class="nav-arrow" data-href="ceramics.html">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </div>
+          <img src="img/gong/bg.png" alt="Crafts" class="full-bleed">
+        </div>
+
         <div class="second page">
           <div class="nav-arrow" data-href="sumak.html">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -583,21 +636,7 @@ body.loading { overflow: hidden; }
                 <img src="img/sumak/Group18.png" alt="이미지 4" class="stack-image">
             </div>
         </div>
-        <div class="third page">
-          <div class="nav-arrow" data-href="ceramics.html">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path d="M9 18l6-6-6-6"/>
-            </svg>
-          </div>
-          <div class="third-page-layout">
-            <div class="right-column">
-              <img src="img/gong/1.png" alt="이미지 1" class="stack-image image2">
-              <img src="img/gong/44.png" alt="이미지 2" class="stack-image image3">
-              <img src="img/gong/2.png" alt="이미지 3" class="stack-image image4">
-              <img src="img/gong/title2.png" alt="CRAFTS 텍스트" class="stack-image image5">
-            </div>
-          </div>
-        </div>
+        
         <div class="fourth page">
             <div class="nav-arrow" data-href="hanbok.html">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -606,9 +645,8 @@ body.loading { overflow: hidden; }
             </div>
             <img src="img/han/hanbokk.png" alt="이미지 5" class="himage1">
             <img src="img/han/hhh.png" alt="이미지 6" class="himage2">
-            <img src="img/han/hh.png" alt="이미지 7" class="himage3">
+            </div>
         </div>
-    </div>
     
     <ul class="pagination"></ul>
 
@@ -645,7 +683,8 @@ window.onload = () => {
       img.classList.remove('visible');
     });
     
-    if (pageIndex === 2) {
+    // (구) 세 번째 페이지 애니메이션이 이제 pageIndex 1에서 실행되어야 함
+    if (pageIndex === 1) { 
       const title = page.querySelector('.image5');
       const img1 = page.querySelector('.image2');
       const img2 = page.querySelector('.image3');
