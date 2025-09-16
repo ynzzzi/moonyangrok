@@ -81,13 +81,31 @@
   .hm-overlay.open .hm-panel{ transform: translateX(0); }
   #react-menu-root{ height:100%; }
   .fm-menu-wrap{ width:100%; height:100%; overflow:hidden; background:#060010; }
-  .fm-menu{ display:flex; flex-direction:column; height:100%; margin:0; padding:0; }
-  .fm-menu__item{ flex:1; position:relative; overflow:hidden; text-align:center; box-shadow:0 -1px rgba(255,255,255,.22);
-    min-height: 120px; display:flex; align-items:center; justify-content:center; }
+  .fm-menu{ display:flex; flex-direction:column; height:100%; margin:0; padding:0;    grid-template-rows: repeat(4, 1fr);   justify-content: space-evenly; }
+  .fm-menu__item{  position: relative;
+  overflow: hidden;
+  text-align: center;
+  box-shadow: 0 -1px var(--fm-divider);
+  display: grid;
+  place-items: center; /* 수직/수평 중앙 */
+  height: 100%;
+  min-height: unset;   /* 높이 강제값 해제(큰 화면에서 상단 치우침 방지) */}
+.menu-items { height: 100%; }
   .fm-menu__item-link{
-    display:flex; align-items:center; justify-content:center; height:100%;
-    cursor:pointer; text-transform:uppercase; text-decoration:none; white-space:nowrap;
-    font-weight:600; color:#fff; font-size:clamp(18px,4vh,42px); outline:none;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--fm-fg);
+  font-size: clamp(18px, 4vh, 42px);
+  outline: none;
+font-family:'BookkGothic';
+      font-weight:600; color:#fff;
   }
   .fm-menu__item-link:focus-visible{ outline:2px solid #fff; outline-offset: -4px; }
   .fm-marquee{ position:absolute; inset:0; overflow:hidden; pointer-events:none; background:#fff;
@@ -343,7 +361,7 @@
     border-radius: clamp(8px, 0.8vw, 16px);
   }
   @media (min-width: 1600px){
-    .site-header{ height: 72px; padding-inline: max(24px, 4vw); }
+    .site-header{ height: 72px; padding-inline: max(24px, 4vw); top: 20px; }
   }
 </style>
 </head>

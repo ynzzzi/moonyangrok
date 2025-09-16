@@ -21,9 +21,9 @@
     }
 
     /* ==== 스크롤바/기본 ==== */
-    html{ scroll-behavior:auto; }
+    html{ min-height: 100%; height: auto; scroll-behavior:auto; }
     html, body { height: 100%; margin: 0; padding: 0; }
-    body { font-family:'SUIT-Regular'; overflow-x:hidden; color:#FCFCFc; }
+    body {min-height: 100%;  font-family:'SUIT-Regular'; overflow-x:hidden; color:#FCFCFc; }
     img{ max-width:100%; height:auto; display:block; }
 
     /* ==== 커스텀 커서 ==== */
@@ -102,14 +102,30 @@
 
     #react-menu-root{ height:100%; }
     .fm-menu-wrap{ width:100%; height:100%; overflow:hidden; background:var(--fm-bg); }
-    .fm-menu{ display:flex; flex-direction:column; height:100%; margin:0; padding:0; }
-    .fm-menu__item{ flex:1; position:relative; overflow:hidden; text-align:center; box-shadow:0 -1px var(--fm-divider);
+    .fm-menu{    justify-content: space-evenly; display:flex; flex-direction:column; height:100%; margin:0; padding:0;     justify-content: center;   grid-template-rows: repeat(4, 1fr);}
+    .fm-menu__item{position:relative;     height: 25%; overflow:hidden; text-align:center; box-shadow:0 -1px var(--fm-divider);   place-items: center;   min-height: unset; 
       min-height: 120px; display:flex; align-items:center; justify-content:center; }
     .fm-menu__item-link{
-      display:flex; align-items:center; justify-content:center; height:100%;
-      cursor:pointer; text-transform:uppercase; text-decoration:none; white-space:nowrap;
-      font-weight:600; color:var(--fm-fg); font-size:clamp(18px,4vh,42px); outline:none;
+        display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--fm-fg);
+  font-size: clamp(18px, 4vh, 42px);
+  outline: none;
+font-family:'BookkGothic';
+      font-weight:600; color:#fff; 
     }
+
+    /* 화면 높이가 작은 환경에선 최소 높이 보장(겹침 방지) */
+@media (max-height: 700px){
+  .fm-menu__item{ min-height: 120px; }
+}
     .fm-menu__item-link:focus-visible{ outline:2px solid #fff; outline-offset: -4px; }
     .fm-marquee{ position:absolute; inset:0; overflow:hidden; pointer-events:none; background:#fff;
       transform: translate3d(0,101%,0); transition: transform .6s cubic-bezier(.19,1,.22,1); }
@@ -152,7 +168,15 @@
     .about-image-container2 img{ width:70vw; max-width:1200px; height:auto; }
     .about-image-container3{ display:flex; justify-content:center; align-items:center; width:100%; z-index:0; padding:60px 0; position:relative; margin-bottom:-300px; }
     .about-image-container3 img{ width:100vw; height:auto; }
-    .about-image-container4{ display:flex; justify-content:center; align-items:center; z-index:0; width:100%; padding:20px 0; margin-top:200px; }
+    .about-image-container4 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 0;
+    width: 100%;
+    padding: 20px 0;
+    margin-top: 0; /* 불필요한 상단 마진 제거 */
+}
     .overlay-text{ position:absolute; top:50%; transform:translateY(-50%); color:#121212; max-width:800px; padding:20px; }
     .overlay-text.left{ left:13.5%; text-align:left; }
     .overlay-text.right{ right:13%; text-align:right; margin-top:150px; }
@@ -241,6 +265,8 @@
     .tile-item:nth-child(5) { width: 285px; top: 53%; left: 64%; }
     .tile-item:nth-child(6) { width: 240px; top: -12%; left: 5%; }
 }
+
+.menu-items { height: 100%; }
   </style>
 </head>
 <body>
@@ -473,40 +499,45 @@
 
   <script>
     /* Lenis 부드러운 스크롤 */
-    (function(){
-      const lenis = new Lenis({
-        duration: 1.1,
-        smoothWheel: true,
-        smoothTouch: true,
-        touchMultiplier: 1.15,
-        wheelMultiplier: 1.0,
-        gestureOrientation: 'vertical',
-        normalizeWheel: true
-      });
-      function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
-      requestAnimationFrame(raf);
-      window.__lenis = lenis;
-      window.__addLenisCb = (fn)=>{
-        let ticking = false;
-        lenis.on('scroll', () => {
-          if (!ticking){
-            ticking = true;
-            requestAnimationFrame(() => { try{ fn(); } finally { ticking = false; } });
-          }
-        });
-      };
-      // 내부 앵커 이동
-      document.querySelectorAll('a[href^="#"]').forEach(a=>{
-        a.addEventListener('click', (e)=>{
-          const id = a.getAttribute('href');
-          const target = id && document.querySelector(id);
-          if (target){
-            e.preventDefault();
-            lenis.scrollTo(target, { duration: 0.9, easing: (t)=>1-Math.pow(1-t,3) });
-          }
-        });
-      });
-    })();
+/* Lenis 부드러운 스크롤 (수정본) */
+(function(){
+  const lenis = new Lenis({
+    duration: 0.95,          // 관성 약간 짧게
+    smoothWheel: true,
+    smoothTouch: true,
+    wheelMultiplier: 1.25,   // 휠 감도 ↑ (고해상도 트랙패드 대응)
+    touchMultiplier: 1.15,
+    normalizeWheel: false,   // ← Safari/iMac에서 ‘멈춤’ 이슈 예방 포인트
+    gestureOrientation: 'vertical'
+  });
+
+  function raf(time){ lenis.raf(time); requestAnimationFrame(raf); }
+  requestAnimationFrame(raf);
+  window.__lenis = lenis;
+
+  // Lenis 스크롤 콜백 헬퍼 그대로 유지
+  window.__addLenisCb = (fn)=>{
+    let ticking = false;
+    lenis.on('scroll', () => {
+      if (!ticking){
+        ticking = true;
+        requestAnimationFrame(() => { try{ fn(); } finally { ticking = false; } });
+      }
+    });
+  };
+
+  // 내부 앵커 이동(기존 코드 유지)
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click', (e)=>{
+      const id = a.getAttribute('href');
+      const target = id && document.querySelector(id);
+      if (target){
+        e.preventDefault();
+        lenis.scrollTo(target, { duration: 0.9, easing: (t)=>1-Math.pow(1-t,3) });
+      }
+    });
+  });
+})();
 
     /* ===== 커서 이동 + 히어로 전용 상태 토글 ===== */
     (function(){
