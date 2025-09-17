@@ -182,7 +182,7 @@
       cursor: pointer;
       font-size: 14px;
       position: absolute;
-      top: 30px;
+      top: 40px;
       left: 60px;
       z-index: 10;
       transition: all 0.3s ease;
@@ -389,6 +389,26 @@
     }
 
 }
+
+/* === 섹션 간 여백 확장 (맥 24인치 전용) === */
+@media (min-width: 1600px) {
+  .thumbnail-container {
+    top: 14%; /* 기존 10% → 약간 내려서 더 여유롭게 */
+    gap: 28px; /* 썸네일 간 간격 살짝 확대 */
+  }
+  .artifact-info {
+    bottom: 12%; /* 기존 15% → 살짝 위로 올려서 여백 확보 */
+  }
+  .artifact-title {
+    font-size: 40px; /* 타이틀 조금 키움 */
+    margin-bottom: 12px;
+  }
+  .artifact-subtitle {
+    font-size: 18px;
+    margin-bottom: 36px;
+  }
+}
+
   </style>
 </head>
 <body>

@@ -416,6 +416,26 @@
   .fm-marquee__img{     height:  clamp(56px, 8vh, 120px); }
 }
 
+/* === Controls Height Unify (Filter = Zoom) === */
+.filter-bar,
+.seg,
+.seg-icon,
+.zoom-btn { height: 38px; }
+
+.zoom-btn {
+  width: 38px;           /* 정원(동그라미) 크기도 38px로 맞춤 */
+  font-size: 18px;       /* 아이콘 크기 유지 */
+  line-height: 38px;     /* 수직 중앙 보정(브라우저별) */
+}
+
+/* 큰 화면(UHD 포함)에서도 고정 38px 유지 — 위 값이 항상 우선되도록 다시 지정 */
+@media (min-width: 1600px){
+  .zoom-btn { width: 38px; height: 38px; font-size: 18px; }
+  .filter-bar { height: 38px; }
+  .seg, .seg-icon { height: 38px; }
+}
+
+
   </style>
 
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -580,10 +600,12 @@
   // ===== 💡 수정된 부분 1: pxVar 함수 =====
   // CSS 변수 읽기에 실패할 경우(NaN)를 대비해 fallback 값을 받도록 수정
   const pxVar = (name, fallback) => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name).trim()) || fallback;
-  const Z_MIN=.6, Z_MAX=2, Z_STEP=.15;
-
+  const Z_MIN = 0.6, Z_MAX = 2, Z_STEP = 0.15;
+const isBigDesktop = window.matchMedia('(min-width: 1600px)').matches;
+const preferredStartScale = isBigDesktop ? 1.18 : 0.92;
+let scale = preferredStartScale;
+let targetScale = preferredStartScale;
   let pos={x:0,y:0}, targetPos={x:0,y:0};
-  let scale=Z_MIN, targetScale=Z_MIN;
   let vel={x:0,y:0};
 
   let isDown=false, moved=false, start={x:0,y:0}, downAt={x:0,y:0};

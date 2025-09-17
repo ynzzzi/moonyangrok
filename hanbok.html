@@ -324,6 +324,8 @@ section#gallery .gallery-container{
       border-radius: 12px;
       overflow: hidden;
       border: 1px solid #ddd;
+        touch-action: pan-y;           /* 트랙패드/터치에서 수직 스크롤 허용 */
+  overscroll-behavior: auto; 
     }
     .sp-fullbleed img {
       width: 100%;
@@ -681,6 +683,24 @@ section#gallery .gallery-container{
   #sp-copy-content p { font-size: 15px; }
 }
 
+/* ===== Mac 24" 등 고해상도에서 갤러리 상단 쏠림 보정 ===== */
+@media (min-width: 1600px) {
+  /* 컨테이너에 상단 패딩을 줘서 카드들의 기준점을 아래로 */
+  section#gallery .gallery-container{
+    height: 88svh;      /* 78~100svh 사이에서 취향 조절 가능 */
+    padding-top: 6vh;   /* 위로 몰림 방지용 오프셋 */
+  }
+
+  /* 카드들의 초기 top 값을 전체적으로 조금씩 내려서 밸런스 맞추기 */
+  .item2{ top: 12vh; }  /* 기존 4vh → 12vh */
+  .item3{ top: 34vh; }  /* 기존 28vh → 34vh */
+  .item4{ top: 30vh; }  /* 기존 24vh → 30vh */
+  .item5{ top: 36vh; }  /* 기존 30vh → 36vh */
+  .item6{ top: 14vh; }  /* 기존 6vh  → 14vh */
+}
+
+/* 패턴 팝업의 이미지 완전 비활성화 */
+.popup-image { display: none !important; }
   </style>
 
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -957,8 +977,8 @@ section#gallery .gallery-container{
           },
           detail_image: "img/han/dang.jpg",
           patterns: [
-            { name: "봉황문", description: "봉황은 상서롭고 고귀한 새로, 왕비의 복식에 주로 사용되었습니다. 태평성대를 상징하며, 암컷과 수컷이 함께 그려져 부부의 화합과 금슬을 의미합니다.", position: { top: '30%', left: '55%' }, image: "img/han/bonghwang.jpg" },
-            { name: "화문", description: "작은 꽃 문양은 아름다움과 생명력을 상징합니다. 여러 종류의 꽃이 어우러져 조화와 번영의 의미를 더하며, 당의 전체에 화사함을 부여하는 역할을 합니다.", position: { top: '75%', left: '45%' }, image: "img/han/flower.jpg" }
+            { name: "화문", description: "어깨와 자락 가장자리에 흐르는 꽃과 덩굴은 부귀·번영과 가문의 영화, 집안의 번창을 상징합니다.", position: { top: '30%', left: '55%' }},
+            { name: "문자문", description: "옷의 허리·자락에 반복된 네모꼴 문자무늬는 장수와 복을 기원하는 수복문입니다. 띠 형태(연속문)로 두른 것은 복과 수명이 끊기지 않고 이어지라는 뜻입니다.", position: { top: '75%', left: '45%' }, image: "img/han/flower.jpg" }
           ]
         },
         { id:1,
@@ -1006,7 +1026,7 @@ section#gallery .gallery-container{
           },
           detail_image: "img/han/dann.jpg",
           patterns: [
-            { name: "띠 장식 (Belt)", description: "철릭과 함께 착용하는 띠(광다회)는 신분을 나타내는 중요한 장신구였습니다. 띠의 색상과 재질, 문양을 통해 착용자의 품계를 알 수 있었습니다.", position: { top: '55%', left: '50%' }, image: "img/han/belt_pattern.jpg" }
+            { name: "호표(호랑이/표범) 문양", description: "흉배의 호표(호랑이/표범) 문양은 무관(軍職)의 품계를 나타내며, 용맹·결단·수호를 상징합니다.", position: { top: '55%', left: '50%' }, image: "img/han/belt_pattern.jpg" }
           ]
         },
         { id:4,
@@ -1017,12 +1037,12 @@ section#gallery .gallery-container{
           mini_images: ["img/han/no.png", "img/han/no2.png"],
           secondary_feature: {
             title: "노의의 문양, 복과 장수를 입히다",
-            text: "노의에는 봉황·학·모란·연꽃·사군자·십장생 같은 길상 문양을 단정히 수놓아 부귀·장수·정결·화합을 기원합니다. 깃·자락·소매 끝의 연속문(당초·운문)과 작은 단자 중심으로, 오방색에 금사·은사로 포인트를 주어 품위를 살립니다.",
-            image: "img/han/dopo_secondary.jpg"
+            text: "노의는 노의와 짝을 이루는 전용 허리띠인 노의대와 착용합니다. 격식 있는 외출·의식에서 노의의 품을 잡아 주는 역할을 합니다. 길상문(당초·보상화 등)으로 단정하게 꾸며 노의 색과 대비·조화를 맞춥니다.",
+            image: "img/han/dae.jpg"
           },
-          detail_image: "img/han/2.png",
+          detail_image: "img/han/noo.jpg",
           patterns: [
-            { name: "전삼 (Back Panel)", description: "도포의 가장 큰 특징인 등판의 덧자락 '전삼'은 예를 갖추어야 할 때 뒷트임을 가려주는 역할을 했습니다. 이는 선비들이 항상 몸가짐을 바르게 하고자 했던 정신을 반영합니다.", position: { top: '40%', left: '50%' }, image: "img/han/jeonsam_pattern.jpg" }
+            { name: "원(圓)형 단자의 반복", description: "원만‧화합‧영속을 뜻하고, 복과 길운이 끊이지 않길 바라는 의미합니다.", position: { top: '40%', left: '50%' }, image: "img/han/jeonsam_pattern.jpg" }
           ]
         }
       ];
