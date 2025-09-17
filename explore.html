@@ -434,6 +434,65 @@
   .filter-bar { height: 38px; }
   .seg, .seg-icon { height: 38px; }
 }
+/* =========================================================
+   iMac 24″ 레이아웃 Fix
+   - 상세 패널 더 넓게
+   - 큰 화면에서만 히어로 이미지를 '흐름(static)'으로 두어 겹침 방지
+   - 본문은 자동으로 남은 높이에서 스크롤 가능
+   ========================================================= */
+@media (min-width: 1600px) and (min-height: 900px){
+  /* 패널 폭 확장 (기존 min(44vw,1400px) → 더 넓게) */
+  .detail-panel{
+    width: min(56vw, 1680px);
+  }
+
+  /* 패널 내부 여백/그리드 상향 + 내용이 위로 몰리지 않도록 위쪽 여백 증가 */
+  .detail-inner{
+    grid-template-columns: 112px 1fr;                     /* 썸네일 열 약간 넓힘 */
+    gap: clamp(24px, 2.2vw, 40px);
+    padding: clamp(64px, 7vh, 112px) clamp(48px, 3.4vw, 80px);
+    align-content: start;                                  /* 내용이 상단에 달라붙지 않게 정리 */
+  }
+
+  .detail-title{
+    font-size: clamp(52px, 3.4vw, 76px);
+    line-height: 1.06;
+    margin: 0 0 18px 0;
+  }
+
+  /* ⚠️ 겹침 원인 제거: 큰 화면에서는 히어로 이미지를 절대배치 → 정적배치로 변경 */
+  .detail-hero{
+    position: static;          /* ← 핵심! (기존 absolute를 이 구간에서만 해제) */
+    width: 100%;
+    max-width: clamp(520px, 34vw, 840px);
+    max-height: none;
+    margin: 8px 0 18px;        /* 제목과 본문 사이 적당한 간격 */
+    object-fit: contain;
+  }
+
+  /* 본문: 절대배치가 사라졌으니 위 여백을 0으로 */
+  .detail-description{
+    margin-top: 0;             /* ← 기존 370px 제거 */
+    font-size: clamp(15px, 1.05vw, 18px);
+    line-height: 1.7;
+    overflow-y: auto;          /* 패널 높이 내에서 자연 스크롤 */
+  }
+
+  /* 본문 래퍼를 grid로 묶어 '이미지/메타/본문/CTA' 순으로 안전 배치 */
+  .detail-body{
+    display: grid;
+    grid-template-rows: auto auto 1fr auto; /* 제목은 이미 바깥, 여기서부터: 이미지, 메타, 본문(가변), CTA */
+    min-height: 0;                           /* 오버플로우 계산 정확도 ↑ */
+  }
+
+  /* 썸네일 박스도 큰 화면에서 살짝 키움 */
+  .thumb{ width: clamp(72px, 5vw, 104px); height: clamp(72px, 5vw, 104px); }
+}
+
+/* 아주 큰 화면(UHD 2560px+)에서는 패널을 한 단계 더 여유롭게 */
+@media (min-width: 2560px){
+  .detail-panel{ width: min(52vw, 1760px); }
+}
 
 
   </style>
