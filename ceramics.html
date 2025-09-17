@@ -784,153 +784,185 @@ font-family:'BookkGothic';
   
   
   /* ===== Horizontal panels: one-by-one opening (discrete steps) ===== */
-  (function(){
-    const sec = document.getElementById('crafts-hscroll');
-    const track = document.getElementById('crafts-track');
-    if (!sec || !track) return;
+/* ===== Horizontal panels: stable one-by-one opening (fixed) ===== */
+(() => {
+  const sec   = document.getElementById('crafts-hscroll');
+  const track = document.getElementById('crafts-track');
+  if (!sec || !track) return;
 
-    const panels = Array.from(track.querySelectorAll('.panel'));
-    const count = panels.length;
-    document.documentElement.style.setProperty('--panels', String(count));
+  const panels = Array.from(track.querySelectorAll('.panel'));
+  const count  = panels.length;
+  document.documentElement.style.setProperty('--panels', String(count));
 
-    const steps = Math.max(1, count - 1);
-    const vh = () => window.innerHeight || document.documentElement.clientHeight;
+  const steps = Math.max(1, count - 1); // 인덱스 범위 0..steps
+  const vh    = () => window.innerHeight || document.documentElement.clientHeight;
 
-    function progress(){
-      const r = sec.getBoundingClientRect();
-      const denom = r.height - vh();
-      if (denom <= 0) return 0;
-      return Math.max(0, Math.min(1, (0 - r.top)/denom));
+  /* ---- 진행도 계산 (0~1) ---- */
+  function progress(){
+    const r = sec.getBoundingClientRect();
+    const denom = r.height - vh();
+    if (denom <= 0) return 0;
+    return Math.max(0, Math.min(1, (0 - r.top) / denom));
+  }
+
+  /* ---- 반올림 버그 수정: 반드시 p*steps를 반올림 ---- */
+  function idxFromProgress(p){
+    const clamped = Math.max(0, Math.min(1, p));
+    return Math.round(clamped * steps);
+  }
+
+  /* ---- 섹션 화면 내 고정 여부 ---- */
+  function inPinnedView(){
+    const r = sec.getBoundingClientRect();
+    return r.top <= 0 && r.bottom >= vh();
+  }
+
+  /* ---- 상태 ---- */
+  let activeIdx   = 0;
+  let openTimer   = null;
+  let idleTimer   = null;
+  let isSnapping  = false;  // 스크롤/스냅 애니메이션 잠금
+  let lastSnapAt  = 0;
+
+  const FLEX_DUR_MS       = 1100; // 패널 열림( flex-grow ) 시간
+  const IDLE_DELAY_MS     = 420;  // 멈춘 뒤 스냅까지 지연
+  const IDLE_COOLDOWN_MS  = 600;  // 최근 스냅 후 무시 시간
+  const RAW_HYSTERESIS    = 0.40; // 히스테리시스(세그먼트의 '중심'에서 얼마나 벗어나야 전환될지) 0.35~0.4 권장
+
+  /* ---- 활성화(확장 후 콘텐츠 노출) ---- */
+  function setActive(idx, opts = { preserveIfSame:true }){
+    const target = Math.max(0, Math.min(steps, idx));
+    if (opts.preserveIfSame && target === activeIdx) return;
+
+    activeIdx = target;
+
+    // 다른 패널 상태 제거
+    panels.forEach((el, i) => {
+      if (i !== activeIdx) el.classList.remove('is-active', 'is-open', 'show-footer');
+    });
+
+    // 활성 패널 펼치기
+    const active = panels[activeIdx];
+    if (active) active.classList.add('is-active');
+
+    // 열림 끝난 뒤 콘텐츠 등장
+    clearTimeout(openTimer);
+    openTimer = setTimeout(() => {
+      const current = panels[activeIdx];
+      if (!current) return;
+      current.classList.add('is-open');
+      current.classList.add('show-footer');
+    }, FLEX_DUR_MS);
+  }
+
+  /* ---- 부드럽게 해당 인덱스로 스크롤(세로 스냅) ---- */
+  const easing = t => 1 - Math.pow(1 - t, 4);
+  function snapToIndex(idx){
+    const i = Math.max(0, Math.min(steps, idx));
+    const r = sec.getBoundingClientRect();
+    const sectionTop = window.scrollY + r.top;
+    const denom = r.height - vh();
+    const targetY = sectionTop + denom * (i / steps);
+
+    isSnapping = true;
+    if (window.__lenis && typeof window.__lenis.scrollTo === 'function'){
+      window.__lenis.scrollTo(targetY, { duration: 1.05, easing });
+    } else {
+      window.scrollTo({ top: targetY, behavior: 'smooth' });
     }
-    function idxFromProgress(p){ return Math.round(Math.max(0, Math.min(1, p)) * steps); }
-    function inPinnedView(){
-      const r = sec.getBoundingClientRect();
-      return r.top <= 0 && r.bottom >= vh();
-    }
+    lastSnapAt = Date.now();
+    setTimeout(() => { isSnapping = false; }, 900); // 애니메이션 끝나면 락 해제
+  }
 
-    let activeIdx = 0;
-    let openTimer = null;
-    const FLEX_DUR_MS = 1100;
+  /* ---- 진행도 기반 스냅(히스테리시스 적용) ---- */
+  function idleSnap(){
+    if (!inPinnedView() || isSnapping) return;
+    const p   = progress();
+    const raw = p * steps;                    // 0..steps 실수 좌표
+    const diffFromActive = Math.abs(raw - activeIdx);
 
-    function setActive(idx, opts = { preserveIfSame: true }){
-      const target = Math.max(0, Math.min(count-1, idx));
-      if (opts.preserveIfSame && target === activeIdx) {
-        return;
+    // 세그먼트 중앙에서 RAW_HYSTERESIS만큼 벗어나야 이동
+    if (diffFromActive >= RAW_HYSTERESIS) {
+      const target = idxFromProgress(p);
+      if (target !== activeIdx) {
+        setActive(target, { preserveIfSame:false });
+        snapToIndex(target);
       }
-      activeIdx = target;
-
-      panels.forEach((el, i) => {
-        if (i !== activeIdx) el.classList.remove('is-active', 'is-open');
-      });
-
-      const active = panels[activeIdx];
-      if (active) active.classList.add('is-active');
-
-      clearTimeout(openTimer);
-      openTimer = setTimeout(() => {
-        const current = panels[activeIdx];
-        if (current) current.classList.add('is-open');
-      }, FLEX_DUR_MS);
     }
-    setActive(0, { preserveIfSame: false });
+  }
 
-    const easing = t => 1 - Math.pow(1 - t, 4);
-    function snapToIndex(idx){
-      const i = Math.max(0, Math.min(steps, idx));
-      const rect  = sec.getBoundingClientRect();
-      const denom = rect.height - vh();
-      const targetY = window.scrollY + rect.top + denom * (i/steps);
-      if (window.__lenis && typeof window.__lenis.scrollTo === 'function'){
-        window.__lenis.scrollTo(targetY, { duration: 1.05, easing });
-      } else {
-        window.scrollTo({ top: targetY, behavior: 'smooth' });
-      }
-    }
+  function scheduleIdleSnap(){
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if (Date.now() - lastSnapAt < IDLE_COOLDOWN_MS) return; // 직후 재스냅 방지
+      idleSnap();
+    }, IDLE_DELAY_MS);
+  }
 
-    const FORWARD_THRESHOLD = 0.6;
-    const BACKWARD_THRESHOLD = -0.6;
-    function maybeAdvanceByProgress(){
-      const p = progress();
-      const cp = p * steps - activeIdx;
-      if (cp >= FORWARD_THRESHOLD && activeIdx < steps){
-        setActive(activeIdx + 1, { preserveIfSame: false });
-        snapToIndex(activeIdx);
-        return true;
-      } else if (cp <= BACKWARD_THRESHOLD && activeIdx > 0){
-        setActive(activeIdx - 1, { preserveIfSame: false });
-        snapToIndex(activeIdx);
-        return true;
-      }
-      return false;
-    }
+  /* ---- 초기 첫 패널 활성화 ---- */
+  setActive(0, { preserveIfSame:false });
 
-    let idleTimer = null;
-    function scheduleIdleSnap(){
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(()=>{
-        if (!inPinnedView()) return;
-        if (!maybeAdvanceByProgress()) {
-          const target = idxFromProgress(progress());
-          if (target !== activeIdx) {
-            setActive(target, { preserveIfSame: false });
-          }
-          snapToIndex(target);
-        }
-      }, 420);
-    }
+  /* ---- 휠/터치 조작 ---- */
+  let wheelAccum = 0;
+  let lastWheelAt = 0;
+  let lastWheelSign = 0;
 
-    window.addEventListener('scroll', ()=>{
-      if (!inPinnedView()) return;
+  const WHEEL_STEP_THRESHOLD = 120; // 스텝 이동에 필요한 누적값
+  const WHEEL_COOLDOWN       = 550; // 한 번 이동 후 쿨다운
+
+  window.addEventListener('wheel', (e)=>{
+    if (!inPinnedView()) return;
+
+    const now = Date.now();
+    const dy  = e.deltaY || 0;
+    const sign = Math.sign(dy);
+
+    // 전환 중엔 가로채서 흔들림 방지
+    if (isSnapping) { e.preventDefault(); return; }
+
+    // 방향 바뀌면 누적 리셋
+    if (sign !== 0 && sign !== lastWheelSign) wheelAccum = 0;
+    lastWheelSign = sign;
+
+    wheelAccum += dy;
+
+    const ready = Math.abs(wheelAccum) >= WHEEL_STEP_THRESHOLD && (now - lastWheelAt) >= WHEEL_COOLDOWN;
+    if (ready){
+      e.preventDefault();
+      const next = activeIdx + (wheelAccum > 0 ? 1 : -1);
+      wheelAccum = 0;
+      lastWheelAt = now;
+
+      setActive(next, { preserveIfSame:false });
+      snapToIndex(next);
+    } else {
+      // 아직 스텝에 못 미치면 idle 스냅만 예약
       scheduleIdleSnap();
-    }, { passive:true });
-    window.addEventListener('resize', scheduleIdleSnap);
+    }
+  }, { passive:false });
 
-    let wheelAccum = 0;
-    let lastWheelSign = 0;
-    let lastWheelAt = 0;
-    const WHEEL_STEP_THRESHOLD = 120;
-    const WHEEL_COOLDOWN = 550;
+  // 터치 스와이프
+  let touchStartY = null;
+  sec.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive:true });
+  sec.addEventListener('touchend',   e => {
+    if (!inPinnedView()) return;
+    if (touchStartY == null) return;
+    const dy = (e.changedTouches[0].clientY - touchStartY);
+    touchStartY = null;
 
-    window.addEventListener('wheel', (e)=>{
-      if (!inPinnedView()) return;
-      const now = Date.now();
-      const dy = e.deltaY || 0;
-      const sign = Math.sign(dy);
+    if (Math.abs(dy) > 70) {
+      const next = activeIdx + (dy < 0 ? 1 : -1);
+      setActive(next, { preserveIfSame:false });
+      snapToIndex(next);
+    } else {
+      scheduleIdleSnap();
+    }
+  }, { passive:true });
 
-      if (sign !== 0 && sign !== lastWheelSign) {
-        wheelAccum = 0;
-      }
-      lastWheelSign = sign;
-
-      wheelAccum += dy;
-
-      const ready = Math.abs(wheelAccum) >= WHEEL_STEP_THRESHOLD && (now - lastWheelAt) >= WHEEL_COOLDOWN;
-      if (ready){
-        e.preventDefault();
-        lastWheelAt = now;
-        const dir = Math.sign(wheelAccum);
-        wheelAccum = 0;
-        const next = activeIdx + (dir > 0 ? 1 : -1);
-        setActive(next, { preserveIfSame: false });
-        snapToIndex(next);
-      }
-    }, { passive:false });
-
-    let touchStartY = null;
-    sec.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive:true });
-    sec.addEventListener('touchend',   e => {
-      if (touchStartY == null) return;
-      const dy = (e.changedTouches[0].clientY - touchStartY);
-      if (Math.abs(dy) > 70) {
-        const next = activeIdx + (dy < 0 ? 1 : -1);
-        setActive(next, { preserveIfSame: false });
-        snapToIndex(next);
-      } else {
-        scheduleIdleSnap();
-      }
-      touchStartY = null;
-    }, { passive:true });
-  })();
+  // 스크롤/리사이즈로도 안정 스냅
+  window.addEventListener('scroll', () => { if (inPinnedView()) scheduleIdleSnap(); }, { passive:true });
+  window.addEventListener('resize', () => { if (inPinnedView()) scheduleIdleSnap(); });
+})();
 </script>
 
 </body>
