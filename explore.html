@@ -35,7 +35,7 @@
       --cell-size: 320px;
       --cell-gap:  140px;
       --cell-pad:  140px;
-      --bg: #f8f8ec;
+      --bg: #ffffff;
       --easing: cubic-bezier(.2,.8,.2,1);
       --t-panel: .55s;
       --t-fly:   .45s;
@@ -494,7 +494,56 @@
   .detail-panel{ width: min(52vw, 1760px); }
 }
 
+@media (min-width: 1600px) {
+  .detail-panel {
+    width: min(54vw, 1500px);
+    background: rgba(247,247,236,0.95);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
+  .detail-inner {
+    grid-template-columns: 120px 1fr;
+    gap: 48px;
+    padding: 72px 64px;
+  }
+
+  /* ✅ 히어로 이미지 크기 고정 (27인치 기준) */
+  .detail-hero {
+    position: static; /* 절대 배치 제거 — 자연스럽게 흐름에 포함 */
+    width: 600px;
+    height: 450px;
+    object-fit: contain;
+    display: block;
+    margin: 20px 0 40px 0;
+    transform: none;
+    left: auto;
+  }
+
+  /* ✅ 제목과 설명 간격 여유 있게 */
+  .detail-title {
+    font-size: 60px;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+
+  /* ✅ 본문 영역도 여유있게 확장 */
+  .detail-description {
+    margin-top: 0;
+    font-size: 18px;
+    line-height: 1.8;
+    max-width: 800px;
+    color: #333;
+  }
+
+  /* 썸네일도 약간 키움 */
+  .thumb {
+    width: 84px;
+    height: 84px;
+  }
+}
   </style>
 
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

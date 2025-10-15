@@ -783,8 +783,7 @@ font-family:'BookkGothic';
   
   
   
-  /* ===== Horizontal panels: one-by-one opening (discrete steps) ===== */
-/* ===== Horizontal panels: stable one-by-one opening (fixed) ===== */
+/* ===== Horizontal panels: improved stable one-by-one opening ===== */
 (() => {
   const sec   = document.getElementById('crafts-hscroll');
   const track = document.getElementById('crafts-track');
@@ -812,25 +811,32 @@ font-family:'BookkGothic';
   }
 
   /* ---- 섹션 화면 내 고정 여부 ---- */
+  let pinnedSince = null;
   function inPinnedView(){
     const r = sec.getBoundingClientRect();
-    return r.top <= 0 && r.bottom >= vh();
+    const pinned = r.top <= 0 && r.bottom >= vh();
+    if (pinned && pinnedSince === null) pinnedSince = Date.now();
+    if (!pinned) pinnedSince = null;
+    return pinned;
   }
 
   /* ---- 상태 ---- */
   let activeIdx   = 0;
   let openTimer   = null;
   let idleTimer   = null;
-  let isSnapping  = false;  // 스크롤/스냅 애니메이션 잠금
+  let isSnapping  = false;  // 스냅 애니메이션 잠금
   let lastSnapAt  = 0;
+  let lastRaw     = 0;      // 마지막 raw progress (0..steps)
+  let userInteracted = false;
+  let lastScrollTime = 0;
 
   const FLEX_DUR_MS       = 1100; // 패널 열림( flex-grow ) 시간
-  const IDLE_DELAY_MS     = 420;  // 멈춘 뒤 스냅까지 지연
+  const IDLE_DELAY_MS     = 650;  // 멈춘 뒤 스냅까지 지연 (조금 여유)
   const IDLE_COOLDOWN_MS  = 600;  // 최근 스냅 후 무시 시간
-  const RAW_HYSTERESIS    = 0.40; // 히스테리시스(세그먼트의 '중심'에서 얼마나 벗어나야 전환될지) 0.35~0.4 권장
+  const RAW_HYSTERESIS    = 0.55; // 중심에서 더 벗어나야 이동하도록 완화
 
   /* ---- 활성화(확장 후 콘텐츠 노출) ---- */
-  function setActive(idx, opts = { preserveIfSame:true }){
+  function setActive(idx, opts = { preserveIfSame:true }) {
     const target = Math.max(0, Math.min(steps, idx));
     if (opts.preserveIfSame && target === activeIdx) return;
 
@@ -866,6 +872,7 @@ font-family:'BookkGothic';
 
     isSnapping = true;
     if (window.__lenis && typeof window.__lenis.scrollTo === 'function'){
+      // lenis가 있을 경우 lenis로 이동
       window.__lenis.scrollTo(targetY, { duration: 1.05, easing });
     } else {
       window.scrollTo({ top: targetY, behavior: 'smooth' });
@@ -874,14 +881,29 @@ font-family:'BookkGothic';
     setTimeout(() => { isSnapping = false; }, 900); // 애니메이션 끝나면 락 해제
   }
 
-  /* ---- 진행도 기반 스냅(히스테리시스 적용) ---- */
+  /* ---- 진행도 기반 스냅(안전성 강화) ---- */
   function idleSnap(){
     if (!inPinnedView() || isSnapping) return;
+
     const p   = progress();
     const raw = p * steps;                    // 0..steps 실수 좌표
     const diffFromActive = Math.abs(raw - activeIdx);
 
-    // 세그먼트 중앙에서 RAW_HYSTERESIS만큼 벗어나야 이동
+    // 1) 진입 직후(사용자 입력 없음)에는 자동 스냅 금지 — 사용자 조작이나 충분한 체류시간 필요
+    if (!userInteracted) {
+      if (!pinnedSince || (Date.now() - pinnedSince) < 600) {
+        lastRaw = raw; // 상태 갱신만
+        return;
+      }
+    }
+
+    // 2) progress가 충분히 변하지 않았다면 스냅 무시 (작은 진동에 의한 이동 방지)
+    if (Math.abs(raw - lastRaw) < 0.12) {
+      lastRaw = raw;
+      return;
+    }
+
+    // 3) 중심에서 얼마나 벗어났는지 기준으로 이동 결정
     if (diffFromActive >= RAW_HYSTERESIS) {
       const target = idxFromProgress(p);
       if (target !== activeIdx) {
@@ -889,6 +911,8 @@ font-family:'BookkGothic';
         snapToIndex(target);
       }
     }
+
+    lastRaw = raw;
   }
 
   function scheduleIdleSnap(){
@@ -901,8 +925,10 @@ font-family:'BookkGothic';
 
   /* ---- 초기 첫 패널 활성화 ---- */
   setActive(0, { preserveIfSame:false });
+  lastRaw = progress();
+  if (inPinnedView()) pinnedSince = Date.now();
 
-  /* ---- 휠/터치 조작 ---- */
+  /* ---- 휠/터치 조작 (사용자 입력 감지 포함) ---- */
   let wheelAccum = 0;
   let lastWheelAt = 0;
   let lastWheelSign = 0;
@@ -912,6 +938,9 @@ font-family:'BookkGothic';
 
   window.addEventListener('wheel', (e)=>{
     if (!inPinnedView()) return;
+
+    userInteracted = true; // 사용자가 휠로 조작했음을 표시
+    lastScrollTime = Date.now();
 
     const now = Date.now();
     const dy  = e.deltaY || 0;
@@ -943,7 +972,7 @@ font-family:'BookkGothic';
 
   // 터치 스와이프
   let touchStartY = null;
-  sec.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, { passive:true });
+  sec.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; userInteracted = true; }, { passive:true });
   sec.addEventListener('touchend',   e => {
     if (!inPinnedView()) return;
     if (touchStartY == null) return;
@@ -959,9 +988,14 @@ font-family:'BookkGothic';
     }
   }, { passive:true });
 
-  // 스크롤/리사이즈로도 안정 스냅
-  window.addEventListener('scroll', () => { if (inPinnedView()) scheduleIdleSnap(); }, { passive:true });
+  // 포인터/키 입력도 "사용자 조작"으로 본다
+  window.addEventListener('pointerdown', () => { userInteracted = true; }, { passive:true });
+  window.addEventListener('keydown', () => { userInteracted = true; }, { passive:true });
+
+  // 스크롤/리사이즈로도 안정 스냅 (스크롤이 실제로 발생했을 때만)
+  window.addEventListener('scroll', () => { lastScrollTime = Date.now(); if (inPinnedView()) scheduleIdleSnap(); }, { passive:true });
   window.addEventListener('resize', () => { if (inPinnedView()) scheduleIdleSnap(); });
+
 })();
 </script>
 

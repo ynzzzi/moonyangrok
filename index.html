@@ -537,10 +537,49 @@ body.loading { overflow: hidden; }
     }
 }
 /* 2번째 섹션 이미지를 섹션 안에만 딱 채우기 (전역 적용) */
-.second.page { position: relative; overflow: hidden; }
-.second.page .full-bleed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display:block; z-index: 0; }
-/* 화살표는 항상 이미지 위로 */
-.second.page .nav-arrow { z-index: 10000; }
+.second.page {
+  position: relative;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+.second.page .full-bleed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.second.page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
+    url('img/sumak/index.jpg') center/cover no-repeat;
+  background-size: cover;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.second.page > *:not(.full-bleed) {
+  position: relative;
+  z-index: 2;
+}
+
+.second.page .nav-arrow {
+  z-index: 9999 !important;
+    position: absolute;
+  top: 50vh;               /* 화면 높이의 중앙 (세로 기준) */
+  right: 4vw;              /* 화면 너비의 약 4% 떨어진 위치 */
+  transform: translateY(-50%); /* 세로 중앙 기준 정렬 */
+  z-index: 9999;
+  background-color: rgba(255, 255, 255, 0.25);
+  transition: background-color 0.3s ease;
+}
+
 
 
 
@@ -606,10 +645,45 @@ body.loading { overflow: hidden; }
 .third.page {
   background-color: #111;  /* 🔥 배경색 검정 */
 }
+
+/* ==== custom cursor (from sumak) ==== */
+* { cursor: none; } /* 시스템 커서 숨김 */
+
+.cursor{
+  position: fixed;
+  width: 20px; height: 20px;
+  background: rgba(100, 100, 100, 0.7);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  mix-blend-mode: difference;
+  transition: transform .15s ease-out, width .25s ease, height .25s ease, background-color .25s ease, border-color .25s ease, opacity .2s ease;
+  top: 0; left: 0;
+  transform: translate(-50%, -50%);
+  display: grid; place-items: center;
+  opacity: 0; /* 처음엔 숨김, 마우스 들어오면 나타남 */
+}
+.cursor > span{
+  display: none;
+  font-family:'SUIT-Regular', 'BookkGothic', sans-serif;
+  font-size: 13px; letter-spacing: .2em;
+  text-transform: uppercase; color:#000; line-height:1;
+  user-select: none; pointer-events: none;
+}
+/* 히어로 전용(첫 섹션에서만) */
+.cursor--hero{
+  width:110px; height:110px;
+  background: rgba(128,128,128,0.96);
+  border:2px solid #000;
+  mix-blend-mode: normal;
+}
+.cursor--hero > span{ display:block; }
+
   </style>
 </head>
 
 <body class="loading">
+    <div id="custom-cursor" class="cursor" aria-hidden="true"><span>scroll</span></div>
   <div id="loader" aria-hidden="true">
     <svg class="line-svg" viewBox="0 0 1920 1080" preserveAspectRatio="none">
       <line class="h-line" x1="0" y1="540" x2="1920" y2="540" stroke="black" stroke-width="1"/>
@@ -820,6 +894,54 @@ window.onload = () => {
     });
   });
 }
+
+/* ==== custom cursor controller (scoped for index.html) ==== */
+(function(){
+  const cursor = document.getElementById('custom-cursor');
+  const hero = document.querySelector('.first.page');   // 첫 번째 섹션
+  const pages = document.querySelector('.pages');
+
+  if(!cursor || !hero || !pages) return;
+
+  let cx = window.innerWidth/2, cy = window.innerHeight/2;
+
+  // 마우스 따라다니기
+  window.addEventListener('mousemove', (e)=>{
+    cx = e.clientX; cy = e.clientY;
+    cursor.style.transform = `translate(${cx}px, ${cy}px)`;
+    if (cursor.style.opacity !== '1') cursor.style.opacity = '1';
+  }, {passive:true});
+  window.addEventListener('mouseleave', ()=>{ cursor.style.opacity = '0'; });
+  window.addEventListener('mouseenter', ()=>{ cursor.style.opacity = '1'; });
+
+  // 뷰포트 안에 있는지 판단(absolute 전환에도 안정적)
+  function inView(el){
+    const r = el.getBoundingClientRect();
+    return r.top < window.innerHeight && r.bottom > 0;
+  }
+
+  function updateCursorMode(){
+    if (inView(hero)) cursor.classList.add('cursor--hero');
+    else cursor.classList.remove('cursor--hero');
+  }
+
+  // 스크롤/리사이즈에 반응
+  ['scroll','resize','load'].forEach(evt => window.addEventListener(evt, updateCursorMode, {passive:true}));
+
+  // 슬라이더 전환(휠/터치) 후 약간의 지연을 두고 모드 갱신
+  pages.addEventListener('wheel', ()=> setTimeout(updateCursorMode, 750), {passive:true});
+  pages.addEventListener('touchend', ()=> setTimeout(updateCursorMode, 750), {passive:true});
+
+  // 스타일 변경(슬라이드 이동) 감지용 — 페이지 포지션 변화에도 대응
+  const mo = new MutationObserver(()=>{ setTimeout(updateCursorMode, 50); });
+  mo.observe(pages, { attributes:true, subtree:true, attributeFilter:['style','class'] });
+
+  // 초기 1프레임 후 보정
+  requestAnimationFrame(()=>{
+    cursor.style.transform = `translate(${cx}px, ${cy}px)`;
+    updateCursorMode();
+  });
+})();
 </script>
 </body>
 </html>

@@ -149,11 +149,38 @@ section#gallery .gallery-container{
       width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);border-top:1px solid #eaeaea;background:#fff;
     }
     #split-portfolio .sp-app{display:grid;grid-template-columns: 1fr 1.45fr;min-height:100vh;}
-    #split-portfolio .sp-left{
-      position:sticky; top:0; height:100vh; display:flex; flex-direction:column; justify-content:space-between;
-      border-right:1px solid #ddd; background:#fff;
+    
+    /* === ▼ [수정됨] sp-left 스타일 === */
+    #split-portfolio .sp-left {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid #ddd;
       padding: 80px 40px 40px 40px;
+      
+      /* 배경 관련 스타일 */
+      background-size: cover;
+      background-position: center;
+      transition: background-image 0.4s ease-in-out; /* 배경 전환 효과 */
+      z-index: 0;
     }
+
+    /* 반투명 오버레이 추가 (가독성 확보) */
+    #split-portfolio .sp-left::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.7); /* 70% 투명도 흰색 */
+      z-index: -1; /* 텍스트 뒤, 배경이미지 위 */
+    }
+    /* === ▲ [수정됨] sp-left 스타일 === */
+
     #split-portfolio .sp-title-line{font-family:ui-serif,Georgia,serif;letter-spacing:-.02em;user-select:none;font-size:clamp(40px,8vw,96px);line-height:.95;margin:0}
     .sp-title-desc {
         color: #555;
@@ -963,12 +990,15 @@ section#gallery .gallery-container{
     (function(){
       const root = document.getElementById('split-portfolio');
       if(!root) return;
+      
+      // === ▼ [수정됨] projects 데이터에 background_image 추가 ===
       const projects = [
         { id:0,
           title:"당의(唐衣)", category:"궁중·사대부 여성의 예복",
           description:"당의는 저고리에서 길이가 늘어나 치마 위에 겹쳐 입는 겉옷으로, 앞길이보다 뒤길이가 약간 길고 둥근 도련·흰 동정(깃)이 특징입니다. 왕실에선 소례와 조회 같은 격식 있는 자리에, 민간에선 예복이나 혼례 때 착용했다.",
           featureBody:"당의에 보이는 주요 문양은 주로 금박(金箔) 기법으로 새겨져 있으며, '수'와 '복' 문자를 옷에 새기는 것은 착용자에게 장수와 행복이 깃들기를 바라는 가장 직접적이고 강력한 기원이었다.",
           image:"img/han/d.png", thumb:"img/han/d.png",
+          background_image: "img/han/spbg.png", // 배경이미지
           mini_images: ["img/han/1.png", "img/han/3.png"],
           secondary_feature: {
             title: "왕실의 권위와 번영",
@@ -986,6 +1016,7 @@ section#gallery .gallery-container{
           description:"활옷은 붉은 계열의 바탕에 넓은 소매를 갖춘 신부 예복으로, 모란·봉황·박쥐 등 길상 문양을 정교한 자수로 수놓아 복과 번영을 기원합니다. 본래 궁중 예복 계통의 형식이 민간 혼례로 확장되어 널리 쓰였으며, 짙은 색 대비와 화사한 자수가 의식의 중심을 강조합니다.",
           featureBody:"활옷의 자수는 상징의 사전입니다. 봉황은 기품과 화합, 모란은 부귀, 박쥐는 복(福)을 뜻해 혼례의 의미를 시각적으로 드러냅니다. 넉넉한 품과 긴 길이는 신부의 동선을 우아하게 만듭니다.",
           image:"img/han/hwal.png", thumb:"img/han/hwal.png",
+          background_image: "img/han/hwa.jpg", // 배경이미지
           mini_images: ["img/han/hwall.png", "img/han/hwalot.png"],
           secondary_feature: {
             title: "자수의 상징성",
@@ -1002,6 +1033,7 @@ section#gallery .gallery-container{
           description:"원삼은 품이 넓고 길이가 긴 겉옷으로, 상·하의의 색 대비와 소매 단의 장식이 돋보이는 의례복입니다. 본래 왕비와 빈의 소례복이지만, 민간에서도 신부 예복로 널리 전해졌습니다.",
           featureBody:"원삼은 넓은 품과 곧게 떨어지는 선으로 장중함을 표현합니다. 소매와 몸판의 색 배치가 리듬을 만들어 움직임마다 화면이 달라지며, 치마 위에 겹쳐 입어 실루엣을 정제합니다.",
           image:"img/han/n.png", thumb:"img/han/n.png",
+          background_image: "img/han/won.jpg", // 배경이미지
           mini_images: ["img/han/won.png", "img/han/wonsam.png"],
            secondary_feature: {
             title: "색동 소매의 의미",
@@ -1018,6 +1050,7 @@ section#gallery .gallery-container{
           description:"단령은 둥근 깃이 특징인 포(袍)로, 조선시대 관리들이 공적인 임무를 수행할 때 입었던 대표적인 관복입니다.",
           featureBody: "단령(團領)은 ‘둥근 옷깃’이라는 뜻에서 유래했으며, 둥근 깃이 달린 겉옷을 포괄적으로 지칭합니다.",
           image:"img/han/dan.png", thumb:"img/han/dan.png",
+          background_image: "img/han/je.jpg", // 배경이미지
           mini_images: ["img/han/dan1.png", "img/han/dan2.png"],
           secondary_feature: {
             title: "제례의 권위·정결·길상",
@@ -1034,6 +1067,7 @@ section#gallery .gallery-container{
           description: "노의(露衣)는 고려 말부터 조선 후기까지 여성의 외출복이자 예복으로 사용된 겉옷을 의미합니다. 주로 왕비와 세자빈, 왕자의 부인 등 왕실 여성들이 입었으며, 신분 구분 없이 널리 착용되어 사회적 논란이 일기도 했습니다.",
           featureBody: "노의는 여성 예복의 한 형태로, 조선 후기까지 이어진 전통 의복입니다.",
           image:"img/han/2.png", thumb:"img/han/2.png",
+          background_image: "img/han/dae.jpg", // 배경이미지
           mini_images: ["img/han/no.png", "img/han/no2.png"],
           secondary_feature: {
             title: "노의의 문양, 복과 장수를 입히다",
@@ -1046,8 +1080,10 @@ section#gallery .gallery-container{
           ]
         }
       ];
+      // === ▲ [수정됨] projects 데이터 ===
 
       let active=-1;
+      const elLeftPanel = root.querySelector('.sp-left'); //  ◀◀◀ [추가됨] 좌측 패널 선택
       const elCategory = root.querySelector('#sp-category');
       const elTitle    = root.querySelector('#sp-title2');
       const elHero     = root.querySelector('#sp-hero');
@@ -1064,6 +1100,12 @@ section#gallery .gallery-container{
       function setActive(i){
         if (i === active) return;
         active=i; const p=projects[i];
+
+        // ▼ [추가됨] 배경이미지 변경 로직
+        if (p.background_image) {
+          elLeftPanel.style.backgroundImage = `url('${p.background_image}')`;
+        }
+        // ▲ [추가됨] 배경이미지 변경 로직
 
         elCategory.textContent=p.category;
         elTitle.textContent=p.title;
