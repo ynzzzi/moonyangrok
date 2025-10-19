@@ -726,6 +726,16 @@ section#gallery .gallery-container{
   .item6{ top: 14vh; }  /* 기존 6vh  → 14vh */
 }
 
+/* === 스크롤 멈춤 수정 === */
+#split-portfolio {
+  padding-bottom: 200vh; /* 여유 높이 추가 */
+}
+
+@media (min-width: 1600px) {
+  #split-portfolio {
+    padding-bottom: 250vh; /* 큰 화면에서는 더 길게 */
+  }
+}
 /* 패턴 팝업의 이미지 완전 비활성화 */
 .popup-image { display: none !important; }
   </style>

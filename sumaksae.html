@@ -390,22 +390,32 @@
 
 }
 
-/* === 섹션 간 여백 확장 (맥 24인치 전용) === */
+
+/* === 27인치(대형 화면)에서 간격 재조정 === */
 @media (min-width: 1600px) {
+  /* 썸네일 이미지를 더 오른쪽으로 */
   .thumbnail-container {
-    top: 14%; /* 기존 10% → 약간 내려서 더 여유롭게 */
-    gap: 28px; /* 썸네일 간 간격 살짝 확대 */
+    right: 5%; /* 기존 0 → 약간 오른쪽으로 이동 */
+    top: 12%;
+    gap: 32px; /* 썸네일 간격 약간 더 띄움 */
   }
+
+  /* artifact-info를 좀 더 왼쪽으로 */
   .artifact-info {
-    bottom: 12%; /* 기존 15% → 살짝 위로 올려서 여백 확보 */
+    left: 10%; /* 기존 5% → 왼쪽으로 더 당김 */
+    bottom: 12%; /* 위치 살짝 위로 */
+    max-width: 420px; /* 영역 약간 넓혀줌 */
   }
-  .artifact-title {
-    font-size: 40px; /* 타이틀 조금 키움 */
-    margin-bottom: 12px;
+
+  /* slider__btn-buy 버튼도 조금 왼쪽으로 */
+  .slider__btn-buy {
+    left: 8%; /* 기존 60px → 비율 기준으로 통일 */
+    top: 60px;
   }
-  .artifact-subtitle {
-    font-size: 18px;
-    margin-bottom: 36px;
+
+  /* 중앙 이미지와 시각적 균형 맞추기 */
+  .main-image img.visible {
+    max-width: 70%; /* 이미지가 너무 크면 65~70%로 축소 */
   }
 }
 
