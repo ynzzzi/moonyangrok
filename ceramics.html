@@ -394,6 +394,15 @@ font-family:'BookkGothic';
   @media (min-width: 1600px){
     .site-header{ height: 72px; padding-inline: max(24px, 4vw); top: 20px; }
   }
+
+  /* === 스크롤 멈춤 방지: hscroll 아래 여유 높이 추가 === */
+.hscroll-new::after {
+  content: "";
+  display: block;
+  height: 200vh; /* 추가 스크롤 여유 공간 */
+}
+
+
 </style>
 </head>
 <body>

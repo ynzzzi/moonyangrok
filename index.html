@@ -679,6 +679,78 @@ body.loading { overflow: hidden; }
 }
 .cursor--hero > span{ display:block; }
 
+/* === 반응형 글자 크기 조정 === */
+.description-text {
+  font-size: clamp(10px, 0.6vw + 4px, 16px); /* 화면 폭에 따라 자동 조정 */
+  line-height: 1.4;
+}
+
+/* 27인치 이상(대형 모니터용)에서는 명시적으로 더 키움 */
+@media (min-width: 1600px) {
+  .description-text {
+    font-size: 18px;
+    line-height: 1.6;
+  }
+}
+
+/* 4K 화면용 추가 보정 */
+@media (min-width: 2560px) {
+  .description-text {
+    font-size: 22px;
+    line-height: 1.8;
+  }
+}
+/* ============================================= */
+/* === 첫 번째 섹션 반응형 타이포그래피 보정 === */
+/* ============================================= */
+
+/* 기본: 중간 화면(노트북 등) 기준 */
+.grid-text.top-left-text {
+  font-size: clamp(18px, 1vw + 10px, 28px);
+}
+
+.grid-text.bottom-right-text {
+  font-size: clamp(60px, 5vw + 10px, 100px);
+}
+
+.description-text {
+  font-size: clamp(10px, 0.6vw + 4px, 16px);
+  line-height: 1.5;
+}
+
+/* --- 27인치(1600px 이상) --- */
+@media (min-width: 1600px) {
+  .grid-text.top-left-text {
+    font-size: 36px;       /* '문양록;' */
+  }
+
+  .grid-text.bottom-right-text {
+    font-size: 130px;      /* '文樣錄' */
+  }
+
+  .description-text {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-top: 24px;
+  }
+}
+
+/* --- 4K(2560px 이상) --- */
+@media (min-width: 2560px) {
+  .grid-text.top-left-text {
+    font-size: 48px;
+  }
+
+  .grid-text.bottom-right-text {
+    font-size: 180px;
+  }
+
+  .description-text {
+    font-size: 22px;
+    line-height: 1.8;
+  }
+}
+
   </style>
 </head>
 
