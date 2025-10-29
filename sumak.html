@@ -521,10 +521,10 @@ font-family:'BookkGothic';
     const menuRoot = document.getElementById('react-menu-root');
     if (menuRoot) {
       const menuItems = [
-        { link: 'index.html',    text: '홈',   image: 'img/8.jpg' },
-        { link: 'sumak.html',     text: '수막새', image: 'img/6.jpg' },
-        { link: 'ceramics.html', text: '공예품', image: 'img/gong/do.png' },
-        { link: 'hanbok.html',   text: '한복', image: 'img/han/bg.jpg' },
+                    { link: 'ceramics.html',    text: '공예품',   image: 'img/gong/do.png' },
+                    { link: 'sumak.html',     text: '수막새', image: 'img/6.jpg' },
+                    { link: 'hanbok.html', text: '한복', image: 'img/han/bg.jpg' },
+                    { link: 'card.html',   text: '부적', image: 'img/8.jpg' },
       ];
       ReactDOM.createRoot(menuRoot).render(<FlowingMenu items={menuItems} />);
     }

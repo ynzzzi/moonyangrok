@@ -59,7 +59,7 @@
   /* 헤더(홈/메뉴 아이콘)를 화면 상단에서 ↓로 조금 내리기 */
 .site-header{
   top: 18px !important;   /* ← 내려가는 양: 12~28px 사이로 취향 조절 */
-  left: 0; 
+  left: 0;
   right: 0;
 }
 
@@ -175,9 +175,9 @@ font-family:'BookkGothic';
   }
   .panel {
     border-left: 1px solid #e5e7eb;
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     flex-basis: 0;
     flex-shrink: 0;
     flex-grow: 1;
@@ -187,8 +187,8 @@ font-family:'BookkGothic';
     height: 100vh;
     overflow: hidden;
   }
-  .panel.is-active{ 
-    box-shadow: 0 16px 48px rgba(0,0,0,.08); 
+  .panel.is-active{
+    box-shadow: 0 16px 48px rgba(0,0,0,.08);
   }
 
   .panel-content {
@@ -239,16 +239,16 @@ font-family:'BookkGothic';
     align-items: baseline;
     gap: 16px;
     border-bottom: 1px solid #e5e7eb;
-    padding-bottom: 16px;
-    margin-bottom: 40px;
+    padding-bottom: 22px; /* Adjusted */
+    margin-bottom: 44px;  /* Adjusted */
     width: 100%;
   }
 
   .panel-number {     font-family: 'BookkGothic';font-size: clamp(16px, 1.1vw, 22px); font-weight: 700; color: #94a3b8; transition: transform .45s ease; }
   .panel-title  {     font-family: 'BookkGothic';font-size: clamp(28px, 2.5vw, 42px); font-weight: 700; margin: 0; color:#111; transition: transform .45s ease; }
   .panel.is-open .panel-number,
-  .panel.is-open .panel-title { transform: translateY(8px); }
-  
+  .panel.is-open .panel-title { transform: translateY(16px); } /* Adjusted */
+
   .panel-footer {
      font-size: 14px;
   }
@@ -290,10 +290,15 @@ font-family:'BookkGothic';
   .panel:not(.is-active) .panel-title {
      font-size: clamp(20px, 1.6vw, 34px);
   }
+ /* Adjusted */
+  .panel:not(.is-active) .panel-header-collapsed .panel-number,
+  .panel:not(.is-active) .panel-header-collapsed .panel-title {
+    transform: translateY(6px);
+  }
 
   .panel { flex: 1 0 0; }
   .panel.is-active { flex: 12 0 0; }
-  
+
   @media (max-width: 1024px) {
     .panel { padding: 0 32px; justify-content: flex-start; }
     .panel-content { flex-direction: column; padding: 20px 0; gap: 20px; opacity: 0; transform: translateY(16px); pointer-events:none; }
@@ -328,25 +333,6 @@ font-family:'BookkGothic';
       }
   }
 
-  /* ↓ 패널이 열렸을 때(가로 패널 내부 헤더) 숫자/타이틀을 조금 더 아래로 */
-.panel.is-open .panel-number,
-.panel.is-open .panel-title {
-  transform: translateY(16px); /* 기존 8px → 16px로 살짝 하향 */
-}
-
-/* ↓ 헤더 줄 자체에 여백 살짝 더 줘서 전체적으로 아래로 보이게 */
-.panel-header {
-  padding-bottom: 22px; /* +6px */
-  margin-bottom: 44px;  /* +4px */
-}
-
-/* ↓ 접혀있을 때(세로 글자 열)도 아주 조금 하향 */
-.panel:not(.is-active) .panel-header-collapsed .panel-number,
-.panel:not(.is-active) .panel-header-collapsed .panel-title {
-  transform: translateY(6px);
-}
-
-
 
   /* ===== Gallery after ===== */
   .un-section{
@@ -354,7 +340,7 @@ font-family:'BookkGothic';
     justify-content:center;
     align-items:center;
     width:100%;
-    padding:60px 0; 
+    padding:60px 0;
     background:var(--hero-bg);
     position: relative;
     z-index: 2;
@@ -381,7 +367,7 @@ font-family:'BookkGothic';
   .circle-hero{
     width: clamp(360px, 40vw, 720px);
   }
-  
+
   .image-list{
     gap: clamp(40px, 6vh, 100px);
   }
@@ -415,6 +401,7 @@ font-family:'BookkGothic';
       </svg>
     </a>
   </div>
+
   <div class="header-right">
     <button id="menuBtn" class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="menuPanel" aria-label="Open menu">
       <span class="burger"><span></span><span></span><span></span></span>
@@ -559,7 +546,7 @@ font-family:'BookkGothic';
   class ImageItem {
     DOM = { el:null, inner:null }; defaultStyle = { scale:1, x:0, y:0, opacity:0 }; rect=null;
     constructor(DOM_el){ this.DOM.el = DOM_el; this.DOM.inner = this.DOM.el.querySelector('.content__img-inner'); this.getRect(); this.initEvents(); }
-    initEvents(){ this.resize = () => { gsap.set(this.DOM.el, this.defaultStyle); this.getRect(); }; window.addEventListener('resize', this.resize); }
+    initEvents(){ this.resize = () => { if (typeof gsap !== 'undefined') gsap.set(this.DOM.el, this.defaultStyle); this.getRect(); }; window.addEventListener('resize', this.resize); } // Added gsap check
     getRect(){ this.rect = this.DOM.el.getBoundingClientRect(); }
   }
   class ImageTrailVariant1{
@@ -589,7 +576,7 @@ font-family:'BookkGothic';
     showNextImage(){
       ++this.zIndexVal; this.imgPosition = this.imgPosition < this.imagesTotal - 1 ? this.imgPosition + 1 : 0;
       const img = this.images[this.imgPosition];
-      if (typeof gsap === 'undefined') return;
+      if (typeof gsap === 'undefined') return; // Added gsap check
       gsap.killTweensOf(img.DOM.el);
       gsap.timeline()
         .fromTo(img.DOM.el, { opacity: 1, scale: 1, zIndex: this.zIndexVal, x: this.cacheMousePos.x - img.rect.width/2, y: this.cacheMousePos.y - img.rect.height/2 },
@@ -649,9 +636,13 @@ font-family:'BookkGothic';
       const testLoad = (url) => new Promise((res) => { const im = new Image(); im.onload  = () => res(url); im.onerror = () => res(null); im.src = url; });
       const results = await Promise.allSettled(requested.map(testLoad));
       const ok = results.map(r => (r.status==='fulfilled' ? r.value : null)).filter(Boolean);
-      const fallback = ['https://picsum.photos/id/287/300/300','https://picsum.photos/id/1001/300/300','https://picsum.photos/id/1025/300/300','https://picsum.photos/id/1026/300/300',];
+      const fallback = ['img/gong/back/5.png','img/gong/back/a1.png','img/gong/b.png', /* Add more fallbacks if needed */ ];
       const usable = (ok.length ? ok : fallback).map(src => ({ src })); const variant = box?.dataset?.variant ? parseInt(box.dataset.variant, 10) : 1;
-      ReactDOM.createRoot(trailRoot).render(<ImageTrail items={usable} variant={variant} />);
+      if (ReactDOM.createRoot) {
+         ReactDOM.createRoot(trailRoot).render(<ImageTrail items={usable} variant={variant} />);
+      } else {
+         ReactDOM.render(React.createElement(ImageTrail, { items: usable, variant: variant }), trailRoot);
+      }
     }
 
     // FlowingMenu mount (explore 스타일, 중복 마운트 가드)
@@ -659,10 +650,10 @@ font-family:'BookkGothic';
     if (menuRoot && !menuRoot.__mounted) {
       menuRoot.__mounted = true;
       const menuItems = [
-        { link: 'index.html',    text: '홈',   image: 'img/8.jpg' },
-        { link: 'sumak.html',     text: '수막새', image: 'img/6.jpg' },
-        { link: 'ceramics.html', text: '공예품', image: 'img/gong/do.png' },
-        { link: 'hanbok.html',   text: '한복', image: 'img/han/bg.jpg' },
+                    { link: 'ceramics.html',    text: '공예품',   image: 'img/gong/do.png' },
+                    { link: 'sumak.html',     text: '수막새', image: 'img/6.jpg' },
+                    { link: 'hanbok.html', text: '한복', image: 'img/han/bg.jpg' },
+                    { link: 'card.html',   text: '부적', image: 'img/8.jpg' },
       ];
       if (ReactDOM.createRoot) {
         ReactDOM.createRoot(menuRoot).render(<FlowingMenu items={menuItems} />);
@@ -701,16 +692,23 @@ font-family:'BookkGothic';
       const hero  = document.getElementById('hero');
       const title = document.getElementById('heroTitle');
       if(!hero || !title) return;
-      title.style.transform = 'none';
+      title.style.transform = 'none'; // Reset transform before measuring
       const W_MARGIN = .96, H_MARGIN = .88;
       const cs   = getComputedStyle(hero);
-      const wMax = (hero.clientWidth  - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0)) * W_MARGIN;
-      const hMax = (hero.clientHeight - (parseFloat(cs.paddingTop)||0)  - (parseFloat(cs.paddingBottom)||0)) * H_MARGIN;
+      // Ensure clientWidth/Height are positive before calculations
+      const heroClientWidth = Math.max(0, hero.clientWidth);
+      const heroClientHeight = Math.max(0, hero.clientHeight);
+      const wMax = (heroClientWidth  - (parseFloat(cs.paddingLeft)||0) - (parseFloat(cs.paddingRight)||0)) * W_MARGIN;
+      const hMax = (heroClientHeight - (parseFloat(cs.paddingTop)||0)  - (parseFloat(cs.paddingBottom)||0)) * H_MARGIN;
       const rect = title.getBoundingClientRect();
-      const scale = Math.min(1, wMax/rect.width, hMax/rect.height);
+      // Ensure rect dimensions are positive
+      const rectWidth = Math.max(1, rect.width); // Avoid division by zero
+      const rectHeight = Math.max(1, rect.height);
+      const scale = Math.min(1, wMax/rectWidth, hMax/rectHeight);
       title.style.transformOrigin = 'center';
       title.style.transform = `scale(${scale})`;
     }
+    // Use requestAnimationFrame for initial call after fonts ready
     (document.fonts?.ready || Promise.resolve()).then(() => { requestAnimationFrame(() => { fitHeroTitle(); }); });
     window.addEventListener('resize', fitHeroTitle);
   });
@@ -730,7 +728,7 @@ font-family:'BookkGothic';
     const text = (raw || '').replace(/\s+/g, ' ').trim();
     if (!text) return;
     const words = text.split(' ');
-    p.textContent = '';
+    p.textContent = ''; // Clear original text
     const spans = words.map((w) => {
       const s = document.createElement('span');
       s.className = 'w';
@@ -742,28 +740,31 @@ font-family:'BookkGothic';
       const rect = section.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const denom = rect.height - vh;
-      if (denom <= 0) return 1;
+      if (denom <= 0) return 1; // Return 1 if section is shorter than viewport
       return Math.max(0, Math.min(1, (0 - rect.top) / denom));
     }
     function render() {
       const prog = pinProgress();
       const N = spans.length;
       for (let i = 0; i < N; i++) {
-        const t = (i + 1) / (N + 1);
-        const a = Math.max(0, Math.min(1, (prog - t) / 0.12));
-        const op = 1 - Math.pow(1 - a, 3);
-        const ty = (1 - op) * 16;
+        const t = (i + 1) / (N + 1); // Stagger threshold for each word
+        const a = Math.max(0, Math.min(1, (prog - t) / 0.12)); // Animation progress for word i
+        const op = 1 - Math.pow(1 - a, 3); // Eased opacity
+        const ty = (1 - op) * 16; // Eased translation
         const el = spans[i];
         el.style.opacity = op.toFixed(3);
         el.style.transform = `translateY(${ty.toFixed(2)}px)`;
       }
+      // Optimization: If fully revealed, set final styles and potentially detach listener
       if (prog >= 1) {
         spans.forEach((el) => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
+        // Consider removing scroll listener here if performance is critical
       }
     }
+    // Add passive:true for better scroll performance
     addEventListener('scroll', render, { passive: true });
-    addEventListener('resize', render);
-    requestAnimationFrame(render);
+    addEventListener('resize', render); // Re-render on resize
+    requestAnimationFrame(render); // Initial render
   })();
 
   /* ===== Interlude circle parallax/scale ===== */
@@ -775,23 +776,23 @@ font-family:'BookkGothic';
       const rect = sec.getBoundingClientRect();
       const vh = window.innerHeight || document.documentElement.clientHeight;
       const denom = rect.height - vh;
-      if (denom <= 0) return 1;
-      return Math.max(0, Math.min(1, (0 - rect.top) / denom));
+      if (denom <= 0) return 1; // If shorter than viewport, progress is 1
+      return Math.max(0, Math.min(1, (0 - rect.top) / denom)); // Clamp progress 0-1
     }
     function render(){
       const p = progress();
-      const s = 1 + 0.12*p;
-      const ty = - (window.innerHeight * 0.06) * p;
+      const s = 1 + 0.12*p; // Scale from 1 to 1.12
+      const ty = - (window.innerHeight * 0.06) * p; // Translate up slightly
       img.style.transform = `translateY(${ty}px) scale(${s})`;
     }
-    addEventListener('scroll', render, { passive:true });
-    addEventListener('resize', render);
-    requestAnimationFrame(render);
+    addEventListener('scroll', render, { passive:true }); // Use passive listener
+    addEventListener('resize', render); // Update on resize
+    requestAnimationFrame(render); // Initial render
   })();
 
-  
-  
-  
+
+
+
 /* ===== Horizontal panels: improved stable one-by-one opening ===== */
 (() => {
   const sec   = document.getElementById('crafts-hscroll');
@@ -800,212 +801,223 @@ font-family:'BookkGothic';
 
   const panels = Array.from(track.querySelectorAll('.panel'));
   const count  = panels.length;
+  if (count === 0) return; // Exit if no panels
+
   document.documentElement.style.setProperty('--panels', String(count));
 
-  const steps = Math.max(1, count - 1); // 인덱스 범위 0..steps
+  const steps = Math.max(1, count - 1); // index range 0..steps
   const vh    = () => window.innerHeight || document.documentElement.clientHeight;
 
-  /* ---- 진행도 계산 (0~1) ---- */
+  /* ---- Calculate progress (0-1) ---- */
   function progress(){
     const r = sec.getBoundingClientRect();
     const denom = r.height - vh();
-    if (denom <= 0) return 0;
-    return Math.max(0, Math.min(1, (0 - r.top) / denom));
+    if (denom <= 0) return 0; // Avoid division by zero or negative values
+    return Math.max(0, Math.min(1, (0 - r.top) / denom)); // Clamp 0-1
   }
 
-  /* ---- 반올림 버그 수정: 반드시 p*steps를 반올림 ---- */
+  /* ---- Calculate target index from progress ---- */
   function idxFromProgress(p){
     const clamped = Math.max(0, Math.min(1, p));
-    return Math.round(clamped * steps);
+    return Math.round(clamped * steps); // Round to nearest index
   }
 
-  /* ---- 섹션 화면 내 고정 여부 ---- */
+  /* ---- Check if section is pinned in viewport ---- */
   let pinnedSince = null;
   function inPinnedView(){
     const r = sec.getBoundingClientRect();
     const pinned = r.top <= 0 && r.bottom >= vh();
-    if (pinned && pinnedSince === null) pinnedSince = Date.now();
-    if (!pinned) pinnedSince = null;
+    if (pinned && pinnedSince === null) pinnedSince = Date.now(); // Record when pinning started
+    if (!pinned) pinnedSince = null; // Reset when not pinned
     return pinned;
   }
 
-  /* ---- 상태 ---- */
+  /* ---- State variables ---- */
   let activeIdx   = 0;
   let openTimer   = null;
   let idleTimer   = null;
-  let isSnapping  = false;  // 스냅 애니메이션 잠금
-  let lastSnapAt  = 0;
-  let lastRaw     = 0;      // 마지막 raw progress (0..steps)
-  let userInteracted = false;
-  let lastScrollTime = 0;
+  let isSnapping  = false;  // Lock during snap animation
+  let lastSnapAt  = 0;      // Timestamp of last snap start
+  let lastRaw     = 0;      // Last raw progress (0..steps)
+  let userInteracted = false; // Track if user has scrolled/touched etc.
+  let lastScrollTime = 0;   // Timestamp of last scroll event
 
-  const FLEX_DUR_MS       = 1100; // 패널 열림( flex-grow ) 시간
-  const IDLE_DELAY_MS     = 650;  // 멈춘 뒤 스냅까지 지연 (조금 여유)
-  const IDLE_COOLDOWN_MS  = 600;  // 최근 스냅 후 무시 시간
-  const RAW_HYSTERESIS    = 0.55; // 중심에서 더 벗어나야 이동하도록 완화
+  const FLEX_DUR_MS       = 1100; // Panel opening duration (matches CSS)
+  const IDLE_DELAY_MS     = 650;  // Delay before snapping after scroll stops
+  const IDLE_COOLDOWN_MS  = 600;  // Cooldown after a snap to prevent immediate re-snap
+  const RAW_HYSTERESIS    = 0.55; // Threshold to move to next/prev panel
 
-  /* ---- 활성화(확장 후 콘텐츠 노출) ---- */
+  /* ---- Set active panel (expand and show content) ---- */
   function setActive(idx, opts = { preserveIfSame:true }) {
-    const target = Math.max(0, Math.min(steps, idx));
-    if (opts.preserveIfSame && target === activeIdx) return;
+    const target = Math.max(0, Math.min(steps, idx)); // Clamp index
+    if (opts.preserveIfSame && target === activeIdx) return; // No change needed
 
     activeIdx = target;
 
-    // 다른 패널 상태 제거
+    // Reset other panels
     panels.forEach((el, i) => {
       if (i !== activeIdx) el.classList.remove('is-active', 'is-open', 'show-footer');
     });
 
-    // 활성 패널 펼치기
-    const active = panels[activeIdx];
-    if (active) active.classList.add('is-active');
+    // Activate the target panel
+    const activePanel = panels[activeIdx];
+    if (activePanel) activePanel.classList.add('is-active');
 
-    // 열림 끝난 뒤 콘텐츠 등장
+    // Show content after flex animation completes
     clearTimeout(openTimer);
     openTimer = setTimeout(() => {
-      const current = panels[activeIdx];
-      if (!current) return;
-      current.classList.add('is-open');
-      current.classList.add('show-footer');
+      const currentPanel = panels[activeIdx];
+      if (!currentPanel) return;
+      currentPanel.classList.add('is-open');
+      currentPanel.classList.add('show-footer'); // Add class to show footer
     }, FLEX_DUR_MS);
   }
 
-  /* ---- 부드럽게 해당 인덱스로 스크롤(세로 스냅) ---- */
-  const easing = t => 1 - Math.pow(1 - t, 4);
+  /* ---- Smooth scroll to a specific index (vertical snap) ---- */
+  const easing = t => 1 - Math.pow(1 - t, 4); // Ease-out quart
   function snapToIndex(idx){
-    const i = Math.max(0, Math.min(steps, idx));
+    const i = Math.max(0, Math.min(steps, idx)); // Clamp index
     const r = sec.getBoundingClientRect();
     const sectionTop = window.scrollY + r.top;
     const denom = r.height - vh();
-    const targetY = sectionTop + denom * (i / steps);
+    if (denom <= 0) return; // Cannot snap if section height <= viewport height
+
+    const targetY = sectionTop + denom * (i / steps); // Calculate target scroll position
 
     isSnapping = true;
+    lastSnapAt = Date.now();
+
     if (window.__lenis && typeof window.__lenis.scrollTo === 'function'){
-      // lenis가 있을 경우 lenis로 이동
+      // Use Lenis if available
       window.__lenis.scrollTo(targetY, { duration: 1.05, easing });
     } else {
+      // Use native smooth scroll otherwise
       window.scrollTo({ top: targetY, behavior: 'smooth' });
     }
-    lastSnapAt = Date.now();
-    setTimeout(() => { isSnapping = false; }, 900); // 애니메이션 끝나면 락 해제
+
+    // Unlock after a delay (slightly shorter than animation duration)
+    setTimeout(() => { isSnapping = false; }, 900);
   }
 
-  /* ---- 진행도 기반 스냅(안전성 강화) ---- */
+  /* ---- Snap logic based on scroll progress when idle ---- */
   function idleSnap(){
-    if (!inPinnedView() || isSnapping) return;
+    // Only snap if pinned, not already snapping, and enough time has passed since last snap
+    if (!inPinnedView() || isSnapping || (Date.now() - lastSnapAt < IDLE_COOLDOWN_MS)) return;
 
     const p   = progress();
-    const raw = p * steps;                    // 0..steps 실수 좌표
-    const diffFromActive = Math.abs(raw - activeIdx);
+    const raw = p * steps; // Raw progress (0..steps)
+    const diffFromActive = Math.abs(raw - activeIdx); // How far from current active center
 
-    // 1) 진입 직후(사용자 입력 없음)에는 자동 스냅 금지 — 사용자 조작이나 충분한 체류시간 필요
+    // Prevent auto-snap immediately on entering view unless user interacts or waits
     if (!userInteracted) {
       if (!pinnedSince || (Date.now() - pinnedSince) < 600) {
-        lastRaw = raw; // 상태 갱신만
+        lastRaw = raw; // Update state but don't snap yet
         return;
       }
     }
 
-    // 2) progress가 충분히 변하지 않았다면 스냅 무시 (작은 진동에 의한 이동 방지)
+    // Ignore tiny scroll changes (jitter reduction)
     if (Math.abs(raw - lastRaw) < 0.12) {
       lastRaw = raw;
       return;
     }
 
-    // 3) 중심에서 얼마나 벗어났는지 기준으로 이동 결정
+    // If scrolled far enough from the center, snap to the new target
     if (diffFromActive >= RAW_HYSTERESIS) {
       const target = idxFromProgress(p);
       if (target !== activeIdx) {
         setActive(target, { preserveIfSame:false });
         snapToIndex(target);
       }
+    } else {
+      // If not far enough, snap back to the current active index (optional, can be removed)
+      // snapToIndex(activeIdx);
     }
 
-    lastRaw = raw;
+    lastRaw = raw; // Update last raw position
   }
 
+  // Debounced call to idleSnap after scrolling stops
   function scheduleIdleSnap(){
     clearTimeout(idleTimer);
-    idleTimer = setTimeout(() => {
-      if (Date.now() - lastSnapAt < IDLE_COOLDOWN_MS) return; // 직후 재스냅 방지
-      idleSnap();
-    }, IDLE_DELAY_MS);
+    idleTimer = setTimeout(idleSnap, IDLE_DELAY_MS);
   }
 
-  /* ---- 초기 첫 패널 활성화 ---- */
-  setActive(0, { preserveIfSame:false });
-  lastRaw = progress();
-  if (inPinnedView()) pinnedSince = Date.now();
+  /* ---- Initialization ---- */
+  setActive(0, { preserveIfSame:false }); // Activate first panel initially
+  lastRaw = progress() * steps; // Set initial raw progress
+  if (inPinnedView()) pinnedSince = Date.now(); // Check if already pinned on load
 
-  /* ---- 휠/터치 조작 (사용자 입력 감지 포함) ---- */
+  /* ---- Event Listeners ---- */
+
+  // Wheel event for step-by-step navigation
   let wheelAccum = 0;
   let lastWheelAt = 0;
   let lastWheelSign = 0;
-
-  const WHEEL_STEP_THRESHOLD = 120; // 스텝 이동에 필요한 누적값
-  const WHEEL_COOLDOWN       = 550; // 한 번 이동 후 쿨다운
+  const WHEEL_STEP_THRESHOLD = 120; // Accumulation needed for one step
+  const WHEEL_COOLDOWN       = 550; // Cooldown between wheel steps
 
   window.addEventListener('wheel', (e)=>{
-    if (!inPinnedView()) return;
+    if (!inPinnedView()) return; // Only act when pinned
 
-    userInteracted = true; // 사용자가 휠로 조작했음을 표시
-    lastScrollTime = Date.now();
+    userInteracted = true; // Mark interaction
+    lastScrollTime = Date.now(); // Track last scroll activity
+
+    if (isSnapping) { e.preventDefault(); return; } // Prevent interference during snap
 
     const now = Date.now();
     const dy  = e.deltaY || 0;
     const sign = Math.sign(dy);
 
-    // 전환 중엔 가로채서 흔들림 방지
-    if (isSnapping) { e.preventDefault(); return; }
-
-    // 방향 바뀌면 누적 리셋
+    // Reset accumulator if direction changes
     if (sign !== 0 && sign !== lastWheelSign) wheelAccum = 0;
     lastWheelSign = sign;
-
     wheelAccum += dy;
 
+    // Check if threshold and cooldown are met
     const ready = Math.abs(wheelAccum) >= WHEEL_STEP_THRESHOLD && (now - lastWheelAt) >= WHEEL_COOLDOWN;
     if (ready){
-      e.preventDefault();
-      const next = activeIdx + (wheelAccum > 0 ? 1 : -1);
-      wheelAccum = 0;
-      lastWheelAt = now;
+      e.preventDefault(); // Prevent default page scroll
+      const next = activeIdx + (wheelAccum > 0 ? 1 : -1); // Calculate next index
+      wheelAccum = 0; // Reset accumulator
+      lastWheelAt = now; // Update timestamp
 
-      setActive(next, { preserveIfSame:false });
-      snapToIndex(next);
+      setActive(next, { preserveIfSame:false }); // Set new active panel
+      snapToIndex(next); // Snap to it
     } else {
-      // 아직 스텝에 못 미치면 idle 스냅만 예약
-      scheduleIdleSnap();
+      scheduleIdleSnap(); // If not ready, just schedule idle check
     }
-  }, { passive:false });
+  }, { passive:false }); // Use active listener to allow preventDefault
 
-  // 터치 스와이프
+  // Touch swipe events
   let touchStartY = null;
   sec.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; userInteracted = true; }, { passive:true });
-  sec.addEventListener('touchend',   e => {
-    if (!inPinnedView()) return;
-    if (touchStartY == null) return;
+  sec.addEventListener('touchend', e => {
+    if (!inPinnedView() || touchStartY == null) return;
     const dy = (e.changedTouches[0].clientY - touchStartY);
-    touchStartY = null;
+    touchStartY = null; // Reset start position
 
-    if (Math.abs(dy) > 70) {
-      const next = activeIdx + (dy < 0 ? 1 : -1);
+    if (Math.abs(dy) > 70) { // Swipe threshold
+      const next = activeIdx + (dy < 0 ? 1 : -1); // Determine direction
       setActive(next, { preserveIfSame:false });
       snapToIndex(next);
     } else {
-      scheduleIdleSnap();
+      scheduleIdleSnap(); // If not a significant swipe, schedule idle check
     }
   }, { passive:true });
 
-  // 포인터/키 입력도 "사용자 조작"으로 본다
+  // Mark interaction on pointer/key events
   window.addEventListener('pointerdown', () => { userInteracted = true; }, { passive:true });
   window.addEventListener('keydown', () => { userInteracted = true; }, { passive:true });
 
-  // 스크롤/리사이즈로도 안정 스냅 (스크롤이 실제로 발생했을 때만)
+  // Schedule idle snap check on scroll and resize events
   window.addEventListener('scroll', () => { lastScrollTime = Date.now(); if (inPinnedView()) scheduleIdleSnap(); }, { passive:true });
   window.addEventListener('resize', () => { if (inPinnedView()) scheduleIdleSnap(); });
 
 })();
+
+  // Back button event listener removed
+
 </script>
 
 </body>

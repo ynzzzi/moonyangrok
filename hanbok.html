@@ -32,6 +32,49 @@
     .item4{width:250px;height:250px;top:200px;left:700px;z-index:2}
     .item5{width:450px;height:300px;top:250px;left:200px;z-index:1}
     .item6{width:350px;height:380px;top:40px;left:50px;z-index:4}
+
+    /* ▼ [수정] 갤러리 - 빨간 원 장식 */
+    .deco-circle {
+      position: absolute;
+      background-color: #FF3F3F;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #111; /* 텍스트 검정색 */
+      font-family: 'BookkMyungjo', sans-serif; /* 폰트 변경 */
+      font-weight: 700; /* 폰트 두께 (명조 Bold) */
+      z-index: 5; /* .gallery-item의 z-index (1-4) 보다 높게 설정 */
+      pointer-events: none; /* 뒤의 이미지와 상호작용 가능하도록 */
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+
+      /* 반응형 크기 */
+      width: clamp(24px, 3.5vw, 45px);
+      height: clamp(24px, 3.5vw, 45px);
+      font-size: clamp(12px, 1.6vw, 20px);
+    }
+    
+    /* 텍스트 없는 원 스타일 */
+    .deco-circle-blank {
+        width: clamp(20px, 2.8vw, 35px);
+        height: clamp(20px, 2.8vw, 35px);
+    }
+
+    /* [수정] 텍스트 원 위치 (한복 레이아웃) */
+    .circle-1 { top: 38%; left: 15%; } /* ㅎ (item5 근처) */
+    .circle-2 { top: 40%; left: 28%; } /* ㅏ (ㅎ 오른쪽) */
+    .circle-3 { top: 25%; left: 45%; } /* ㄴ (중앙 상단) */
+    .circle-4 { top: 45%; left: 65%; } /* ㅂ (item4 근처) */
+    .circle-5 { top: 15%; right: 12%; width: clamp(32px, 4.5vw, 55px); height: clamp(32px, 4.5vw, 55px); } /* ㅗ (item2 근처) */
+    .circle-6 { top: 50%; right: 18%; } /* ㄱ (item3 근처) */
+    
+    /* [추가] 텍스트 없는 원 위치 */
+    .circle-7 { top: 55%; left: 55%; } /* item4 (bu.gif) 밑 */
+    .circle-8 { top: 12%; left: 32%; } /* item6 (2.mp4) 오른쪽 위 1 */
+    .circle-9 { top: 20%; left: 38%; } /* item6 (2.mp4) 오른쪽 위 2 */
+    .circle-10 { top: 38%; right: 2%; } /* item3 (m.jpg) 오른쪽 */
+    /* ▲ [수정] 갤러리 - 빨간 원 장식 */
+
 /* Hero(#gallery)를 컨테이너 밖으로 풀-블리드(가로 100vw) */
 section#gallery{
   width: 100vw;
@@ -46,6 +89,7 @@ section#gallery .gallery-container{
   height: 100svh;             /* 100vh 대신 100svh로 안전 */
   margin-top: 0;              /* 기존 50px 제거 */
   overflow: hidden;
+  padding-top: 5vh; /* [수정] 갤러리 콘텐츠 전체 하강 */
 }
 
 /* 필요 시(큰 화면에서 살짝 비침 방지): 헤더가 겹쳐도 깔끔 */
@@ -225,7 +269,7 @@ section#gallery .gallery-container{
     }
 
     #split-portfolio .sp-thumb:hover{transform:translateY(-1px) scale(1.01);opacity:1 }
-    #split-portfolio .sp-thumb.active{outline-color:#7c5cff}
+    #split-portfolio .sp-thumb.active{outline-color:#222222}
     #split-portfolio .sp-thumb img{width:100%;height:100%;object-fit:cover; border-radius: 6px;}
     #split-portfolio .sp-thumb-caption{margin-top:6px;color:#777;font-size:12px}
 
@@ -738,6 +782,9 @@ section#gallery .gallery-container{
 }
 /* 패턴 팝업의 이미지 완전 비활성화 */
 .popup-image { display: none !important; }
+
+.header-left { display: flex; align-items: center; }
+
   </style>
 
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -748,20 +795,20 @@ section#gallery .gallery-container{
 </head>
 <body>
   <div class="cursor" id="custom-cursor"></div>
-  <header class="site-header" role="banner">
-    <div class="header-left">
-      <a class="icon-btn" href="index.html" aria-label="Home">
-        <svg class="home-svg" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />
-        </svg>
-      </a>
-    </div>
-    <div class="header-right">
-      <button id="menuBtn" class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="menuPanel" aria-label="Open menu">
-        <span class="burger"><span></span><span></span><span></span></span>
-      </button>
-    </div>
-  </header>
+<header class="site-header">
+  <div class="header-left">
+    <a class="icon-btn" href="index.html" aria-label="Home">
+      <svg class="home-svg" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5"/></svg>
+    </a>
+  </div>
+
+  <div class="header-right">
+    <button id="menuBtn" class="icon-btn menu-btn" ...>
+      <span class="burger"><span></span><span></span><span></span></span>
+    </button>
+  </div>
+</header>
+
 
   <div id="menuOverlay" class="hm-overlay" aria-hidden="true">
     <aside id="menuPanel" class="hm-panel" role="dialog" aria-modal="true" aria-label="Navigation menu">
@@ -773,12 +820,24 @@ section#gallery .gallery-container{
     <section id="gallery">
       <div class="gallery-container">
         <div class="background-image"><img src="" alt="" /></div>
+
+        <div class="deco-circle circle-1">ㅎ</div>
+        <div class="deco-circle circle-2">ㅏ</div>
+        <div class="deco-circle circle-3">ㄴ</div>
+        <div class="deco-circle circle-4">ㅂ</div>
+        <div class="deco-circle circle-5">ㅗ</div>
+        <div class="deco-circle circle-6">ㄱ</div>
+        
+        <div class="deco-circle deco-circle-blank circle-7"></div>
+        <div class="deco-circle deco-circle-blank circle-8"></div>
+        <div class="deco-circle deco-circle-blank circle-9"></div>
+        <div class="deco-circle deco-circle-blank circle-10"></div>
         <div class="gallery-item item2">
           <video id="mainVideo"  loop autoplay muted playsinline preload="metadata">
             <source src="img/han/1.mp4" type="video/mp4"/>
           </video>
         </div>
-        <div class="gallery-item item3"><img src="img/han/m.jpg" alt="아트워크 이미지"/></div>
+        <div class="gallery-item item3"><img src="img/han/m.webp" alt="아트워크 이미지"/></div>
         <div class="gallery-item item4"><img src="img/han/bu.gif" alt="그룹 사진"/></div>
         <div class="gallery-item item5"><img src="img/han/f.gif" alt="텍스트가 있는 인물 사진"/></div>
         <div class="gallery-item item6">
@@ -817,11 +876,11 @@ section#gallery .gallery-container{
         </div>
       </div>
       <div class="stack pre">
-        <div class="card bg1" data-rot="-8"><img src="img/han/2.jpg" alt=""></div>
-        <div class="card bg2" data-rot="6"><img src="img/han/5.jpg" alt=""></div>
+        <div class="card bg1" data-rot="-8"><img src="img/han/2.webp" alt=""></div>
+        <div class="card bg2" data-rot="6"><img src="img/han/5.webp" alt=""></div>
         <button class="card main" id="photoMain" aria-label="사진 변경">
-          <img id="photoMainFront" class="front" src="img/han/4.jpg" alt="앞">
-          <img id="photoMainBack" class="back" src="img/han/5.jpg" alt="뒤">
+          <img id="photoMainFront" class="front" src="img/han/4.webp" alt="앞">
+          <img id="photoMainBack" class="back" src="img/han/5.webp" alt="뒤">
         </button>
       </div>
 <p class="stack-hint" id="stackHint" aria-hidden="true">
@@ -1007,86 +1066,81 @@ section#gallery .gallery-container{
           title:"당의(唐衣)", category:"궁중·사대부 여성의 예복",
           description:"당의는 저고리에서 길이가 늘어나 치마 위에 겹쳐 입는 겉옷으로, 앞길이보다 뒤길이가 약간 길고 둥근 도련·흰 동정(깃)이 특징입니다. 왕실에선 소례와 조회 같은 격식 있는 자리에, 민간에선 예복이나 혼례 때 착용했다.",
           featureBody:"당의에 보이는 주요 문양은 주로 금박(金箔) 기법으로 새겨져 있으며, '수'와 '복' 문자를 옷에 새기는 것은 착용자에게 장수와 행복이 깃들기를 바라는 가장 직접적이고 강력한 기원이었다.",
-          image:"img/han/d.png", thumb:"img/han/d.png",
-          background_image: "img/han/spbg.png", // 배경이미지
-          mini_images: ["img/han/1.png", "img/han/3.png"],
+          image:"img/han/d.webp", thumb:"img/han/d.webp",
+          mini_images: ["img/han/1.webp", "img/han/3.webp"],
           secondary_feature: {
             title: "왕실의 권위와 번영",
             text: "당의에 나타난 문양들은 단순히 옷을 아름답게 꾸미는 것을 넘어, 착용자인 왕실 여성의 건강과 장수(壽), 행복과 길운(福), 그리고 부귀영화(모란 등)를 기원하는 상징물들의 집합체입니다. 이러한 길상 문양을 최고급 재료인 금으로 화려하게 새겨 넣어 왕실의 권위와 번영을 드러내고자 했던 것이다.",
-            image: "img/han/bg.jpg"
+            image: "img/han/bg.webp"
           },
-          detail_image: "img/han/dang.jpg",
+          detail_image: "img/han/dang.webp",
           patterns: [
             { name: "화문", description: "어깨와 자락 가장자리에 흐르는 꽃과 덩굴은 부귀·번영과 가문의 영화, 집안의 번창을 상징합니다.", position: { top: '30%', left: '55%' }},
-            { name: "문자문", description: "옷의 허리·자락에 반복된 네모꼴 문자무늬는 장수와 복을 기원하는 수복문입니다. 띠 형태(연속문)로 두른 것은 복과 수명이 끊기지 않고 이어지라는 뜻입니다.", position: { top: '75%', left: '45%' }, image: "img/han/flower.jpg" }
+            { name: "문자문", description: "옷의 허리·자락에 반복된 네모꼴 문자무늬는 장수와 복을 기원하는 수복문입니다. 띠 형태(연속문)로 두른 것은 복과 수명이 끊기지 않고 이어지라는 뜻입니다.", position: { top: '75%', left: '45%' }, image: "img/han/flower.webp" }
           ]
         },
         { id:1,
           title:"활옷(闊衣)", category:"신부 예복(혼례복)",
           description:"활옷은 붉은 계열의 바탕에 넓은 소매를 갖춘 신부 예복으로, 모란·봉황·박쥐 등 길상 문양을 정교한 자수로 수놓아 복과 번영을 기원합니다. 본래 궁중 예복 계통의 형식이 민간 혼례로 확장되어 널리 쓰였으며, 짙은 색 대비와 화사한 자수가 의식의 중심을 강조합니다.",
           featureBody:"활옷의 자수는 상징의 사전입니다. 봉황은 기품과 화합, 모란은 부귀, 박쥐는 복(福)을 뜻해 혼례의 의미를 시각적으로 드러냅니다. 넉넉한 품과 긴 길이는 신부의 동선을 우아하게 만듭니다.",
-          image:"img/han/hwal.png", thumb:"img/han/hwal.png",
-          background_image: "img/han/hwa.jpg", // 배경이미지
-          mini_images: ["img/han/hwall.png", "img/han/hwalot.png"],
+          image:"img/han/hwal.webp", thumb:"img/han/hwal.webp",
+          mini_images: ["img/han/hwall.webp", "img/han/hwalot.webp"],
           secondary_feature: {
             title: "자수의 상징성",
             text: "활옷은 화관이라는 모자와 함께 착용되었습니다. 화관은 머리에서 복과 덕을 부르는 장식입니다. 두 예복은 ‘혼례’라는 같은 맥락에서 문양이 짝을 이뤄 복(福)·다복(多福)·장수·화합을 기원하는 상징 세트를 이룹니다.",
-            image: "img/han/hwa.jpg"
+            image: "img/han/hwa.webp"
           },
-          detail_image: "img/han/hwal.jpg",
+          detail_image: "img/han/hwal.webp",
           patterns: [
-            { name: "모란문", description: "부귀영화를 상징하는 모란은 활옷의 중심 문양으로 자주 사용됩니다. 풍성하고 화려한 형태로 수놓아 신부의 행복과 번영을 기원하는 의미를 담고 있습니다.", position: { top: '50%', left: '50%' }, image: "img/han/moran.jpg" }
+            { name: "모란문", description: "부귀영화를 상징하는 모란은 활옷의 중심 문양으로 자주 사용됩니다. 풍성하고 화려한 형태로 수놓아 신부의 행복과 번영을 기원하는 의미를 담고 있습니다.", position: { top: '50%', left: '50%' }, image: "img/han/moran.webp" }
           ]
         },
         { id:2,
           title:"원삼(圓衫)", category:"왕비·빈의 소례복 / 신부 예복",
           description:"원삼은 품이 넓고 길이가 긴 겉옷으로, 상·하의의 색 대비와 소매 단의 장식이 돋보이는 의례복입니다. 본래 왕비와 빈의 소례복이지만, 민간에서도 신부 예복로 널리 전해졌습니다.",
           featureBody:"원삼은 넓은 품과 곧게 떨어지는 선으로 장중함을 표현합니다. 소매와 몸판의 색 배치가 리듬을 만들어 움직임마다 화면이 달라지며, 치마 위에 겹쳐 입어 실루엣을 정제합니다.",
-          image:"img/han/n.png", thumb:"img/han/n.png",
-          background_image: "img/han/won.jpg", // 배경이미지
-          mini_images: ["img/han/won.png", "img/han/wonsam.png"],
+          image:"img/han/n.webp", thumb:"img/han/n.webp",
+          mini_images: ["img/han/won.webp", "img/han/wonsam.webp"],
            secondary_feature: {
             title: "색동 소매의 의미",
             text: "원삼 소매 끝에 여러 색의 천을 이어 붙인 '색동'은 음양오행설에 기반하여 나쁜 기운을 막고 복을 부르는 벽사(辟邪)와 길상(吉祥)의 의미를 담고 있습니다. 화려한 색동은 원삼의 장식미를 더하는 동시에 의복에 좋은 기운을 불어넣는 역할을 합니다.",
-            image: "img/han/won.jpg"
+            image: "img/han/won1.jpg"
           },
-          detail_image: "img/han/w.jpg",
+          detail_image: "img/han/w.webp",
           patterns: [
-            { name: "운봉문", description: "구름과 봉황을 함께 수놓은 운봉문은 왕실의 권위와 신성함을 상징합니다. 봉황은 왕비를, 구름은 상서로운 기운을 뜻하여 국가의 태평과 왕실의 영원한 번영을 기원하는 최고 등급의 문양입니다.", position: { top: '45%', left: '60%' }, image: "img/han/unbong.jpg" }
+            { name: "운봉문", description: "구름과 봉황을 함께 수놓은 운봉문은 왕실의 권위와 신성함을 상징합니다. 봉황은 왕비를, 구름은 상서로운 기운을 뜻하여 국가의 태평과 왕실의 영원한 번영을 기원하는 최고 등급의 문양입니다.", position: { top: '45%', left: '60%' }, image: "img/han/unbong.webp" }
           ]
         },
         { id:3,
           title:"단령", category:"사대부가의 관복",
           description:"단령은 둥근 깃이 특징인 포(袍)로, 조선시대 관리들이 공적인 임무를 수행할 때 입었던 대표적인 관복입니다.",
           featureBody: "단령(團領)은 ‘둥근 옷깃’이라는 뜻에서 유래했으며, 둥근 깃이 달린 겉옷을 포괄적으로 지칭합니다.",
-          image:"img/han/dan.png", thumb:"img/han/dan.png",
-          background_image: "img/han/je.jpg", // 배경이미지
-          mini_images: ["img/han/dan1.png", "img/han/dan2.png"],
+          image:"img/han/dan.webp", thumb:"img/han/dan.webp",
+          mini_images: ["img/han/dan1.webp", "img/han/dan2.webp"],
           secondary_feature: {
             title: "제례의 권위·정결·길상",
             text: "딘령은 제사를 올리는 의식에서만 쓰는 모자인 제관과 함께 착용하기도 했습니다. 단령의 흉배 ‘호표’는 수호·용맹(무관의 위계), 제관의 금빛·화문은 존귀·길상·정결을 뜻해 두 품목이 함께 제례의 위엄과 길한 기운을 표현합니다.",
-            image: "img/han/je.jpg"
+            image: "img/han/je.webp"
           },
-          detail_image: "img/han/dann.jpg",
+          detail_image: "img/han/dann.webp",
           patterns: [
-            { name: "호표(호랑이/표범) 문양", description: "흉배의 호표(호랑이/표범) 문양은 무관(軍職)의 품계를 나타내며, 용맹·결단·수호를 상징합니다.", position: { top: '55%', left: '50%' }, image: "img/han/belt_pattern.jpg" }
+            { name: "호표(호랑이/표범) 문양", description: "흉배의 호표(호랑이/표범) 문양은 무관(軍職)의 품계를 나타내며, 용맹·결단·수호를 상징합니다.", position: { top: '55%', left: '50%' }, image: "img/han/belt_pattern.webp" }
           ]
         },
         { id:4,
           title:"노의(露衣)", category:"여성의 외출복이자 예복",
           description: "노의(露衣)는 고려 말부터 조선 후기까지 여성의 외출복이자 예복으로 사용된 겉옷을 의미합니다. 주로 왕비와 세자빈, 왕자의 부인 등 왕실 여성들이 입었으며, 신분 구분 없이 널리 착용되어 사회적 논란이 일기도 했습니다.",
           featureBody: "노의는 여성 예복의 한 형태로, 조선 후기까지 이어진 전통 의복입니다.",
-          image:"img/han/2.png", thumb:"img/han/2.png",
-          background_image: "img/han/dae.jpg", // 배경이미지
-          mini_images: ["img/han/no.png", "img/han/no2.png"],
+          image:"img/han/2.webp", thumb:"img/han/2.webp",
+          mini_images: ["img/han/no.webp", "img/han/no2.webp"],
           secondary_feature: {
             title: "노의의 문양, 복과 장수를 입히다",
             text: "노의는 노의와 짝을 이루는 전용 허리띠인 노의대와 착용합니다. 격식 있는 외출·의식에서 노의의 품을 잡아 주는 역할을 합니다. 길상문(당초·보상화 등)으로 단정하게 꾸며 노의 색과 대비·조화를 맞춥니다.",
-            image: "img/han/dae.jpg"
+            image: "img/han/dae.webp"
           },
-          detail_image: "img/han/noo.jpg",
+          detail_image: "img/han/noo.webp",
           patterns: [
-            { name: "원(圓)형 단자의 반복", description: "원만‧화합‧영속을 뜻하고, 복과 길운이 끊이지 않길 바라는 의미합니다.", position: { top: '40%', left: '50%' }, image: "img/han/jeonsam_pattern.jpg" }
+            { name: "원(圓)형 단자의 반복", description: "원만‧화합‧영속을 뜻하고, 복과 길운이 끊이지 않길 바라는 의미합니다.", position: { top: '40%', left: '50%' }, image: "img/han/jeonsam_pattern.webp" }
           ]
         }
       ];
@@ -1390,10 +1444,10 @@ section#gallery .gallery-container{
       const menuRoot = document.getElementById('react-menu-root');
     if (menuRoot) {
       const menuItems = [
-        { link: 'index.html',    text: '홈',   image: 'img/8.jpg' },
-        { link: 'sumak.html',     text: '수막새', image: 'img/6.jpg' },
-        { link: 'ceramics.html', text: '공예품', image: 'img/gong/do.png' },
-        { link: 'hanbok.html',   text: '한복', image: 'img/han/bg.jpg' },
+                    { link: 'ceramics.html',    text: '공예품',   image: 'img/gong/do.png' },
+                    { link: 'sumak.html',     text: '수막새', image: 'img/6.jpg' },
+                    { link: 'hanbok.html', text: '한복', image: 'img/han/bg.jpg' },
+                    { link: 'card.html',   text: '부적', image: 'img/8.jpg' },
       ];
         ReactDOM.createRoot(menuRoot).render(<FlowingMenu items={menuItems} />);
       }
