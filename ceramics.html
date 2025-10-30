@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>CRAFT WORK</title>
+<title>공예품</title>
 
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://unpkg.com/@studio-freight/lenis/dist/lenis.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
 <style>
   /* ===== Fonts ===== */
@@ -146,7 +147,7 @@ font-family:'BookkGothic';
   .content__img-inner { display: block; width: 100%; height: 100%; object-fit: contain; background: none !important; }
 
   /* ===== Interlude ===== */
-  .interlude{ height: 350vh; padding: 0 var(--gutter); display:block; background:var(--hero-bg); border-block: 1px solid #e5e5dc; }
+  .interlude{ padding: 0 var(--gutter); display:block; background:var(--hero-bg); border-block: 1px solid #e5e5dc; }
   .interlude--circle .interlude__wrap{ position: sticky; top: 0; min-height: 100svh; max-width: 1100px; margin: 0 auto;
     display:grid; place-content:center; justify-items:center; text-align:center; gap: 24px; padding: clamp(48px,  8vw, 120px) 0; }
   .interlude--circle .interlude__desc{ font-family: 'BookkMyungjo', serif; color:#2b2b2b; letter-spacing:-.01em; line-height:1.9;
@@ -154,6 +155,54 @@ font-family:'BookkGothic';
   .interlude__desc .w{ display:inline-block; opacity:0; transform: translateY(16px); will-change: transform, opacity; margin-right:.28em; vertical-align:baseline; white-space:nowrap; }
   .circle-hero{ width: min(52vw, 440px); aspect-ratio: 16 / 10; border-radius: 9999px; overflow:hidden; display:grid; place-items:center; background:#f3f3eb; box-shadow: 0 12px 34px rgba(0,0,0,.08); will-change: transform; }
   .circle-hero img{ width:110%; height:110%; object-fit:cover; transform: translate3d(0,0,0) scale(1); transform-origin:50% 50%; will-change: transform; }
+/* === interlude--circle : 세로 스크롤 → 가로 이동형 === */
+.interlude--circle {
+  position: relative;
+  height: 100vh; /* 자체는 뷰포트 한 화면 높이만 */
+  overflow: hidden;
+  background: var(--hero-bg);
+}
+
+.interlude--circle .horizontal-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.interlude--circle .horizontal-track {
+  display: flex;
+  height: 100%;
+  width: 300vw; /* 패널 수 × 100vw */
+}
+
+.interlude--circle .hpanel {
+  flex: 0 0 100vw;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.interlude--circle .interlude__desc {
+  font-family: 'BookkMyungjo', serif;
+  color: #2b2b2b;
+  letter-spacing: -0.01em;
+  line-height: 1.9;
+  font-size: clamp(16px, 1.2vw, 22px);
+  max-width: 70ch;
+  text-align: center;
+  padding: 0 6vw;
+}
+
+.interlude--circle .circle-hero img {
+  width: clamp(360px, 40vw, 720px);
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  object-fit: cover;
+}
 
   /* ===== Horizontal Scroll Section Layout ===== */
   .hscroll-new {
@@ -434,16 +483,30 @@ font-family:'BookkGothic';
 </section>
 
 <section class="interlude interlude--circle" id="overview">
-  <div class="interlude__wrap">
-    <p id="interlude-desc" class="interlude__desc">
-      도자기는 흙으로 빚은 그릇을 구워내는 방법에 따라 토기(土器), 도기(陶器), 자기(瓷器)로 나누어지는데,
-      백토 등이 혼합되어 높은 온도에서 구워낸 그릇을 사기(자기)라고 합니다.
-    </p>
-    <figure class="circle-hero" aria-hidden="true">
-      <img id="circleImg" src="img/gong/do.png" alt="도자기 제작 장면">
-    </figure>
+  <div class="horizontal-sticky">
+    <div class="horizontal-track">
+      <div class="hpanel">
+        <p class="interlude__desc">
+          도자기는 흙으로 빚은 그릇을 구워내는 방법에 따라
+          토기(土器), 도기(陶器), 자기(瓷器)로 나누어집니다.
+        </p>
+      </div>
+      <div class="hpanel">
+        <figure class="circle-hero">
+          <img src="img/gong/do.png" alt="도자기 제작 장면">
+        </figure>
+      </div>
+      <div class="hpanel">
+        <p class="interlude__desc">
+          백토 등이 혼합되어 높은 온도에서 구워낸 그릇을
+          사기(자기)라고 하며, 조선의 백자는 그 대표적인 예입니다.
+        </p>
+      </div>
+    </div>
   </div>
 </section>
+
+
 
 <section class="hscroll-new" id="crafts-hscroll">
   <div class="hscroll-sticky">
@@ -1017,6 +1080,39 @@ font-family:'BookkGothic';
 })();
 
   // Back button event listener removed
+/* === interlude--circle : GSAP ScrollTrigger 가로 스크롤 === */
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
+    console.warn("GSAP or ScrollTrigger not loaded");
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const section = document.querySelector(".interlude--circle");
+  const track = section?.querySelector(".horizontal-track");
+  if (!section || !track) return;
+
+  const panels = gsap.utils.toArray(".interlude--circle .hpanel");
+  const totalScroll = track.scrollWidth - window.innerWidth;
+
+  gsap.to(track, {
+    x: () => -totalScroll,
+    ease: "power1.out", // 부드럽게 감속되는 느낌
+    scrollTrigger: {
+      trigger: section,
+      start: "top top",
+      end: () => `+=${track.scrollWidth - window.innerWidth}`,
+      scrub: 1.2, // 스크롤 비율에 따라 부드럽게 연결
+      pin: true,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+    },
+  });
+});
+
+
+
 
 </script>
 

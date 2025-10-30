@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>한복 아카이브</title>
+  <title>한복</title>
 
   <style>
     @font-face { font-family:'BookkMyungjo'; src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkMyungjo-Bd.woff2') format('woff2'); font-weight:700; font-display:swap }
@@ -333,6 +333,7 @@ section#gallery .gallery-container{
     .sp-hero {
       position:relative; overflow:hidden; 
       aspect-ratio: 3 / 4;
+        margin-top: 60px;
     }
     .sp-hero img{width:100%; height:100%; object-fit:cover; transition:transform .5s ease, opacity .3s ease;}
     .sp-hero:hover img{transform:scale(1.02)}
@@ -770,20 +771,22 @@ section#gallery .gallery-container{
   .item6{ top: 14vh; }  /* 기존 6vh  → 14vh */
 }
 
-/* === 스크롤 멈춤 수정 === */
-#split-portfolio {
-  padding-bottom: 200vh; /* 여유 높이 추가 */
-}
-
-@media (min-width: 1600px) {
-  #split-portfolio {
-    padding-bottom: 250vh; /* 큰 화면에서는 더 길게 */
-  }
-}
 /* 패턴 팝업의 이미지 완전 비활성화 */
 .popup-image { display: none !important; }
 
 .header-left { display: flex; align-items: center; }
+
+
+@media (min-width: 1600px) {
+  #split-portfolio .sp-thumb {
+    width: 120px;   /* 기존 80px → 120px로 확대 */
+    height: 120px;  /* 비율 유지 */
+  }
+
+  #split-portfolio .sp-thumbs {
+    gap: 48px;      /* 썸네일 간 간격도 약간 넓혀줌 */
+  }
+}
 
   </style>
 

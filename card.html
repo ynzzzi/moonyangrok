@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3D Book Flip Carousel (Image Version)</title>
+    <title>부적</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
@@ -345,6 +345,30 @@
         @media (prefers-reduced-motion: reduce){ .fm-marquee__inner{ animation:none; } }
         /* ===== End Header / Menu CSS ===== */
 
+
+        /* ======================================== */
+        /* ===== ▼▼ 27" 모니터용 카드 크기 (신규) ▼▼ ===== */
+        /* ======================================== */
+        @media (min-width: 1600px) {
+            .swiper {
+                /* 하단 여백을 늘려, 커진 카드 아래의 author 정보가 보일 공간 확보 */
+                padding: 60px 0 120px 0; 
+            }
+            .swiper-slide {
+                /* 기본 10rem / 22rem 에서 크기 대폭 증가 */
+                width: 18rem;  /* 288px */
+                height: 40rem; /* 640px */
+            }
+            .swiper-slide .author {
+                 /* 카드 하단으로부터의 거리 증가 */
+                bottom: -110px;
+            }
+        }
+        /* ======================================== */
+        /* ===== ▲▲ 27" 모니터용 카드 크기 (신규) ▲▲ ===== */
+        /* ======================================== */
+
+
     </style>
 </head>
 <body>
@@ -371,7 +395,7 @@
 </div>
 <section>
     <h2>符籍</h2>
-    <p>마음에 드는 문양을 골라 나만의 부적을 뽑아보세요.</p>
+    <p>마음에 드는 문양을 골라 나만의 부적을 뽑아보세요. <br> 문양을 고른 후, 카드를 클릭하면 나만의 부적을 볼 수 있습니다.</p>
     <div class="swiper-container">
     <div class="swiper">
         <div class="swiper-wrapper">
@@ -420,7 +444,49 @@
             </div>
         </div>
 
+        <div class="swiper-slide swiper-slide--one">
+            <div class="flip-card-inner">
+            <div class="flip-card-front">
+                <img src="img/card/b1.png" alt="Card 1 Front Image">
+                </div>
+            <div class="flip-card-back">
+                <img src="img/card/b2.png" alt="Card 1 Back Image">
+            </div>
+            </div>
+        </div>
+        
+        <div class="swiper-slide swiper-slide--two">
+            <div class="flip-card-inner">
+            <div class="flip-card-front">
+                <img src="img/card/h1.png" alt="Card 2 Front Image">
+            </div>
+            <div class="flip-card-back">
+                <img src="img/card/h2.png" alt="Card 2 Back Image">
+            </div>
+            </div>
+        </div>
 
+        <div class="swiper-slide swiper-slide--three">
+            <div class="flip-card-inner">
+            <div class="flip-card-front">
+                <img src="img/card/bb1.png" alt="Card 3 Front Image">
+            </div>
+            <div class="flip-card-back">
+                <img src="img/card/bb2.png" alt="Card 3 Back Image">
+            </div>
+            </div>
+        </div>
+        
+        <div class="swiper-slide swiper-slide--four">
+            <div class="flip-card-inner">
+            <div class="flip-card-front">
+                <img src="img/card/t1.png" alt="Card 4 Front Image">
+            </div>
+            <div class="flip-card-back">
+                <img src="img/card/t2.png" alt="Card 4 Back Image">
+            </div>
+            </div>
+        </div>
         </div> </div> <div class="swiper-button-prev">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75" />
@@ -436,6 +502,7 @@
     </div> </section>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
     <script>
 
     var swiper = new Swiper(".swiper", {
@@ -460,16 +527,19 @@
         mousewheel: {
             thresholdDelta: 70
         },
-        slidesPerView: 1.5, // Default for small screens
-        // ▼▼▼ [수정] Breakpoints Updated ▼▼▼
+        // ▼▼▼ [수정] slidesPerView를 3으로 고정 ▼▼▼
+        slidesPerView: 3,
+        
+        // ▼▼▼ [수정] Breakpoints 제거 (항상 3장) ▼▼▼
+        /*
         breakpoints: {
             // For 560px and wider, show 3 slides
             560: {
                 slidesPerView: 3
             }
-            // No need for separate 768px or 1024px if they also show 3
         }
-        // ▲▲▲ [수정] Breakpoints Updated ▲▲▲
+        */
+        // ▲▲▲ [수정] Breakpoints 제거 ▲▲▲
     });
 
 
@@ -522,7 +592,6 @@
 
 
     </script>
-
     <script type="text/babel" data-presets="env,react">
         const { useRef, useEffect, Fragment } = React; // Added Fragment
 
