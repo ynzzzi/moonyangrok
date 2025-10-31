@@ -348,35 +348,30 @@
 
 
 
-/* ===== ▼▼ 27" 모니터용 (스크롤바 없는 버전) ▼▼ ===== */
+/* ===== ▼▼ 27" 모니터용 (최종 수정) ▼▼ ===== */
 @media (min-width: 1600px) {
   section {
     justify-content: flex-start;
-    
-    /* [수정] 100vh 안에 맞추기 위해 상하 여백을 줄입니다 */
-    padding-top: 8vh;    /* 10vh -> 8vh */
-    padding-bottom: 2vh; /* 10vh -> 2vh */
+    padding-top: 8vh;
+    padding-bottom: 2vh;
     width: 70%;
   }
 
   .swiper {
     max-width: 1200px;
-    
-    /* [수정] 슬라이더 자체의 상하 여백도 줄입니다 */
-    padding: 40px 0 80px 0; /* 80px/140px -> 40px/80px */
+    padding: 40px 0 80px 0;
     margin: 0 auto;
-    
-    /* [수정] 텍스트와 슬라이더 사이 여백도 줄입니다 */
-    margin-top: 5vh; /* 8vh -> 5vh */
+    margin-top: 5vh; 
   }
 
   .swiper-slide {
-    aspect-ratio: 3 / 6; /* 1:2 세로 비율 유지 */
+    /* [수정] aspect-ratio를 지우고, 더 큰 1:2 비율의 크기를 직접 지정합니다 */
+    width: 15rem;   /* 10rem -> 15rem (약 240px) */
+    height: 30rem;  /* 22rem -> 30rem (약 480px) */
   }
 
   .swiper-slide .author {
-    /* 슬라이더의 padding-bottom(80px)이 이 공간을 확보합니다 */
-    bottom: -100px; /* 120px -> 100px */
+    bottom: -100px;
   }
 
   .swiper-button-prev {
@@ -386,7 +381,7 @@
     right: 30px;
   }
 }
-/* ===== ▲▲ 27" 모니터용 (스크롤바 없는 버전) ▲▲ ===== */
+/* ===== ▲▲ 27" 모니터용 (최종 수정) ▲▲ ===== */
 
     </style>
 </head>
