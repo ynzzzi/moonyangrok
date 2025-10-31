@@ -388,7 +388,14 @@ font-family:'BookkGothic';
   height: 200vh; /* 추가 스크롤 여유 공간 */
 }
 
-
+/* 27인치 모니터 기준 (1600px 이상) */
+@media (min-width: 1600px) {
+  .interlude--circle .interlude__wrap {
+    padding-top: 10vh;   /* 화면 상단으로부터 여백 */
+    padding-bottom: 10vh; /* 아래쪽 균형 맞추기 */
+    transform: translateY(3vh); /* 전체 콘텐츠를 아래로 살짝 이동 */
+  }
+}
 </style>
 </head>
 <body>
