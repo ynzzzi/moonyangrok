@@ -63,9 +63,9 @@
     /* [수정] 텍스트 원 위치 (한복 레이아웃) */
     .circle-1 { top: 38%; left: 15%; } /* ㅎ (item5 근처) */
     .circle-2 { top: 40%; left: 28%; } /* ㅏ (ㅎ 오른쪽) */
-    .circle-3 { top: 25%; left: 45%; } /* ㄴ (중앙 상단) */
+    .circle-3 { top: 25%; left: 42%; } /* ㄴ (중앙 상단) */
     .circle-4 { top: 45%; left: 65%; } /* ㅂ (item4 근처) */
-    .circle-5 { top: 15%; right: 12%; width: clamp(32px, 4.5vw, 55px); height: clamp(32px, 4.5vw, 55px); } /* ㅗ (item2 근처) */
+    .circle-5 { top: 60%; right: 12%; width: clamp(32px, 4.5vw, 55px); height: clamp(32px, 4.5vw, 55px); } /* ㅗ (item2 근처) */
     .circle-6 { top: 50%; right: 18%; } /* ㄱ (item3 근처) */
     
     /* [추가] 텍스트 없는 원 위치 */
@@ -697,14 +697,20 @@ section#gallery .gallery-container{
 
 /* 2) 갤러리 카드: vw/% 기반으로 확대 재배치 (초대형 화면에서만) */
 @media (min-width: 1600px){
+  /* 컨테이너에 상단 패딩을 줘서 카드들의 기준점을 아래로 */
+  section#gallery .gallery-container{
+    height: 88svh;      /* 78~100svh 사이에서 취향 조절 가능 */
+    padding-top: 6vh;   /* 위로 몰림 방지용 오프셋 */
+  }
+
   .gallery-container{ height: 78vh; }
 
   .gallery-item{ box-shadow: 0 10px 30px rgba(0,0,0,.12); }
 
-  .item2{ width: 28vw; height: 15.5vw; top: 4vh; right: 6vw; }
-  .item3{ width: 18vw; height: 18vw;  top: 28vh; right: 5vw; }
-  .item4{ width: 16vw; height: 16vw;  top: 24vh; left: 52vw; }
-  .item5{ width: 26vw; height: 17vw;  top: 30vh; left: 14vw; }
+.item2{ width: 30vw; height: 17vw; top: 12vh; right: 6vw; }  /* 기존 28vw, 15.5vw → 확대 */
+  .item3{ width: 20vw; height: 20vw;  top: 34vh; right: 5vw; }  /* 기존 18vw, 18vw → 확대 */
+  .item4{ width: 18vw; height: 18vw;  top: 30vh; left: 52vw; }  /* 기존 16vw, 16vw → 확대 */
+  .item5{ width: 28vw; height: 18.5vw;  top: 36vh; left: 14vw; }  /* 기존 26vw, 17vw → 확대 */
   .item6{ width: 22vw; height: 24vw;  top: 6vh;  left: 6vw;  }
 }
 
@@ -828,8 +834,8 @@ section#gallery .gallery-container{
         <div class="deco-circle circle-2">ㅏ</div>
         <div class="deco-circle circle-3">ㄴ</div>
         <div class="deco-circle circle-4">ㅂ</div>
-        <div class="deco-circle circle-5">ㅗ</div>
-        <div class="deco-circle circle-6">ㄱ</div>
+        <div class="deco-circle circle-5">ㄱ</div>
+        <div class="deco-circle circle-6">ㅗ</div>
         
         <div class="deco-circle deco-circle-blank circle-7"></div>
         <div class="deco-circle deco-circle-blank circle-8"></div>
@@ -979,7 +985,7 @@ section#gallery .gallery-container{
       const items = document.querySelectorAll('.gallery-item');
       let isDragging=false, current=null, startX=0,startY=0, offX=0,offY=0;
       items.forEach(item=>{
-        const rot = (Math.random()-0.5)*3;
+        const rot = 0;
         item.style.transform = `rotate(${rot}deg)`;
         item.addEventListener('mouseenter',()=> item.style.transform='rotate(0deg) scale(1.03)');
         item.addEventListener('mouseleave',()=>{ if(!isDragging) item.style.transform=`rotate(${rot}deg)`; });

@@ -355,12 +355,15 @@
   }
 
   .swiper {
-    padding: 80px 0 140px 0; /* 아래 공간 확보 */
+    width: 80%;          /* 기존 100%에서 줄여보면, 카드들이 화면에 더 넓게 퍼짐 */
+    max-width: 1800px;   /* 27인치 기준 중앙부 넓게 */
+    padding: 80px 0 140px 0;
+    margin: 0 auto;      /* 가운데 정렬 */
   }
 
   .swiper-slide {
-    width: 30rem;   /* 4:6 비율 */
-    height: 33rem;  /* 더 안정적 */
+    width: 28rem;   /* 카드 가로 크기 약간 확대 */
+    height: 42rem;  /* 세로 비율 맞춤 (2:3 비율 유지) */
   }
 
   .swiper-slide .author {
