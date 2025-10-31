@@ -114,7 +114,7 @@
             margin-inline: auto;
             margin-top: 10px;
             font-family: 'Suit', sans-serif; /* Changed font */
-            color: #555; /* Slightly lighter text color */
+            color: #eaeaea; /* Slightly lighter text color */
         }
         }
 
@@ -348,37 +348,45 @@
 
 
 
-/* ===== ▼▼ 27" 모니터용 (최종 수정) ▼▼ ===== */
+
 /* ===== ▼▼ 27" 모니터용 (최종 수정) ▼▼ ===== */
 @media (min-width: 1600px) {
   section {
-    /* [수정 1] 텍스트 위치를 위로 올립니다 */
-    padding-top: 10vh;    /* 기존 18vh에서 줄임 */
-    padding-bottom: 10vh;  /* 위아래 밸런스 조정 */
+    /* [요청 1] 텍스트를 상단에 배치합니다 */
+    justify-content: flex-start; /* 기존 center에서 변경 */
     
-    /* [수정 2] 카드 섹션 전체 폭을 90%로 대폭 확대합니다 */
-    width: 90%;
+    padding-top: 10vh;    /* 텍스트의 상단 여백 */
+    padding-bottom: 10vh;
+    width: 70%;
   }
 
   .swiper {
-    /* [수정 3] 부모(section)가 넓어졌으므로 95% 설정 제거 */
-    /* width: 95%; */ /* 이 줄을 삭제하거나 주석 처리합니다 */
-    
     max-width: 1200px;
     padding: 80px 0 140px 0;
-    margin: 0 auto;
+    margin: 0 auto; /* 중앙 정렬 */
+    
+    /* [요청 1] 텍스트와 슬라이더 사이에 여백을 줍니다 */
+    margin-top: 8vh; 
   }
 
   .swiper-slide {
-    /* JS가 너비를 계산할 때 2:3 비율을 유지하도록 합니다 (그대로 둠) */
-    aspect-ratio: 3 / 5; 
+    /* [요청 3] 세로 길이를 3:5 보다 더 길게 수정합니다 */
+    aspect-ratio: 3 / 5.5; 
   }
 
   .swiper-slide .author {
     bottom: -120px;
   }
+
+  /* [요청 2] 화살표 버튼을 안쪽으로 이동시킵니다 */
+  .swiper-button-prev {
+    left: 30px; /* -30px에서 30px로 변경 */
+  }
+  .swiper-button-next {
+    right: 30px; /* -30px에서 30px로 변경 */
+  }
 }
-/* ===== ▲▲ 27" 모니터용 (최종 수정) ▲▲ ===== */▲▲ ===== */
+/* ===== ▲▲ 27" 모니터용 (최종 수정) ▲▲ ===== */
 
     </style>
 </head>
