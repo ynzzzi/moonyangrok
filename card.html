@@ -91,7 +91,7 @@
         position: relative;
         width: calc(min(47rem, 90%));
         margin: 0 auto;
-        min-height: 100vh;
+        height: 100vh;
         column-gap: 3rem;
         padding-block: min(20vh, 3rem);
         text-align: center;
@@ -359,8 +359,8 @@
   }
 
   .swiper-slide {
-    width: 24rem;   /* 4:6 비율 */
-    height: 36rem;  /* 더 안정적 */
+    width: 30rem;   /* 4:6 비율 */
+    height: 33rem;  /* 더 안정적 */
   }
 
   .swiper-slide .author {
@@ -528,7 +528,7 @@
             thresholdDelta: 70
         },
         // ▼▼▼ [수정] slidesPerView를 3으로 고정 ▼▼▼
-        slidesPerView: 'auto',
+        slidesPerView: 3,
         
         // ▼▼▼ [수정] Breakpoints 제거 (항상 3장) ▼▼▼
         /*
