@@ -396,6 +396,18 @@ font-family:'BookkGothic';
     transform: translateY(3vh); /* 전체 콘텐츠를 아래로 살짝 이동 */
   }
 }
+
+@media (min-width: 1600px) {
+  .interlude--circle .interlude__wrap {
+    gap: 8vw; /* 기존보다 간격 넓힘 (기존이 4~5vw였다면 두 배 정도) */
+  }
+
+  /* 혹시 gap이 적용되지 않는 flex 구조라면 margin으로 대체 가능 */
+  .interlude--circle .interlude__text {
+    margin-right: 6vw; /* 텍스트와 이미지 사이 여유 */
+  }
+}
+
 </style>
 </head>
 <body>
