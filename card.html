@@ -114,7 +114,7 @@
             margin-inline: auto;
             margin-top: 10px;
             font-family: 'Suit', sans-serif; /* Changed font */
-            color: #eaeaea; /* Slightly lighter text color */
+            color: #555; /* Slightly lighter text color */
         }
         }
 
@@ -348,45 +348,45 @@
 
 
 
-
-/* ===== ▼▼ 27" 모니터용 (최종 수정) ▼▼ ===== */
+/* ===== ▼▼ 27" 모니터용 (스크롤바 없는 버전) ▼▼ ===== */
 @media (min-width: 1600px) {
   section {
-    /* [요청 1] 텍스트를 상단에 배치합니다 */
-    justify-content: flex-start; /* 기존 center에서 변경 */
+    justify-content: flex-start;
     
-    padding-top: 10vh;    /* 텍스트의 상단 여백 */
-    padding-bottom: 10vh;
+    /* [수정] 100vh 안에 맞추기 위해 상하 여백을 줄입니다 */
+    padding-top: 8vh;    /* 10vh -> 8vh */
+    padding-bottom: 2vh; /* 10vh -> 2vh */
     width: 70%;
   }
 
   .swiper {
     max-width: 1200px;
-    padding: 80px 0 140px 0;
-    margin: 0 auto; /* 중앙 정렬 */
     
-    /* [요청 1] 텍스트와 슬라이더 사이에 여백을 줍니다 */
-    margin-top: 8vh; 
+    /* [수정] 슬라이더 자체의 상하 여백도 줄입니다 */
+    padding: 40px 0 80px 0; /* 80px/140px -> 40px/80px */
+    margin: 0 auto;
+    
+    /* [수정] 텍스트와 슬라이더 사이 여백도 줄입니다 */
+    margin-top: 5vh; /* 8vh -> 5vh */
   }
 
   .swiper-slide {
-    /* [요청 3] 세로 길이를 3:5 보다 더 길게 수정합니다 */
-    aspect-ratio: 3 / 5.5; 
+    aspect-ratio: 3 / 6; /* 1:2 세로 비율 유지 */
   }
 
   .swiper-slide .author {
-    bottom: -120px;
+    /* 슬라이더의 padding-bottom(80px)이 이 공간을 확보합니다 */
+    bottom: -100px; /* 120px -> 100px */
   }
 
-  /* [요청 2] 화살표 버튼을 안쪽으로 이동시킵니다 */
   .swiper-button-prev {
-    left: 30px; /* -30px에서 30px로 변경 */
+    left: 30px;
   }
   .swiper-button-next {
-    right: 30px; /* -30px에서 30px로 변경 */
+    right: 30px;
   }
 }
-/* ===== ▲▲ 27" 모니터용 (최종 수정) ▲▲ ===== */
+/* ===== ▲▲ 27" 모니터용 (스크롤바 없는 버전) ▲▲ ===== */
 
     </style>
 </head>
