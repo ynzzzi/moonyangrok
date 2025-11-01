@@ -134,7 +134,7 @@ font-family:'BookkGothic';
     display:grid; align-items:center; justify-content:center; background:var(--hero-bg); overflow:hidden; }
   .hero-inner{ width:100%; text-align:center; position:relative; z-index:1; }
   .hero-title-wrap{ position:relative; display:inline-block; }
-  .hero-title{ margin:0 auto; font-size: max(40vw, 78vh); line-height:.86; letter-spacing:-.02em; font-weight:900; color:#000;
+  .hero-title{ margin:0 auto; font-size: max(48vw, 90vh); line-height:.86; letter-spacing:-.02em; font-weight:900; color:#000;
     white-space:nowrap; display:inline-block; transform-origin:center; }
   .hero-desc{
     font-family: 'BookkMyungjo', serif; max-width:140ch; margin: clamp(16px, 2vh, 32px) auto 0;
@@ -459,7 +459,9 @@ font-family:'BookkGothic';
       백토 등이 혼합되어 높은 온도에서 구워낸 그릇을 사기(자기)라고 합니다.
     </p>
     <figure class="circle-hero" aria-hidden="true">
+      <a href="explore.html">
       <img id="circleImg" src="img/gong/do.png" alt="도자기 제작 장면">
+      </a>
     </figure>
   </div>
 </section>
@@ -712,7 +714,7 @@ font-family:'BookkGothic';
       const title = document.getElementById('heroTitle');
       if(!hero || !title) return;
       title.style.transform = 'none'; // Reset transform before measuring
-      const W_MARGIN = .96, H_MARGIN = .88;
+      const W_MARGIN = 1.0, H_MARGIN = 0.98;
       const cs   = getComputedStyle(hero);
       // Ensure clientWidth/Height are positive before calculations
       const heroClientWidth = Math.max(0, hero.clientWidth);

@@ -511,8 +511,11 @@
     background: rgba(247,247,236,0.95);
     height: 100vh;
     display: flex;
-    align-items: center;
+    /* [수정 1] align-items: center; 를 flex-start로 변경 */
+    align-items: flex-start;
     justify-content: center;
+    /* [수정 1] padding-top을 추가하여 콘텐츠를 아래로 내림 */
+    padding-top: clamp(120px, 12vh, 180px);
   }
 
   .detail-inner {
@@ -553,6 +556,12 @@
   .thumb {
     width: 84px;
     height: 84px;
+  }
+
+  /* [수정 2] 27인치 모니터에서 X 버튼 위치 조정 */
+  .detail-close {
+    right: 24px; /* -6px (바깥)에서 24px (안쪽)으로 변경 */
+    top: 24px;   /* 12px에서 24px로 상단 여백 확보 */
   }
 }
 
