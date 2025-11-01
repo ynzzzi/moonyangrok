@@ -486,12 +486,13 @@
     margin-top: 0;             /* ← 기존 370px 제거 */
     font-size: clamp(15px, 1.05vw, 18px);
     line-height: 1.7;        /* 패널 높이 내에서 자연 스크롤 */
+    overflow-y: visible;
   }
 
   /* 본문 래퍼를 grid로 묶어 '이미지/메타/본문/CTA' 순으로 안전 배치 */
   .detail-body{
     display: grid;
-    grid-template-rows: auto auto 1fr auto; /* 제목은 이미 바깥, 여기서부터: 이미지, 메타, 본문(가변), CTA */
+ grid-template-rows: auto auto auto auto; /* 제목은 이미 바깥, 여기서부터: 이미지, 메타, 본문(가변), CTA */
     min-height: 0;                           /* 오버플로우 계산 정확도 ↑ */
   }
 
@@ -686,7 +687,7 @@
     { src: "img/gong/back/9.webp", title: "백자 청화 모란무늬 사발", meta: "白磁靑畵牡丹文沙鉢", description: "조선 시대에 모란은 귀한 신분과 복된 삶을 기원하는 의미였다. 특히 왕실이나 상류층이 사용하는 기물에서 자주 나타났다.", thumbs: ["img/gong/back/9.webp", "img/gong/back/10.webp"] },
     { src: "img/gong/back/crafts.webp", title: "청화백자운룡문호", meta: "靑畵白磁雲龍文壺", description: "용은 하늘과 땅, 바다를 모두 다스릴 수 있는 존재로 인식되었으며, 임금이 천자(天子, 하늘의 아들)로서 세상을 다스릴 정당성을 상징했다.", thumbs: ["img/gong/back/crafts.webp"] },
     { src: "img/gong/back/peach.webp", title: "백자 청화 복숭아 모양 연적", meta: "白磁 桃形 硯滴", description: "복숭아의 특징을 잘 나타낸 연적이다. 복숭아는 전통적으로 다양한 의미를 지니고 있는데, ′서왕모(西王母) 전설′의 영향으로 다수(多壽)를 의미하며 한편으로 아들과 다남(多男)을 상징하기도 한다.", thumbs: ["img/gong/back/peach.webp", "img/gong/back/peach2.webp","img/gong/back/peach3.webp"] },
-    { src: "img/gong/back/15.webp", title: "백자 청화 투각 포도무늬 지통", meta: "白磁靑畵透刻葡萄文紙筒", description: "포도송이의 알이 꽉 찬 모습은 풍요와 재물의 상징으로 여겨졌다. 따라서 포도무늬는 풍요로운 삶, 행복이 가득한 집안을 기원하는 의미로 사용되었다.", thumbs: ["img/gong/back/peach.webp", "img/gong/back/peach2.webp","img/gong/back/peach3.webp"] },
+    { src: "img/gong/back/15.webp", title: "백자 청화 투각 포도무늬 지통", meta: "白磁靑畵透刻葡萄文紙筒", description: "포도송이의 알이 꽉 찬 모습은 풍요와 재물의 상징으로 여겨졌다. 따라서 포도무늬는 풍요로운 삶, 행복이 가득한 집안을 기원하는 의미로 사용되었다.", thumbs: ["img/gong/back/15.webp", "img/gong/back/16.webp"] },
     { src: "img/gong/back/13.webp", title: "백자 각화 인물 파도 무늬 완", meta: "白磁陽刻人物波狀文碗", description: "포도송이의 알이 꽉 찬 모습은 풍요와 재물의 상징으로 여겨졌다. 따라서 포도무늬는 풍요로운 삶, 행복이 가득한 집안을 기원하는 의미로 사용되었다.", thumbs: ["img/gong/back/15.webp","img/gong/back/163.webp"] },
     { src: "img/gong/back/12.webp", title: "백자 청화 장생 무늬 항아리", meta: "白磁靑畫銅畫長生文壺", description: "파도무늬는 끊임없이 밀려오는 물결을 표현한 것으로, 끊이지 않는 복(福), 풍요로움을 상징한다. 특히 조선시대에는 파도무늬가 곡식, 재물, 복이 끊이지 않고 들어온다는 뜻으로 여겨져 번영과 다복을 기원하는 길상 문양으로 즐겨 사용되었다.", thumbs: ["img/gong/back/12.webp","img/gong/back/11.webp"] },
 
