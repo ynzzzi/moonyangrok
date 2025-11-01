@@ -466,7 +466,13 @@ body.loading { overflow: hidden; }
 }
 /* ▲▲▲ CSS 수정 ▲▲▲ */
 
-
+@media (min-width: 1600px) and (max-width: 1920px) {
+  .description-text {
+    font-size: 30px !important; /* 👈 이 값을 원하시는 크기로 조절하세요 */
+    line-height: 1.8;
+    margin-top: 20px;
+  }
+}
 /* ============================================= */
 /* ===== 4K 및 고해상도 데스크톱을 위한 미디어 쿼리 ===== */
 /* ============================================= */
@@ -489,8 +495,7 @@ body.loading { overflow: hidden; }
         font-size: 120px; /* '文樣錄' 텍스트 크기 증가 */
     }
 
-    .description-text {
-        font-size: 40px !important; /* 설명 텍스트 크기 증가 */
+    .description-text { 
         line-height: 2; /* 줄 간격 조절 */
         margin-top: 24px;
     }
