@@ -176,7 +176,7 @@
     }
     .detail-panel.open{ clip-path: inset(0 0 0 0); pointer-events:auto; }
     .detail-panel.measuring{visibility:hidden; transition:none !important; pointer-events:none; clip-path: inset(0 0 0 0);}
-    .detail-inner{height:100%;display:grid;grid-template-columns:72px 1fr;gap:28px;padding:52px 44px;color:#121212}
+    .detail-inner{height:100%;display:grid;grid-template-columns:72px 1fr;gap:28px;padding: 140px 64px 72px;color:#121212}
 
     .detail-title{    font-family: 'BookkMyungjo',serif;font-size:56px;line-height:1;letter-spacing:-1px;margin:0 0 24px 0;display:inline-flex;flex-wrap:wrap;gap:.02em;}
     .detail-title .mask{display:inline-block;overflow:hidden}
@@ -457,7 +457,11 @@
   .detail-inner{
     grid-template-columns: 112px 1fr;                     /* 썸네일 열 약간 넓힘 */
     gap: clamp(24px, 2.2vw, 40px);
-    padding: clamp(64px, 7vh, 112px) clamp(48px, 3.4vw, 80px);
+    /* [수정] padding-top을 늘려 콘텐츠를 아래로 내립니다 */
+    padding-top: clamp(140px, 15vh, 200px); /* 👈 상단 여백 (예: 140px ~ 200px) */
+    padding-bottom: clamp(64px, 7vh, 112px); /* 👈 하단 여백 (기존 값 유지) */
+    padding-left: clamp(48px, 3.4vw, 80px); /* 👈 좌측 여백 (기존 값 유지) */
+    padding-right: clamp(48px, 3.4vw, 80px); /* 👈 우측 여백 (기존 값 유지) */
     align-content: start;                                  /* 내용이 상단에 달라붙지 않게 정리 */
   }
 
