@@ -494,8 +494,8 @@ body.loading { overflow: hidden; }
     }
 
     .description-text {
-    font-size: 28px !important; /* 👈 이 값을 원하시는 크기로 조절하세요 */
-    line-height: 1.2;
+    font-size: 18px !important; /* 👈 이 값을 원하시는 크기로 조절하세요 */
+    line-height: 0.8;
     margin-top: 10px;
   }
 
@@ -748,16 +748,7 @@ body.loading { overflow: hidden; }
             </div>
         </div>
 
-        <div class="third page">
-          <div class="nav-arrow" data-href="ceramics.html">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path d="M9 18l6-6-6-6"/>
-            </svg>
-          </div>
-          <img src="img/gong/bg.png" alt="Crafts" class="full-bleed">
-        </div>
-
-        <div class="second page">
+                <div class="second page">
           <div class="nav-arrow" data-href="sumak.html">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
               <path d="M9 18l6-6-6-6"/>
@@ -770,6 +761,17 @@ body.loading { overflow: hidden; }
                 <img src="img/sumak/Group18.png" alt="이미지 4" class="stack-image">
             </div>
         </div>
+
+        <div class="third page">
+          <div class="nav-arrow" data-href="ceramics.html">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </div>
+          <img src="img/gong/bg.png" alt="Crafts" class="full-bleed">
+        </div>
+
+
         
         <div class="fourth page" id="last">
             <div class="nav-arrow" data-href="hanbok.html">
@@ -808,7 +810,7 @@ body.loading { overflow: hidden; }
   /* 랜덤 이미지 스크립트는 이제 사용하지 않습니다. */
 
 window.onload = () => {
-  function animateStackImages(pageIndex) {
+function animateStackImages(pageIndex) {
     const page = document.querySelectorAll('.page')[pageIndex];
     if (!page) return;
     const images = page.querySelectorAll('.stack-image');
@@ -817,8 +819,16 @@ window.onload = () => {
       img.classList.remove('visible');
     });
     
-    // (구) 세 번째 페이지 애니메이션이 이제 pageIndex 1에서 실행되어야 함
-    if (pageIndex === 1) { 
+    // [수정] .second.page (스택 이미지)가 pageIndex 1이 되었으므로 이 로직이 1번으로 이동
+    if (pageIndex === 1) {
+      images.forEach((img, index) => {
+        setTimeout(() => {
+          img.classList.add('visible');
+        }, index * 300);
+      });
+    } 
+    // [수정] .third.page (구 애니메이션)가 pageIndex 2가 되었으므로 이 로직이 2번으로 이동
+    else if (pageIndex === 2) { 
       const title = page.querySelector('.image5');
       const img1 = page.querySelector('.image2');
       const img2 = page.querySelector('.image3');
@@ -828,12 +838,6 @@ window.onload = () => {
       setTimeout(() => img1 && img1.classList.add('visible'), 600);
       setTimeout(() => img2 && img2.classList.add('visible'), 1200);
       setTimeout(() => img3 && img3.classList.add('visible'), 1800);
-    } else if (pageIndex !== 0) {
-      images.forEach((img, index) => {
-        setTimeout(() => {
-          img.classList.add('visible');
-        }, index * 300);
-      });
     }
   }
 
