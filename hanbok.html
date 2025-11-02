@@ -229,7 +229,7 @@ section#gallery .gallery-container{
     .sp-title-desc {
         color: #555;
         font-family: 'Suit', sans-serif;
-        font-size: 15px;
+        font-size: 18px;
         line-height: 1.6;
         margin-top: 20px;
         max-width: 35ch;
@@ -633,7 +633,7 @@ section#gallery .gallery-container{
   left: 50%;
   transform: translateX(-50%);
   bottom: 24px;
-  font-size: 14px;
+  font-size: 20px;
   letter-spacing: .12em;
   color: #111;               /* 요구 사항: 검정색 */
   white-space: nowrap;
@@ -785,13 +785,28 @@ section#gallery .gallery-container{
 
 @media (min-width: 1600px) {
   #split-portfolio .sp-thumb {
-    width: 120px;   /* 기존 80px → 120px로 확대 */
-    height: 120px;  /* 비율 유지 */
+    width: 140px;   /* 기존 80px → 120px로 확대 */
+    height: 140px;  /* 비율 유지 */
   }
 
   #split-portfolio .sp-thumbs {
-    gap: 48px;      /* 썸네일 간 간격도 약간 넓혀줌 */
+    gap: 40px;      /* 썸네일 간 간격도 약간 넓혀줌 */
   }
+
+  /* ▼▼▼ [추가] 2. 히어로 이미지 키우고 / 3. 텍스트와 간격 넓히기 ▼▼▼ */
+  .sp-layout-grid {
+    /* 이미지(1.4fr)가 텍스트(1fr)보다 더 넓은 비율을 갖도록 수정 */
+    grid-template-columns: 1.4fr 1fr;
+    /* 이미지와 텍스트 사이 간격을 72px로 넓힘 */
+    gap: 72px;
+  }
+
+  /* ▼▼▼ [추가] 4. 그 밑(secondary) 이미지 크게 하기 ▼▼▼ */
+  .sp-secondary-image {
+    /* 이미지 영역의 비중을 50% -> 55%로 늘림 */
+    flex-basis: 55%;
+  }
+  
 }
 
   </style>

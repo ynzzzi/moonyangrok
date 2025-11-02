@@ -394,28 +394,33 @@
 /* === 27인치(대형 화면)에서 간격 재조정 === */
 @media (min-width: 1600px) {
   /* 썸네일 이미지를 더 오른쪽으로 */
-  .thumbnail-container {
-    right: 5%; /* 기존 0 → 약간 오른쪽으로 이동 */
+.thumbnail-container {
+    right: 3%; /* 5% -> 3% (더 오른쪽으로) */
     top: 12%;
     gap: 32px; /* 썸네일 간격 약간 더 띄움 */
   }
 
   /* artifact-info를 좀 더 왼쪽으로 */
-  .artifact-info {
-    left: 10%; /* 기존 5% → 왼쪽으로 더 당김 */
+.artifact-info {
+    left: 8%; /* 10% -> 8% (더 왼쪽으로) */
     bottom: 12%; /* 위치 살짝 위로 */
     max-width: 420px; /* 영역 약간 넓혀줌 */
   }
 
   /* slider__btn-buy 버튼도 조금 왼쪽으로 */
-  .slider__btn-buy {
-    left: 8%; /* 기존 60px → 비율 기준으로 통일 */
+.slider__btn-buy {
+    left: 8%; /* 텍스트와 동일하게 8% */
     top: 60px;
   }
 
   /* 중앙 이미지와 시각적 균형 맞추기 */
   .main-image img.visible {
     max-width: 70%; /* 이미지가 너무 크면 65~70%로 축소 */
+  }
+
+  .buy-dropdown {
+    left: 8%; /* 버튼과 동일하게 8% */
+    top: 100px; /* 버튼(top: 60px) 기준으로 하단에 위치 */
   }
 }
 
@@ -604,7 +609,7 @@
             </div>
           </div>
           <div class="slider__index">
-            <div class="slider__index-active" style="width: 25%;"></div>
+            <div class="slider__index-active" style="width: 40%;"></div>
           </div>
         </div>
       </div>

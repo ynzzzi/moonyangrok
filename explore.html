@@ -354,10 +354,13 @@
     /* ===== explore.html — 4K Desktop Responsive Patch (붙여넣기 전용) ===== */
 @media (min-width: 1600px){
   :root{
-    /* 그리드 타일/간격/패딩을 화면 비례 값으로 상향 */
-    --cell-size: clamp(360px, 18vw, 520px);
-    --cell-gap:  clamp(120px, 6vw, 220px);
-    --cell-pad:  clamp(120px, 8vw, 320px);
+/* 그리드 타일/간격/패딩을 화면 비례 값으로 상향 */
+    --cell-size: clamp(360px, 18vw, 520px); /* 이미지 크기는 그대로 둡니다 */
+    
+    /* ▼▼▼ [수정됨] 이미지 간격을 6vw -> 8vw로 더 넓게 조정 ▼▼▼ */
+    --cell-gap:  clamp(160px, 8vw, 280px); /* 기존: clamp(120px, 6vw, 220px) */
+    
+    --cell-pad:  clamp(120px, 8vw, 320px); /* 캔버스 바깥 여백은 유지 */
   }
   
 
@@ -408,11 +411,15 @@
 
 /* 2560px+ (UHD 이상)에서 조금 더 여유롭게 */
 @media (min-width: 2560px){
-  :root{
-    --cell-size: clamp(440px, 20vw, 640px);
-    --cell-gap:  clamp(140px, 6.5vw, 260px);
-    --cell-pad:  clamp(160px, 9vw, 360px);
+:root{
+    --cell-size: clamp(440px, 20vw, 640px); /* 이미지 크기는 그대로 둡니다 */
+    
+    /* ▼▼▼ [수정됨] 이미지 간격을 6.5vw -> 8.5vw로 더 넓게 조정 ▼▼▼ */
+    --cell-gap:  clamp(180px, 8.5vw, 320px); /* 기존: clamp(140px, 6.5vw, 260px) */
+    
+    --cell-pad:  clamp(160px, 9vw, 360px); /* 캔버스 바깥 여백은 유지 */
   }
+
   .detail-panel{ width: min(40vw, 1500px); }
 }
 

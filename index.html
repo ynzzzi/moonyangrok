@@ -470,18 +470,18 @@ body.loading { overflow: hidden; }
 
 @media (min-width: 1600px) and (max-width: 1920px) {
   .description-text {
-    font-size: 16px !important; /* 👈 이 값을 원하시는 크기로 조절하세요 */
+    font-size: 24px !important; /* 👈 이 값을 원하시는 크기로 조절하세요 */
     line-height: 0.8;
     margin-top: 20px;
   }
 }
 
     .grid-text.top-left-text {
-        font-size: 70px; /* '문양록;' 텍스트 크기 증가 */
+        font-size: 100px; /* '문양록;' 텍스트 크기 증가 */
     }
 
         .grid-text.bottom-right-text {
-        font-size: 70px; /* '文樣錄' 텍스트 크기 증가 */
+        font-size: 100px; /* '文樣錄' 텍스트 크기 증가 */
     }
 /* ============================================= */
 /* ===== 4K 및 고해상도 데스크톱을 위한 미디어 쿼리 ===== */
@@ -649,22 +649,29 @@ body.loading { overflow: hidden; }
 @media (min-width: 1600px) and (min-height: 900px){
   /* 화면상 2번째 섹션: 현재 HTML 구조에선 .third.page 임 */
   .third.page .full-bleed{
-    transform: scale(1.16);     /* ← 확대 비율: 1.12~1.22 사이로 취향 조절 */
+    transform: scale(1.22);     /* ← 확대 비율: 1.12~1.22 사이로 취향 조절 */
     transform-origin: 50% 40%;  /* 위쪽을 조금 더 보여주고 싶으면 50% 30% 등으로 */
     object-position: 50% 42%;   /* 크롭 포커스(가운데-약간 위) */
     will-change: transform;
   }
 }
 
+
 /* 만약 진짜로 .second.page 안에 full-bleed를 쓸 때도 대비하려면 같이 지정 */
 @media (min-width: 1600px) and (min-height: 900px){
   .second.page .full-bleed{
-    transform: scale(1.16);
+    transform: scale(1.22);
     transform-origin: 50% 40%;
     object-position: 50% 42%;
     will-change: transform;
   }
 }
+
+@media (min-width: 1600px) {
+  .fourth.page .himage1 { width: 70vw; }
+  .fourth.page .himage2 { width: 75vw; }
+}
+
 .third.page {
   background-color: #111;  /* 🔥 배경색 검정 */
 }
