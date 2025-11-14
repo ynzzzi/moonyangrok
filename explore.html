@@ -573,6 +573,63 @@
   }
 }
 
+/* 뒤로가기 버튼 스타일 */
+.back-btn {
+  position: absolute;
+  top: 68px; /* 홈 아이콘 아래 여백 */
+  left: var(--gutter);
+  width: 60px;  /* 버튼 크기 */
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.7); /* 반투명 검정 */
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+  z-index: var(--z-header);
+}
+
+/* 화살표 아이콘 */
+.back-btn .home-svg {
+  stroke: #fff;
+  width: 26px;
+  height: 26px;
+  transition: transform 0.3s ease;
+}
+
+/* hover 시 버튼 확대 */
+.back-btn:hover {
+  transform: scale(1.05);
+}
+
+/* “돌아가기” 텍스트 + 말풍선 */
+.back-btn .back-text {
+  position: absolute;
+  left: 75px; /* 버튼 오른쪽 위치 */
+  opacity: 0;
+  color: #fff;
+  font-family: 'Suit', sans-serif;
+  font-size: 15px;
+  white-space: nowrap;
+  background: rgba(0, 0, 0, 0.75); /* 말풍선 배경 */
+  padding: 6px 12px;
+  border-radius: 16px; /* 말풍선 둥근 모서리 */
+  transform: translateX(-8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+
+
+/* hover 시 텍스트 표시 */
+.back-btn:hover .back-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+
 
 
   </style>
@@ -588,7 +645,17 @@
         <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />
       </svg>
     </a>
+
+    <!-- 뒤로가기 버튼 -->
+<button class="icon-btn back-btn" onclick="location.href='ceramics.html#overview'" aria-label="뒤로가기">
+  <svg class="home-svg" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>
+      <span class="back-text">돌아가기</span>
+</button>
+
   </div>
+  
   <div class="header-right">
     <button id="menuBtn" class="icon-btn menu-btn" type="button" aria-expanded="false" aria-controls="menuPanel" aria-label="Open menu">
       <span class="burger"><span></span><span></span><span></span></span>

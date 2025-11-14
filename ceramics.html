@@ -176,7 +176,7 @@ font-family:'BookkGothic';
   border-radius: 9999px; /* 부모와 동일한 둥근 모서리 */
   z-index: 1; /* 이미지 위, 텍스트 아래 */
   transition: opacity 0.3s ease-out;
-  opacity: 1;
+  opacity: 0;
   pointer-events: none; /* [추가] 이 필터가 마우스 클릭을 가로채지 않도록 설정 */
 }
 
@@ -193,7 +193,7 @@ font-family:'BookkGothic';
     font-weight: 300;
     z-index: 2; /* 오버레이 위 */
     transition: opacity 0.3s ease-out;
-    opacity: 1;
+    opacity: 0;
     pointer-events: none; /* 텍스트가 링크 클릭을 방해하지 않도록 함 */
     white-space: nowrap; /* 텍스트 줄바꿈 방지 */
   }
@@ -801,7 +801,14 @@ font-family:'BookkGothic';
   requestAnimationFrame(raf);
   window.__lenis = lenis;
 */
-  /* ===== Interlude text progressive reveal ===== */
+
+  /* =============================================================
+    [수정 1] Interlude text progressive reveal
+    - render 함수가 window.__OVERVIEW_ANIM_DISABLED 플래그를 확인.
+    - 플래그가 true이거나 애니메이션이 100% 완료되면,
+    - 리스너를 스스로 제거하여 더 이상 실행되지 않도록 수정.
+  =============================================================
+  */
   (function () {
     const section = document.getElementById('overview');
     const p = document.getElementById('interlude-desc');
@@ -825,7 +832,19 @@ font-family:'BookkGothic';
       if (denom <= 0) return 1; // Return 1 if section is shorter than viewport
       return Math.max(0, Math.min(1, (0 - rect.top) / denom));
     }
-    function render() {
+    
+    // 💡 1: 기존 render 함수 이름을 'overviewTextRender'로 변경합니다.
+    function overviewTextRender() {
+
+      // 💡 2: 애니메이션 비활성화 플래그를 확인하는 로직 추가
+      if (window.__OVERVIEW_ANIM_DISABLED === true) {
+        spans.forEach((el) => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
+        // 리스너를 제거하여 스크롤 시 다시 실행되지 않도록 합니다.
+        removeEventListener('scroll', overviewTextRender);
+        removeEventListener('resize', overviewTextRender);
+        return;
+      }
+
       const prog = pinProgress();
       const N = spans.length;
       for (let i = 0; i < N; i++) {
@@ -837,17 +856,22 @@ font-family:'BookkGothic';
         el.style.opacity = op.toFixed(3);
         el.style.transform = `translateY(${ty.toFixed(2)}px)`;
       }
-      // Optimization: If fully revealed, set final styles and potentially detach listener
+      
+      // 💡 3: 애니메이션이 자연적으로 완료되었을 때도 리스너를 제거합니다.
       if (prog >= 1) {
         spans.forEach((el) => { el.style.opacity = '1'; el.style.transform = 'translateY(0)'; });
-        // Consider removing scroll listener here if performance is critical
+        // 리스너 제거
+        removeEventListener('scroll', overviewTextRender);
+        removeEventListener('resize', overviewTextRender);
       }
     }
-    // Add passive:true for better scroll performance
-    addEventListener('scroll', render, { passive: true });
-    addEventListener('resize', render); // Re-render on resize
-    requestAnimationFrame(render); // Initial render
+    
+    // 💡 4: 'render' 대신 변경된 함수 이름('overviewTextRender')으로 리스너를 등록합니다.
+    addEventListener('scroll', overviewTextRender, { passive: true });
+    addEventListener('resize', overviewTextRender); // Re-render on resize
+    requestAnimationFrame(overviewTextRender); // Initial render
   })();
+
 
   /* ===== Interlude circle parallax/scale ===== */
   (function(){
@@ -1099,6 +1123,170 @@ font-family:'BookkGothic';
 })();
 
   // Back button event listener removed
+//* ===== interlude-desc 완전 노출 시 circleImg 어둡게 + 텍스트 표시 ===== */
+(function(){
+  const section = document.getElementById('overview');
+  const circleHero = document.querySelector('.circle-hero');
+  if (!section || !circleHero) return;
+
+  // 초기에는 필터와 텍스트 둘 다 숨김
+  circleHero.style.setProperty('--overlay-opacity', '0');
+  circleHero.style.setProperty('--hint-opacity', '0');
+
+  // ::before, ::after opacity를 JS에서 제어하기 위한 CSS 변수 추가
+  const style = document.createElement('style');
+  style.textContent = `
+    .circle-hero::before {
+      opacity: var(--overlay-opacity, 0);
+      transition: opacity 0.6s ease;
+    }
+    .circle-hero::after {
+      opacity: var(--hint-opacity, 0);
+      transition: opacity 0.6s ease;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // interlude-desc 스크롤 진행률 계산
+  function getProgress(){
+    const rect = section.getBoundingClientRect();
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    const denom = rect.height - vh;
+    if (denom <= 0) return 1;
+    return Math.max(0, Math.min(1, (0 - rect.top) / denom));
+  }
+
+  function onScroll(){
+    const p = getProgress();
+    // interlude-desc가 전부 다 올라왔을 때(0.9 이상) 오버레이+텍스트 표시
+    const show = p > 0.9;
+    circleHero.style.setProperty('--overlay-opacity', show ? '1' : '0');
+    circleHero.style.setProperty('--hint-opacity', show ? '1' : '0');
+  }
+
+  addEventListener('scroll', onScroll, { passive:true });
+  addEventListener('resize', onScroll);
+  requestAnimationFrame(onScroll);
+})();
+
+
+/* =============================================================
+  [수정 3] #overview로 돌아왔을 때
+  - 텍스트 애니메이션 비활성화
+  - 텍스트/오버레이 즉시 표시
+  - 부드럽게 해당 위치로 스크롤
+  - 스크롤 유도 오버레이 및 텍스트 표시 (NEW)
+=============================================================
+*/
+window.addEventListener("load", () => {
+  // URL 해시가 #overview인 경우
+  if (window.location.hash === "#overview") {
+    
+    // 1. 텍스트 애니메이션 비활성화 플래그 설정
+    window.__OVERVIEW_ANIM_DISABLED = true;
+
+    const desc = document.getElementById("interlude-desc");
+    const circleHero = document.querySelector(".circle-hero");
+
+    // 2. 텍스트 즉시 표시
+    if (desc) {
+      const spans = desc.querySelectorAll(".w");
+      if (spans.length > 0) {
+          spans.forEach((el) => {
+            el.style.opacity = "1";
+            el.style.transform = "translateY(0)";
+          });
+      }
+    }
+
+    // 3. circle 이미지 오버레이와 안내문구 표시
+    if (circleHero) {
+      circleHero.style.setProperty("--overlay-opacity", "1");
+      circleHero.style.setProperty("--hint-opacity", "1");
+    }
+
+    // 4. interlude 섹션으로 부드럽게 스크롤 (300ms 소요)
+    setTimeout(() => {
+      const target = document.querySelector("#overview");
+      if (target) target.scrollIntoView({ behavior: "smooth" });
+
+      // 5. [신규] 스크롤 이동이 끝난 후(300ms + 200ms 버퍼) 
+      //    스크롤 유도 오버레이 표시
+      setTimeout(showScrollHint, 500);
+
+    }, 300);
+
+
+    // 6. [신규] 스크롤 유도 오버레이를 표시하는 함수
+    function showScrollHint() {
+      // 6-1. 스타일 주입 (중복 방지)
+      if (!document.getElementById('scroll-hint-styles')) {
+        const style = document.createElement('style');
+        style.id = 'scroll-hint-styles';
+        style.textContent = `
+          .scroll-hint-overlay {
+            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9998; opacity: 0; transition: opacity 0.5s ease;
+            pointer-events: none;
+          }
+          .scroll-hint-text {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            color: white; font-family: 'Suit', sans-serif;
+            font-size: 22px; font-weight: 600;
+            padding: 16px 24px; background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px; z-index: 9999; opacity: 0;
+            transition: opacity 0.5s ease; pointer-events: none;
+            text-align: center; white-space: nowrap;
+          }
+          .scroll-hint-overlay.show, .scroll-hint-text.show {
+            opacity: 1; pointer-events: auto;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      // 6-2. HTML 요소 생성
+      const overlay = document.createElement('div');
+      overlay.className = 'scroll-hint-overlay';
+
+      const hintText = document.createElement('div');
+      hintText.className = 'scroll-hint-text';
+      hintText.textContent = '스크롤을 내려보세요.';
+
+      document.body.appendChild(overlay);
+      document.body.appendChild(hintText);
+
+      // 6-3. 페이드인
+      requestAnimationFrame(() => {
+        overlay.classList.add('show');
+        hintText.classList.add('show');
+      });
+
+      // 6-4. 스크롤 시 제거하는 함수
+      const removeHint = () => {
+        overlay.classList.remove('show');
+        hintText.classList.remove('show');
+        
+        // 트랜지션(0.5s) 완료 후 DOM에서 제거
+        setTimeout(() => {
+          overlay.remove();
+          hintText.remove();
+        }, 500); 
+        
+        // 리스너 제거
+        window.removeEventListener('scroll', removeHint);
+        window.removeEventListener('wheel', removeHint);
+        window.removeEventListener('touchmove', removeHint);
+      };
+
+      // 6-5. 스크롤, 휠, 터치 이벤트에 리스너 등록 (한 번만 실행)
+      window.addEventListener('scroll', removeHint, { once: true, passive: true });
+      window.addEventListener('wheel', removeHint, { once: true, passive: true });
+      window.addEventListener('touchmove', removeHint, { once: true, passive: true });
+    }
+  }
+});
 
 </script>
 
